@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Css/CategoriesDropdown.css";
 
@@ -12,10 +12,54 @@ const categories = {
   "Sports & Outdoors": ["Fitness", "Sportswear", "Camping"]
 };
 
-export default function CategoriesDropdown() {
+export default function CategoriesDropdown({ mobile = false }) {
+  const [openCategory, setOpenCategory] = useState(null);
+
+  // MOBILE MENU VERSION
+  if (mobile) {
+    return (
+      <div className="mobile-category">
+        <h5 className="fw-bold">Categories</h5>
+
+        {Object.entries(categories).map(([cat, items], index) => (
+          <div key={index} className="mobile-category-item">
+            
+            {/* Category title */}
+            <div
+              className="mobile-category-header"
+              onClick={() => setOpenCategory(openCategory === index ? null : index)}
+            >
+              <span>{cat}</span>
+              <i className={`bi bi-chevron-${openCategory === index ? "up" : "down"}`}></i>
+            </div>
+
+            {/* Items */}
+            {openCategory === index && (
+              <ul className="mobile-category-list">
+                {items.map((item, i) => (
+                  <li key={i}>
+                    <Link
+                      to={`/products/${item.toLowerCase().replace(/\s/g, "-")}`}
+                      className="mobile-category-link"
+                    >
+                      {item}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // DESKTOP VERSION (Mega Menu)
   return (
     <div className="dropdown-container">
       <div className="dropdown-toggle text-secondary">Categories</div>
+
       <div className="mega-menu">
         {Object.entries(categories).map(([category, items], index) => (
           <div key={index} className="category-column">
@@ -23,13 +67,13 @@ export default function CategoriesDropdown() {
             <ul>
               {items.map((item, i) => (
                 <li key={i}>
-  <Link
-    to={`/products/${item.toLowerCase().replace(/\s/g, '-')}`}
-    className={`dropdown-item item-${i}`}>
-    {item}
-</Link>
-</li>
-
+                  <Link
+                    to={`/products/${item.toLowerCase().replace(/\s/g, '-')}`}
+                    className="dropdown-item"
+                  >
+                    {item}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>

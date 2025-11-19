@@ -124,3 +124,38 @@
 .category-column:nth-child(7) .dropdown-item::after {
   background: linear-gradient(to right, #10b981, #047857);
 }
+/* MOBILE CATEGORY ACCORDION */
+.mobile-category {
+  width: 100%;
+}
+
+.mobile-category-item {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.mobile-category-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.mobile-category-list {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.mobile-category-link {
+  display: block;
+  padding: 5px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.mobile-category-link:hover {
+  color: #0d6efd;
+}
+
+/* Desktop CSS remains untouched */

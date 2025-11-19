@@ -32,7 +32,7 @@ export default function Navbar() {
             <ul className="navbar-nav gap-4 mx-auto d-none d-md-flex">
               <li><Link to="/" className="nav-link custom-nav">Home</Link></li>
               {/* <li><Link to="/products" className="nav-link custom-nav">Categories</Link></li> */}
-              <CategoriesDropdown /> 
+              <CategoriesDropdown/>
               <li><Link to="/offers" className="nav-link custom-nav">Offers</Link></li>
               <li><Link to="/seller" className="nav-link custom-nav">Seller</Link></li>
               <li><Link to="/help" className="nav-link custom-nav">Help</Link></li>
@@ -73,21 +73,27 @@ export default function Navbar() {
             <input className="form-control border-0" placeholder="Search..." />
           </div>
 
-          <ul className="navbar-nav gap-4 mx-auto d-none d-md-flex">
-            <li className="nav-item">
-              <Link to="/" className="nav-link custom-nav">Home</Link>
-            </li>
-            <CategoriesDropdown/>  {/* Bootstrap dropdown */}
-            <li className="nav-item">
-              <Link to="/offers" className="nav-link custom-nav">Offers</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/seller" className="nav-link custom-nav">Seller</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/help" className="nav-link custom-nav">Help</Link>
-            </li>
-        </ul>
+          <ul className="navbar-nav gap-4 mx-auto d-flex flex-column">
+  <li className="nav-item">
+    <Link to="/" className="nav-link custom-nav">Home</Link>
+  </li>
+
+  <CategoriesDropdown mobile={true} />
+
+
+  <li className="nav-item">
+    <Link to="/offers" className="nav-link custom-nav">Offers</Link>
+  </li>
+
+  <li className="nav-item">
+    <Link to="/seller" className="nav-link custom-nav">Seller</Link>
+  </li>
+
+  <li className="nav-item">
+    <Link to="/help" className="nav-link custom-nav">Help</Link>
+  </li>
+</ul>
+
 
 
 
