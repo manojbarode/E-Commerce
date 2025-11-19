@@ -104,3 +104,50 @@
   outline: none !important;
   box-shadow: none !important;
 }
+/* Base drawer link animation */
+.drawer-link {
+  position: relative;
+  color: #555;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.drawer-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 3px;
+  transition: width 0.4s;
+}
+
+.drawer-link:hover {
+  color: #2563eb;
+}
+
+.drawer-link:hover::after {
+  width: 100%;
+}
+
+/* Different gradients for each link */
+.drawer-link:nth-child(1)::after {
+  background: linear-gradient(to right, #60a5fa, #2563eb); /* Home */
+}
+
+.drawer-link:nth-child(2)::after {
+  background: linear-gradient(to right, #c084fc, #9333ea); /* Categories */
+}
+
+.drawer-link:nth-child(3)::after {
+  background: linear-gradient(to right, #f87171, #ef4444); /* Offers */
+}
+
+.drawer-link:nth-child(4)::after {
+  background: linear-gradient(to right, #34d399, #059669); /* Seller */
+}
+
+.drawer-link:nth-child(5)::after {
+  background: linear-gradient(to right, #fb7185, #ec4899); /* Help */
+}
