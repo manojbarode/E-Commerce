@@ -1,0 +1,106 @@
+/* NAVBAR HEIGHT SAME AS MUI */
+.custom-navbar {
+  height: 70px;
+}
+
+/* NAV LINKS HOVER UNDERLINE EXACT SAME */
+.custom-nav {
+  position: relative;
+  color: #555 !important;
+  font-weight: 500;
+}
+
+.custom-nav:hover {
+  color: #2563eb !important;
+}
+
+.custom-nav::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  transition: 0.4s;
+}
+
+/* Gradient system EXACT same order */
+.navbar-nav li:nth-child(1) .custom-nav::after {
+  background: linear-gradient(to right, #60a5fa, #2563eb);
+}
+
+.navbar-nav li:nth-child(2) .custom-nav::after {
+  background: linear-gradient(to right, #c084fc, #9333ea);
+}
+
+.navbar-nav li:nth-child(3) .custom-nav::after {
+  background: linear-gradient(to right, #f87171, #ef4444);
+}
+
+.navbar-nav li:nth-child(4) .custom-nav::after {
+  background: linear-gradient(to right, #34d399, #059669);
+}
+
+.navbar-nav li:nth-child(5) .custom-nav::after {
+  background: linear-gradient(to right, #fb7185, #ec4899);
+}
+
+/* Expand line on hover */
+.custom-nav:hover::after {
+  width: 100%;
+}
+
+/* SEARCH BOX EXACT SAME ROUND BORDER LOOK */
+.search-box {
+  display: flex;
+  align-items: center;
+  padding: 6px 15px;
+  border-radius: 30px;
+  border: 1px solid #ccc;
+  width: 300px;
+  transition: 0.3s;
+}
+
+.search-box:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+}
+
+/* DRAWER EXACT MUI SLIDE RIGHT */
+.custom-drawer {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 260px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+  transition: 0.35s ease-in-out;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.custom-drawer.show {
+  right: 0;
+}
+
+/* Drawer header */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Drawer links */
+.list-group-item {
+  font-size: 18px;
+  padding: 12px;
+}
+.search-box:focus-within {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
+}
+.search-box input {
+  outline: none !important;
+  box-shadow: none !important;
+}
