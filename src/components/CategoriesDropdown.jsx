@@ -25,10 +25,9 @@ export default function CategoriesDropdown() {
                 <li key={i}>
   <Link
     to={`/products/${item.toLowerCase().replace(/\s/g, '-')}`}
-    className={`dropdown-item item-${i}`}
-  >
+    className={`dropdown-item item-${i}`}>
     {item}
-  </Link>
+</Link>
 </li>
 
               ))}
