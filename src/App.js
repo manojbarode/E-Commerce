@@ -2,21 +2,13 @@
 import React from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 let App=()=>{
   return(
     <>
       <Navbar/>
+      <Footer/>
     </>
   )
-=======
-import React from "react";
-import Footer from "./components/Footer";
-function App() {
-  return (
-      <>
-    <Footer/>
-  </>  
-  );
->>>>>>> manoj
 }
 export default App
