@@ -71,14 +71,15 @@ export default function Navbar() {
             <input className="form-control border-0" placeholder="Search..." />
           </div>
 
-          {/* NAV LINKS */}
           <div className="list-group">
-            <Link className="list-group-item" to="/" onClick={() => setOpen(false)}>Home</Link>
-            <Link className="list-group-item" to="/products" onClick={() => setOpen(false)}>Categories</Link>
-            <Link className="list-group-item" to="/offers" onClick={() => setOpen(false)}>Offers</Link>
-            <Link className="list-group-item" to="/seller" onClick={() => setOpen(false)}>Seller</Link>
-            <Link className="list-group-item" to="/help" onClick={() => setOpen(false)}>Help</Link>
-          </div>
+  <Link className="list-group-item drawer-link" to="/" onClick={() => setOpen(false)}>Home</Link>
+  <Link className="list-group-item drawer-link" to="/products" onClick={() => setOpen(false)}>Categories</Link>
+  <Link className="list-group-item drawer-link" to="/offers" onClick={() => setOpen(false)}>Offers</Link>
+  <Link className="list-group-item drawer-link" to="/seller" onClick={() => setOpen(false)}>Seller</Link>
+  <Link className="list-group-item drawer-link" to="/help" onClick={() => setOpen(false)}>Help</Link>
+</div>
+
+
 
           <hr />
 
