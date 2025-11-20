@@ -17,7 +17,7 @@ export default function Home() {
             <button type="button" data-bs-target="#carouselExample" data-bs-slide-to="3"></button>
           </div>
           
-          <div className="carousel-inner" style={{height: '500px'}}>
+          <div className="carousel-inner rounded-4" style={{height: '500px'}}>
             <div className="carousel-item active h-100">
               <div className="d-flex justify-content-center align-items-center h-100 bg-dark">
                 <img
