@@ -56,8 +56,8 @@ export default function Navbar() {
                 </div>
               ) : (
                 <>
-                  <Link to="/login" className="text-primary me-2 fs-5">Login</Link>
-                  <Link to="/signup" className="text-primary fs-5">Signup</Link>
+                  <Link to="/login" className="text-primary me-2 fs-6">Login</Link>
+                  <Link to="/signup" className="text-primary fs-6">Signup</Link>
                 </>
               )}
             </div>
