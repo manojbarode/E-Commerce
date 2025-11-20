@@ -6,7 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import './Css/Navbar.css'
 import CategoriesDropdown from "./CategoriesDropdown";
 import { useContext } from "react";
-import {AuthContext, AuthProvider} from "../context/AuthContext";
+import {AuthContext} from "../context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -56,8 +56,8 @@ export default function Navbar() {
               <Link to="/wishlist" className="text-primary"><i className="bi bi-heart-fill"></i></Link>
               <Link to="/cart" className="text-primary"><i className="bi bi-cart-fill"></i></Link>
               {login ? (
-                <button onClick={logoutUser} className="btn btn-outline-primary fs-5">Logout</button>,
-                <Link to="/profile" className="text-primary"><i className="bi bi-person-circle"></i></Link>
+                <button onClick={logoutUser} className="btn btn-outline-primary fs-5">Logout</button>
+                // <Link to="/profile" className="text-primary"><i className="bi bi-person-circle"></i></Link>
               ) : (
                 <>
                   <Link to="/login" className="text-primary me-2 fs-5">Login</Link>
