@@ -9,7 +9,6 @@ let App=()=>{
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/Login" element={<Login />} />
       </Route>
     </Routes>
   )

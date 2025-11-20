@@ -5,6 +5,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import './Css/Navbar.css'
 import CategoriesDropdown from "./CategoriesDropdown";
+import Login from "../pages/Login";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -52,7 +53,7 @@ export default function Navbar() {
             <div className="d-none d-md-flex gap-3 fs-4 ms-4">
               <Link to="/wishlist" className="text-primary"><i className="bi bi-heart-fill"></i></Link>
               <Link to="/cart" className="text-primary"><i className="bi bi-cart-fill"></i></Link>
-              <Link to="/profile" className="text-primary"><i className="bi bi-person-circle"></i></Link>
+              <Link to="/profile" className="text-primary"><i className="bi bi-person-circle"><Login/></i></Link>
             </div>
           </div>
         </div>
