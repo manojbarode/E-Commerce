@@ -11,7 +11,7 @@ export default function Layout() {
 
       {/* Main content */}
       <main className="flex-1 p-6">
-        <Outlet /> {/* This renders the page component (like Test) */}
+        <Outlet />
       </main>
 
       <Footer/>
