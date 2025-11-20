@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import './Css/Navbar.css'
+import CategoriesDropdown from "./CategoriesDropdown";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -11,11 +12,11 @@ export default function Navbar() {
   return (
     <>
       {/* TOP NAVBAR */}
-      <nav className="navbar navbar-expand-md bg-white shadow custom-navbar px-3 py-2">
+      <nav className="navbar navbar-expand-md bg-white shadow custom-navbar px-3 py-2 rounded-bottom-4">
         <div className="container-fluid">
 
           {/* LOGO */}
-          <span className="navbar-brand fs-2 fw-bold text-primary">YourShop</span>
+          <span className="navbar-brand fs-2 fw-bold text-primary">eShop</span>
 
           {/* RIGHT ICONS (MOBILE) */}
           <div className="d-flex d-md-none gap-3 fs-4">
@@ -30,7 +31,8 @@ export default function Navbar() {
             {/* NAV ITEMS */}
             <ul className="navbar-nav gap-4 mx-auto d-none d-md-flex">
               <li><Link to="/" className="nav-link custom-nav">Home</Link></li>
-              <li><Link to="/products" className="nav-link custom-nav">Categories</Link></li>
+              {/* <li><Link to="/products" className="nav-link custom-nav">Categories</Link></li> */}
+              <CategoriesDropdown/>
               <li><Link to="/offers" className="nav-link custom-nav">Offers</Link></li>
               <li><Link to="/seller" className="nav-link custom-nav">Seller</Link></li>
               <li><Link to="/help" className="nav-link custom-nav">Help</Link></li>
@@ -71,13 +73,28 @@ export default function Navbar() {
             <input className="form-control border-0" placeholder="Search..." />
           </div>
 
-          <div className="list-group">
-  <Link className="list-group-item drawer-link" to="/" onClick={() => setOpen(false)}>Home</Link>
-  <Link className="list-group-item drawer-link" to="/products" onClick={() => setOpen(false)}>Categories</Link>
-  <Link className="list-group-item drawer-link" to="/offers" onClick={() => setOpen(false)}>Offers</Link>
-  <Link className="list-group-item drawer-link" to="/seller" onClick={() => setOpen(false)}>Seller</Link>
-  <Link className="list-group-item drawer-link" to="/help" onClick={() => setOpen(false)}>Help</Link>
-</div>
+          <ul className="navbar-nav gap-4 mx-auto d-flex flex-column">
+  <li className="nav-item">
+    <Link to="/" className="nav-link custom-nav">Home</Link>
+  </li>
+
+  <CategoriesDropdown mobile={true} />
+
+
+  <li className="nav-item">
+    <Link to="/offers" className="nav-link custom-nav">Offers</Link>
+  </li>
+
+  <li className="nav-item">
+    <Link to="/seller" className="nav-link custom-nav">Seller</Link>
+  </li>
+
+  <li className="nav-item">
+    <Link to="/help" className="nav-link custom-nav">Help</Link>
+  </li>
+</ul>
+
+
 
 
 

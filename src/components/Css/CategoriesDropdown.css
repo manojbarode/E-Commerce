@@ -1,0 +1,171 @@
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+  font-family: Arial, sans-serif;
+}
+
+.dropdown-toggle {
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  user-select: none;
+}
+
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: -200px;
+  width: 1000px;
+  background-color: #f9f9f9;
+  display: flex;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  border-radius: 5px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.dropdown-container:hover .mega-menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+.category-column {
+  flex: 1;
+  margin-right: 30px;
+}
+
+.category-column h6 {
+  font-weight: bold;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.category-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-column ul li {
+  margin-bottom: 8px;
+}
+
+/* Base dropdown item */
+.dropdown-item {
+  position: relative;
+  /* deep blue */
+  text-decoration: none !important; /* remove underline */
+  font-weight: 500;
+  transition: color 0.3s;
+  padding-bottom: 3px; /* space for underline */
+}
+
+/* Hover text color */
+.dropdown-item:hover {
+  color: #0056b3 !important; /* slightly brighter deep blue */
+  text-decoration: none !important; /* ensure no underline appears */
+}
+
+/* Animated underline */
+.dropdown-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0%;
+  transition: width 0.4s;
+}
+
+/* Animate underline on hover */
+.dropdown-item:hover::after {
+  width: 100%;
+}
+
+
+/* Multi-color gradient for each category-column items */
+/* Clothes */
+.category-column:nth-child(1) .dropdown-item::after {
+  background: linear-gradient(to right, #60a5fa, #2563eb);
+  color: #007bff;
+}
+
+/* Shoes */
+.category-column:nth-child(2) .dropdown-item::after {
+  background: linear-gradient(to right, #c084fc, #9333ea);
+  color:#9333ea;
+}
+
+/* Electronics */
+.category-column:nth-child(3) .dropdown-item::after {
+  background: linear-gradient(to right, #f87171, #ef4444);
+}
+
+/* Home & Kitchen */
+.category-column:nth-child(4) .dropdown-item::after {
+  background: linear-gradient(to right, #34d399, #059669);
+}
+
+/* Books & Stationery */
+.category-column:nth-child(5) .dropdown-item::after {
+  background: linear-gradient(to right, #fb7185, #ec4899);
+}
+
+/* Beauty & Personal Care */
+.category-column:nth-child(6) .dropdown-item::after {
+  background: linear-gradient(to right, #fbbf24, #f59e0b);
+}
+
+/* Sports & Outdoors */
+.category-column:nth-child(7) .dropdown-item::after {
+  background: linear-gradient(to right, #10b981, #047857);
+}
+/* MOBILE CATEGORY ACCORDION */
+.mobile-category {
+  width: 100%;
+}
+
+.mobile-category-item {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.mobile-category-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.mobile-category-list {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.mobile-category-link {
+  display: block;
+  padding: 5px 0;
+  color: #333;
+  text-decoration: none;
+}
+
+.mobile-category-link:hover {
+  color: #0d6efd;
+}
+
+/* Desktop CSS remains untouched */
+.custom-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 80%;
+  height: 100vh;
+  background: white;
+  transition: 0.3s;
+  overflow-y: auto;  /* ✅ SCROLL ENABLE */
+}
