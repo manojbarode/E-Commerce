@@ -1,28 +1,28 @@
-
 import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Login() {
   const { loginUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  function handleLogin(e) {
+  const handleLogin = (e) => {
     e.preventDefault();
-
-    loginUser(); // login status update
-    navigate("/"); // redirect to home
-  }
+    loginUser();
+    navigate("/");
+  };
 
   return (
     <div className="container mt-5">
       <h2>Login</h2>
-
       <form onSubmit={handleLogin}>
-        <input type="text" className="form-control mb-2" placeholder="Email" />
-        <input type="password" className="form-control mb-2" placeholder="Password" />
-        
-        <button type="submit" className="btn btn-primary w-100">Login</button>
+        <div className="mb-3">
+          <input type="email" placeholder="Email" className="form-control" required />
+        </div>
+        <div className="mb-3">
+          <input type="password" placeholder="Password" className="form-control" required />
+        </div>
+        <button type="submit" className="btn btn-primary">Login</button>
       </form>
     </div>
   );

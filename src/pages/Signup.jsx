@@ -1,76 +1,31 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Signup() {
   const { loginUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
-  // input change handle
-  function handleChange(e) {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  }
-
-  // Signup button click
-  function handleSignup(e) {
+  const handleSignup = (e) => {
     e.preventDefault();
-
-    // TODO: API request (optional)
-    // const res = await axios.post("/api/signup", formData);
-
-    // अभी के लिए सीधे loginUser call करेंगे
-    loginUser(); // login state true (localStorage + context)
-
-    navigate("/"); // home redirect
-  }
+    loginUser(); // signup ke baad login
+    navigate("/");
+  };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: "400px" }}>
-      <h2 className="mb-4">Signup</h2>
-
+    <div className="container mt-5">
+      <h2>Signup</h2>
       <form onSubmit={handleSignup}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          className="form-control mb-3"
-          onChange={handleChange}
-          value={formData.name}
-          required
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="form-control mb-3"
-          onChange={handleChange}
-          value={formData.email}
-          required
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="form-control mb-4"
-          onChange={handleChange}
-          value={formData.password}
-          required
-        />
-
-        <button className="btn btn-primary w-100" type="submit">
-          Create Account
-        </button>
+        <div className="mb-3">
+          <input type="text" placeholder="Name" className="form-control" required />
+        </div>
+        <div className="mb-3">
+          <input type="email" placeholder="Email" className="form-control" required />
+        </div>
+        <div className="mb-3">
+          <input type="password" placeholder="Password" className="form-control" required />
+        </div>
+        <button type="submit" className="btn btn-success">Signup</button>
       </form>
     </div>
   );
