@@ -12,9 +12,9 @@ const Profile = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}`);
+  const handleSubmit = () => {
+    console.log("Profile saved:", { name, email, phone, image });
+    alert("Profile saved successfully!");
   };
 
   return (
@@ -28,7 +28,9 @@ const Profile = () => {
             {image ? (
               <img src={image} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-gray-500">Upload</span>
+              <span className="text-gray-500 text-sm">
+                Upload
+              </span>
             )}
           </div>
           <input
@@ -40,7 +42,7 @@ const Profile = () => {
         </label>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
         <input
           type="text"
           placeholder="Enter your name"
@@ -66,12 +68,12 @@ const Profile = () => {
         />
 
         <button
-          type="submit"
+          onClick={handleSubmit}
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
         >
           Save Profile
         </button>
-      </form>
+      </div>
     </div>
   );
 };
