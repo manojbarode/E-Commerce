@@ -1,4 +1,3 @@
-
 import Footer from "./Footer";
 import Navbar from "./Navbar";
 import { Outlet } from "react-router-dom";
@@ -12,7 +11,7 @@ export default function Layout() {
 
       {/* Main content */}
       <main className="flex-1 p-6">
-        <Outlet /> {/* This renders the page component (like Test) */}
+        <Outlet />
       </main>
 
       <Footer/>
