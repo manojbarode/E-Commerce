@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -26,3 +27,17 @@ export default function Login() {
     </div>
   );
 }
+=======
+import React from 'react';
+
+const Login = () => {
+  return (
+    <>
+      <h2>Login Page</h2>
+      <img src="firstimg.jpg" alt="hii" />
+    </>
+  );
+}
+
+export default Login;
+>>>>>>> origin/main

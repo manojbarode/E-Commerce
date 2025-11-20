@@ -15,7 +15,7 @@ export default function Navbar() {
   return (
     <>
       {/* TOP NAVBAR */}
-      <nav className="navbar navbar-expand-md bg-white shadow custom-navbar px-3 py-2">
+      <nav className="navbar navbar-expand-md bg-white shadow custom-navbar px-3 py-2 rounded-bottom-4">
         <div className="container-fluid">
 
           {/* LOGO */}
