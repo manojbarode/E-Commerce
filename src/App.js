@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
 import Login from './pages/Login.jsx';
+import Home from './pages/Home.jsx';
 let App=()=>{
   return(
     <Routes>
