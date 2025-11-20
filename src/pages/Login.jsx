@@ -1,8 +1,12 @@
-import React from "react";
+import React from 'react';
 
-const Login=()=>{
+const Login = () => {
+  return (
     <>
-    <img src="firstimg.jpg" alt="hii"/>
+      <h2>Login Page</h2>
+      <img src="firstimg.jpg" alt="hii" />
     </>
+  );
 }
+
 export default Login;
