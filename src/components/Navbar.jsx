@@ -5,9 +5,12 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import './Css/Navbar.css'
 import CategoriesDropdown from "./CategoriesDropdown";
+import { useContext } from "react";
+import {AuthContext, AuthProvider} from "../context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { login, logoutUser } = useContext(AuthContext);
 
   return (
     <>
@@ -52,7 +55,16 @@ export default function Navbar() {
             <div className="d-none d-md-flex gap-3 fs-4 ms-4">
               <Link to="/wishlist" className="text-primary"><i className="bi bi-heart-fill"></i></Link>
               <Link to="/cart" className="text-primary"><i className="bi bi-cart-fill"></i></Link>
-              <Link to="/profile" className="text-primary"><i className="bi bi-person-circle"></i></Link>
+              {login ? (
+                <button onClick={logoutUser} className="btn btn-outline-primary fs-5">Logout</button>,
+                <Link to="/profile" className="text-primary"><i className="bi bi-person-circle"></i></Link>
+              ) : (
+                <>
+                  <Link to="/login" className="text-primary me-2 fs-5">Login</Link>
+                  <Link to="/signup" className="text-primary fs-5">Signup</Link>
+                </>
+              )}
+
             </div>
           </div>
         </div>
