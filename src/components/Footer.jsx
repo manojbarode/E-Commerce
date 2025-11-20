@@ -7,11 +7,11 @@ export default function Footer() {
       />
       
       <footer className="bg-dark text-white py-5">
-        <div className="container">
-          <div className="row g-4">
+        <div className="container ">
+          <div className="row g-4 ">
             
             {/* Logo & About */}
-            <div className="col-12 col-sm-6 col-md-3">
+            <div className="col-12 col-sm-6 col-md-3 rounded-top-4">
               <h2 className="h4 fw-bold mb-3">E-Shop</h2>
               <p className="text-white-50">
                 Best online shopping platform for all your needs.
