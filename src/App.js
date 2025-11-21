@@ -4,12 +4,12 @@ import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Login from "./pages/Login"; 
-import Signup from "./pages/Signup"; 
-
-// AuthContext import
-import AuthProvider from "./context/AuthContext";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+import AuthProvider from "./context/AuthContext";
 
 const App = () => {
   return (
@@ -19,7 +19,16 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/profile" element={<Profile/>}/>
+
+          {/* Protected profile route */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Routes>
     </AuthProvider>

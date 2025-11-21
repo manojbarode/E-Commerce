@@ -5,18 +5,21 @@ export const AuthContext = createContext();
 export default function AuthProvider({ children }) {
   const [login, setLogin] = useState(false);
 
+  // When app loads → check if user is logged in (from sessionStorage)
   useEffect(() => {
-    const savedLogin = localStorage.getItem("isLoggedIn") === "true";
+    const savedLogin = sessionStorage.getItem("isLoggedIn") === "true";
     setLogin(savedLogin);
   }, []);
 
+  // Login function
   const loginUser = () => {
-    localStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("isLoggedIn", "true"); // store in sessionStorage
     setLogin(true);
   };
 
+  // Logout function
   const logoutUser = () => {
-    localStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("isLoggedIn");
     setLogin(false);
   };
 

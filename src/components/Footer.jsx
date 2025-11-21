@@ -6,7 +6,7 @@ export default function Footer() {
         rel="stylesheet" 
       />
       
-      <footer className="bg-dark text-white py-5 rounded-top-4">
+      <footer className="bg-dark text-white py-5 rounded-top-4 position-fixed-bottom">
         <div className="container ">
           <div className="row g-4 ">
             
