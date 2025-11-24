@@ -12,15 +12,14 @@ const categories = {
   "Sports & Outdoors": ["Fitness", "Sportswear", "Camping"]
 };
 
-export default function CategoriesDropdown({ mobile = false }) {
+// closeDrawer प्रॉप जोड़ा गया
+export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
   const [openCategory, setOpenCategory] = useState(null);
 
-  // MOBILE MENU VERSION
+  // MOBILE MENU VERSION (Accordion)
   if (mobile) {
     return (
       <div className="mobile-category">
-        <h5 className="fw-bold">Categories</h5>
-
         {Object.entries(categories).map(([cat, items], index) => (
           <div key={index} className="mobile-category-item">
             
@@ -33,7 +32,7 @@ export default function CategoriesDropdown({ mobile = false }) {
               <i className={`bi bi-chevron-${openCategory === index ? "up" : "down"}`}></i>
             </div>
 
-            {/* Items */}
+            {/* Sub-Category Links */}
             {openCategory === index && (
               <ul className="mobile-category-list">
                 {items.map((item, i) => (
@@ -41,6 +40,7 @@ export default function CategoriesDropdown({ mobile = false }) {
                     <Link
                       to={`/products/${item.toLowerCase().replace(/\s/g, "-")}`}
                       className="mobile-category-link"
+                      onClick={closeDrawer} // 👈 क्लिक पर ड्रावर बंद करें
                     >
                       {item}
                     </Link>

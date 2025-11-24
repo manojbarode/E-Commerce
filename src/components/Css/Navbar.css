@@ -3,11 +3,29 @@
   height: 70px;
 }
 
-/* NAV LINKS HOVER UNDERLINE EXACT SAME */
+/* ⚡ 1. LOGO SHIFT FIX AND PREMIUM LOOK ⚡ */
+.navbar-brand {
+  padding-left: 20px; /* EShop लोगो को 20px दाईं ओर शिफ्ट करें */
+  transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+}
+
+/* ⚡ 2. PREMIUM SPACING FIX (Tighter links) ⚡ */
+.navbar-nav .nav-item {
+    padding-left: 10px;  /* Nav items के बीच स्पेस कम करें */
+    padding-right: 10px;
+}
+
 .custom-nav {
   position: relative;
   color: #555 !important;
   font-weight: 500;
+  /* लिंक टेक्स्ट के अंदर की पैडिंग कम करें */
+  padding-left: 5px !important; 
+  padding-right: 5px !important;
 }
 
 .custom-nav:hover {
@@ -24,53 +42,72 @@
   transition: 0.4s;
 }
 
-/* Gradient system EXACT same order */
+/* Gradient system (Unchanged) */
 .navbar-nav li:nth-child(1) .custom-nav::after {
   background: linear-gradient(to right, #60a5fa, #2563eb);
 }
-
 .navbar-nav li:nth-child(2) .custom-nav::after {
   background: linear-gradient(to right, #c084fc, #9333ea);
 }
-
 .navbar-nav li:nth-child(3) .custom-nav::after {
   background: linear-gradient(to right, #f87171, #ef4444);
 }
-
 .navbar-nav li:nth-child(4) .custom-nav::after {
   background: linear-gradient(to right, #34d399, #059669);
 }
-
 .navbar-nav li:nth-child(5) .custom-nav::after {
   background: linear-gradient(to right, #fb7185, #ec4899);
 }
 
-/* Expand line on hover */
 .custom-nav:hover::after {
   width: 100%;
 }
 
-/* SEARCH BOX EXACT SAME ROUND BORDER LOOK */
+/* SEARCH BOX */
 .search-box {
   display: flex;
   align-items: center;
-  padding: 6px 15px;
+  /* ⚡ PREMIUM SPACING FIX (Reduced width and padding) ⚡ */
+  width: 250px; 
+  padding: 5px 12px;
+  
   border-radius: 30px;
   border: 1px solid #ccc;
-  width: 300px;
   transition: 0.3s;
 }
 
 .search-box:focus-within {
-  border-color: #2563eb;
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+  border-color: #2563eb !important;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
 }
 
-/* DRAWER EXACT MUI SLIDE RIGHT */
+.search-box input {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 🟢 ICON ALIGNMENT FIX (Upper-Niche Problem) 🟢 */
+.desktop-icons .icon-link, 
+.desktop-icons i {
+  vertical-align: middle; 
+  line-height: 1; 
+}
+
+/* Icon Animation */
+.icon-link {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.icon-link:hover {
+  transform: scale(1.15);
+  color: #0a58ca !important;
+}
+
+/* --- MOBILE DRAWER (Unchanged) --- */
 .custom-drawer {
   position: fixed;
   top: 0;
-  right: -300px;
+  right: -260px;
   width: 260px;
   height: 100vh;
   background: #fff;
@@ -78,6 +115,7 @@
   transition: 0.35s ease-in-out;
   padding: 20px;
   z-index: 9999;
+  overflow-y: auto; 
 }
 
 .custom-drawer.show {
@@ -96,21 +134,14 @@
   font-size: 18px;
   padding: 12px;
 }
-.search-box:focus-within {
-  border-color: #2563eb !important;
-  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5) !important;
-}
-.search-box input {
-  outline: none !important;
-  box-shadow: none !important;
-}
-/* Base drawer link animation */
+
 .drawer-link {
   position: relative;
   color: #555;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.3s;
+  border: none !important;
 }
 
 .drawer-link::after {
@@ -131,23 +162,27 @@
   width: 100%;
 }
 
-/* Different gradients for each link */
-.drawer-link:nth-child(1)::after {
-  background: linear-gradient(to right, #60a5fa, #2563eb); /* Home */
+/* Different gradients for each link in drawer */
+.list-group-flush .drawer-link:nth-child(1)::after {
+  background: linear-gradient(to right, #60a5fa, #2563eb);
+}
+.list-group-flush .drawer-link:nth-child(3)::after {
+  background: linear-gradient(to right, #f87171, #ef4444);
+}
+.list-group-flush .drawer-link:nth-child(4)::after {
+  background: linear-gradient(to right, #34d399, #059669);
+}
+.list-group-flush .drawer-link:nth-child(5)::after {
+  background: linear-gradient(to right, #fb7185, #ec4899);
 }
 
-.drawer-link:nth-child(2)::after {
-  background: linear-gradient(to right, #c084fc, #9333ea); /* Categories */
-}
-
-.drawer-link:nth-child(3)::after {
-  background: linear-gradient(to right, #f87171, #ef4444); /* Offers */
-}
-
-.drawer-link:nth-child(4)::after {
-  background: linear-gradient(to right, #34d399, #059669); /* Seller */
-}
-
-.drawer-link:nth-child(5)::after {
-  background: linear-gradient(to right, #fb7185, #ec4899); /* Help */
+/* Backdrop styling */
+.drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
 }

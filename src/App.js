@@ -4,27 +4,24 @@ import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import AuthProvider from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import AddSeller from "./pages/Admin/Addseller";
+import Login from "./pages/Login";
 
 const App = () => {
   return (
-    <AuthProvider>
+    
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />}/>
           <Route path="/signup" element={<Signup />} />
           <Route path="/seller" element={<AddSeller />} />
-
-          {/* Protected profile route */}
-          <Route path="/profile"
-            element={
+          <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
@@ -32,7 +29,6 @@ const App = () => {
           />
         </Route>
       </Routes>
-    </AuthProvider>
   );
 };
 

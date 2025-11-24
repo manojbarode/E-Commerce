@@ -1,113 +1,173 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import './Css/Navbar.css';
-import CategoriesDropdown from "./CategoriesDropdown";
 import { AuthContext } from "../context/AuthContext";
+import CategoriesDropdown from "./CategoriesDropdown";
+import "./Css/Navbar.css";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
   const { login, logoutUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleProfileClick = () => {
+    if (login) navigate("/profile");
+    else navigate("/signup");
+  };
 
   const handleLogout = () => {
     logoutUser();
-    navigate("/");
+    navigate("/"); // redirect to home after logout
   };
+
+  const closeDrawer = () => setDrawerOpen(false);
 
   return (
     <>
-      <nav className="navbar navbar-expand-md bg-white shadow custom-navbar px-3 py-2 rounded-bottom-4">
-        <div className="container-fluid">
-          <span className="navbar-brand fs-2 fw-bold text-primary">eShop</span>
+      {/* Desktop Navbar */}
+      <nav className="navbar navbar-expand-lg bg-white shadow-lg sticky-top custom-navbar">
+        <div className="container-fluid custom-container">
+          <span
+            className="navbar-brand fs-3 fw-bold text-primary"
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
+            eShop
+          </span>
 
-          {/* MOBILE ICONS */}
-          <div className="d-flex d-md-none gap-3 fs-4">
-            <i className="bi bi-search"></i>
-            <Link to="/cart" className="text-dark"><i className="bi bi-cart"></i></Link>
-            <i className="bi bi-list fs-1" onClick={() => setOpen(true)}></i>
-          </div>
+          <button
+            className="navbar-toggler"
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
-          <div className="collapse navbar-collapse">
-            <ul className="navbar-nav gap-4 mx-auto d-none d-md-flex">
-              <li><Link to="/" className="nav-link custom-nav">Home</Link></li>
-              <CategoriesDropdown/>
-              <li><Link to="/offers" className="nav-link custom-nav">Offers</Link></li>
-              <li><Link to="/Addseller" className="nav-link custom-nav">Seller</Link></li>
-              <li><Link to="/help" className="nav-link custom-nav">Help</Link></li>
+          <div className="collapse navbar-collapse" id="mainNavbar">
+            <ul className="navbar-nav mx-auto mb-2 mb-lg-0 custom-nav-list">
+              <li className="nav-item"><Link className="nav-link custom-nav" to="/">Home</Link></li>
+              <li className="nav-item"><div className="custom-nav" style={{ cursor: "pointer" }}><CategoriesDropdown /></div></li>
+              <li className="nav-item"><Link className="nav-link custom-nav" to="/offers">Offers</Link></li>
+              <li className="nav-item"><Link className="nav-link custom-nav" to="/Addseller">Seller</Link></li>
+              <li className="nav-item"><Link className="nav-link custom-nav" to="/help">Help</Link></li>
             </ul>
+            <div className="search-box me-3 d-none d-lg-flex">
+  <i className="bi bi-search me-2"></i>
+  <input
+    type="search"
+    placeholder="Search products..."
+    className="border-0 bg-transparent"
+    style={{ outline: "none", width: "100%" }}
+  />
+</div>
 
-            <div className="search-box d-none d-md-flex ms-auto">
-              <i className="bi bi-search me-2"></i>
-              <input type="text" className="form-control border-0" placeholder="Search for products, brands..." />
-            </div>
-
-            {/* DESKTOP ICONS */}
-            <div className="d-none d-md-flex gap-3 fs-4 ms-4 align-items-center">
-              <Link to="/wishlist" className="text-primary"><i className="bi bi-heart-fill"></i></Link>
-              <Link to="/cart" className="text-primary"><i className="bi bi-cart-fill"></i></Link>
+            <div className="d-flex align-items-center gap-2 desktop-icons">
+              <Link to="/wishlist" className="text-primary fs-4 text-decoration-none icon-link"><i className="bi bi-heart-fill"></i></Link>
+              <Link to="/cart" className="text-primary fs-4 text-decoration-none icon-link"><i className="bi bi-cart-fill"></i></Link>
 
               {login ? (
-                <div className="d-flex align-items-center gap-3 fs-5">
-                  <Link to="/profile" className="text-primary "><i className="bi bi-person-circle"></i></Link>
-                  <button onClick={handleLogout} className="btn btn-outline-danger btn-sm">Logout</button>
-                </div>
-              ) : (
-                <>
-                  <Link to="/login" className="text-primary me-2 fs-6">Login</Link>
-                  <Link to="/signup" className="text-primary fs-6">Signup</Link>
-                </>
-              )}
+  <>
+    <i
+      className="bi bi-person-circle text-primary fs-3 icon-link"
+      style={{ cursor: "pointer" }}
+      onClick={handleProfileClick}
+    ></i>
+    <button className="btn btn-outline-danger btn-sm fw-bold" onClick={handleLogout}>
+      Logout
+    </button>
+  </>
+) : (
+  <button
+    className="btn btn-outline-primary btn-sm fw-bold"
+    onClick={() => navigate("/signup")}
+  >
+    Sign Up
+  </button>
+)}
+
             </div>
           </div>
         </div>
       </nav>
 
-      {/* MOBILE DRAWER */}
-      <div className={`custom-drawer ${open ? "show" : ""}`}>
-        <div className="drawer-header">
-          <span className="fw-bold fs-4">Menu</span>
-          <i className="bi bi-x-lg fs-3" onClick={() => setOpen(false)}></i>
+      {/* Mobile Drawer */}
+      <div className={`custom-drawer ${drawerOpen ? 'show' : ''}`}>
+        <div className="drawer-header mb-4">
+          <h4 className="text-primary fw-bold">eShop</h4>
+          <button className="btn-close" onClick={closeDrawer}></button>
         </div>
 
-        <div className="drawer-body">
-          <div className="search-box w-100 mb-3">
-            <i className="bi bi-search me-2"></i>
-            <input className="form-control border-0" placeholder="Search..." />
+        <div className="search-box mb-3 w-100">
+          <i className="bi bi-search me-2"></i>
+          <input
+            type="search"
+            placeholder="Search..."
+            className="border-0 bg-transparent w-100"
+            style={{ outline: "none" }}
+          />
+        </div>
+
+        <div className="list-group list-group-flush">
+          <Link to="/" className="list-group-item list-group-item-action drawer-link" onClick={closeDrawer}>Home</Link>
+          <div className="list-group-item list-group-item-action drawer-link p-0 border-0">
+            <CategoriesDropdown mobile={true} closeDrawer={closeDrawer} />
           </div>
+          <Link to="/offers" className="list-group-item list-group-item-action drawer-link" onClick={closeDrawer}>Offers</Link>
+          <Link to="/Addseller" className="list-group-item list-group-item-action drawer-link" onClick={closeDrawer}>Seller</Link>
+          <Link to="/help" className="list-group-item list-group-item-action drawer-link" onClick={closeDrawer}>Help</Link>
+        </div>
+<div className="search-box mb-3 w-100">
+  <i className="bi bi-search me-2"></i>
+  <input
+    type="search"
+    placeholder="Search..."
+    className="border-0 bg-transparent w-100"
+    style={{ outline: "none" }}
+  />
+</div>
 
-          <ul className="navbar-nav gap-3 mx-auto d-flex flex-column">
-            <li><Link to="/" className="nav-link custom-nav">Home</Link></li>
-            <CategoriesDropdown mobile={true}/>
-            <li><Link to="/offers" className="nav-link custom-nav">Offers</Link></li>
-            <li><Link to="/seller" className="nav-link custom-nav">Seller</Link></li>
-            <li><Link to="/help" className="nav-link custom-nav">Help</Link></li>
+        <div className="mt-4 d-flex gap-3 justify-content-center">
+          <Link to="/wishlist" onClick={closeDrawer}><i className="bi bi-heart-fill text-primary fs-4"></i></Link>
+          <Link to="/cart" onClick={closeDrawer}><i className="bi bi-cart-fill text-primary fs-4"></i></Link>
 
-            <li className="nav-item mt-3">
-              {login ? (
-                <div className="d-flex flex-column gap-2">
-                  <Link to="/profile" className="text-primary">Profile</Link>
-                  <button onClick={handleLogout} className="btn btn-outline-danger btn-sm">Logout</button>
-                </div>
-              ) : (
-                <div className="d-flex flex-column gap-2">
-                  <Link to="/login" className="text-primary">Login</Link>
-                  <Link to="/signup" className="text-primary">Signup</Link>
-                </div>
-              )}
-            </li>
-          </ul>
-
-          <hr />
-          <div className="d-flex justify-content-around fs-1 mt-3">
-            <Link to="/wishlist"><i className="bi bi-heart-fill"></i></Link>
-            <Link to="/cart"><i className="bi bi-cart-fill"></i></Link>
-            <Link to={login ? "/profile" : "/login"}><i className="bi bi-person-circle"></i></Link>
-          </div>
+          {login ? (
+            <>
+              <i
+                className="bi bi-person-circle text-primary fs-4"
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  closeDrawer();
+                  handleProfileClick();
+                }}
+              ></i>
+              <button
+                className="btn btn-outline-danger btn-sm fw-bold"
+                onClick={() => {
+                  closeDrawer();
+                  handleLogout();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              className="btn btn-outline-primary btn-sm fw-bold"
+              onClick={() => {
+                closeDrawer();
+                navigate("/signup");
+              }}
+            >
+              Sign Up
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Backdrop */}
+      {drawerOpen && <div className="drawer-backdrop" onClick={closeDrawer}></div>}
     </>
   );
 }
