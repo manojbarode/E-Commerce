@@ -2,27 +2,30 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
-export default function Login() {
+export default function Signup() {
   const { loginUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSignup = (e) => {
     e.preventDefault();
-    loginUser();
+    loginUser(); // signup ke baad login
     navigate("/");
   };
 
   return (
     <div className="container mt-5">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <h2>Signup</h2>
+      <form onSubmit={handleSignup}>
+        <div className="mb-3">
+          <input type="text" placeholder="Name" className="form-control" required />
+        </div>
         <div className="mb-3">
           <input type="email" placeholder="Email" className="form-control" required />
         </div>
         <div className="mb-3">
           <input type="password" placeholder="Password" className="form-control" required />
         </div>
-        <button type="submit" className="btn btn-primary">Login</button>
+        <button type="submit" className="btn btn-success">Signup</button>
       </form>
     </div>
   );
