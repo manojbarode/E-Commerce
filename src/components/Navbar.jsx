@@ -35,7 +35,7 @@ export default function Navbar() {
               <li><Link to="/" className="nav-link custom-nav">Home</Link></li>
               <CategoriesDropdown/>
               <li><Link to="/offers" className="nav-link custom-nav">Offers</Link></li>
-              <li><Link to="/seller" className="nav-link custom-nav">Seller</Link></li>
+              <li><Link to="/Addseller" className="nav-link custom-nav">Seller</Link></li>
               <li><Link to="/help" className="nav-link custom-nav">Help</Link></li>
             </ul>
 
