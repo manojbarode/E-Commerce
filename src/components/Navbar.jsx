@@ -35,7 +35,7 @@ export default function Navbar() {
               <li><Link to="/" className="nav-link custom-nav">Home</Link></li>
               <CategoriesDropdown/>
               <li><Link to="/offers" className="nav-link custom-nav">Offers</Link></li>
-              <li><Link to="/seller" className="nav-link custom-nav">Seller</Link></li>
+              <li><Link to="/Addseller" className="nav-link custom-nav">Seller</Link></li>
               <li><Link to="/help" className="nav-link custom-nav">Help</Link></li>
             </ul>
 
@@ -56,8 +56,8 @@ export default function Navbar() {
                 </div>
               ) : (
                 <>
-                  <Link to="/login" className="text-primary me-2 fs-5">Login</Link>
-                  <Link to="/signup" className="text-primary fs-5">Signup</Link>
+                  <Link to="/login" className="text-primary me-2 fs-6">Login</Link>
+                  <Link to="/signup" className="text-primary fs-6">Signup</Link>
                 </>
               )}
             </div>
