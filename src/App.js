@@ -23,7 +23,8 @@ const App = () => {
           <Route path="/seller" element={<AddSeller />} />
 
           {/* Protected profile route */}
-          <Route path="/profile" element={
+          <Route path="/profile"
+            element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
