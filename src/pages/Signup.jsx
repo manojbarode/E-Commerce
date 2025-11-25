@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { signupUser } from "../api/authApi";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "./Signup.css"; // optional for extra custom styles
+import { toast } from "react-toastify";
+import 'react-toastify/ReactToastify.css';
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -12,27 +13,22 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const handleSignupSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const data = await signupUser({ name, email, password });
-      console.log("Signup successful:", data);
-      setMessage("Signup successful! Redirecting to login...");
-      setPassword("");
+  e.preventDefault();
+  
+  try {
+    const data = await signupUser({ name, email, password });
 
-      setTimeout(() => navigate("/login"), 1500);
-    } catch (err) {
-      if (
-        err === "Already Exists User!" ||
-        err?.toLowerCase().includes("already exists")
-      ) {
-        setMessage("User already registered! Redirecting to login...");
-        setTimeout(() => navigate("/login"), 1500);
-      } else {
-        setMessage(err);
-      }
-      console.error("Signup error:", err);
+    if (data) {
+      toast.success("Signup successful! Please login.");
+      navigate("/login"); // ✅ Signup ke baad login page
     }
-  };
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Signup failed!");
+  }
+};
+
 
   return (
     <div className="container py-5" style={{ background: "#f8f9fa" }}>
@@ -47,7 +43,6 @@ const Signup = () => {
               Sign Up
             </h2>
 
-            {/* Social login buttons */}
             <div className="d-flex justify-content-center mb-3">
               <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
                 <i className="fa fa-facebook"></i>
@@ -63,7 +58,6 @@ const Signup = () => {
               or use your email for registration
             </p>
 
-            {/* Message */}
             {message && <p className="text-center text-danger">{message}</p>}
 
             <form onSubmit={handleSignupSubmit}>
@@ -112,7 +106,9 @@ const Signup = () => {
 
             <p className="text-center mt-3">
               Already have an account?{" "}
-              <button className="btn btn-link p-0 fw-semibold"onClick={() => navigate("/login")}>Login</button>
+              <button className="btn btn-link p-0 fw-semibold" onClick={() => navigate("/login")}>
+                Login
+              </button>
             </p>
           </div>
         </div>

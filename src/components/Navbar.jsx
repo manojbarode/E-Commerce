@@ -19,29 +19,19 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logoutUser();
-    navigate("/"); // redirect to home after logout
+    navigate("/");
   };
 
   const closeDrawer = () => setDrawerOpen(false);
 
   return (
     <>
-      {/* Desktop Navbar */}
       <nav className="navbar navbar-expand-lg bg-white shadow-lg sticky-top custom-navbar">
         <div className="container-fluid custom-container">
-          <span
-            className="navbar-brand fs-3 fw-bold text-primary"
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          >
-            eShop
-          </span>
+          <span className="navbar-brand fs-3 fw-bold text-primary"style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}>eShop</span>
 
-          <button
-            className="navbar-toggler"
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-          >
+          <button className="navbar-toggler" type="button" onClick={() => setDrawerOpen(true)}>
             <span className="navbar-toggler-icon"></span>
           </button>
 
@@ -54,39 +44,21 @@ export default function Navbar() {
               <li className="nav-item"><Link className="nav-link custom-nav" to="/help">Help</Link></li>
             </ul>
             <div className="search-box me-3 d-none d-lg-flex">
-  <i className="bi bi-search me-2"></i>
-  <input
-    type="search"
-    placeholder="Search products..."
-    className="border-0 bg-transparent"
-    style={{ outline: "none", width: "100%" }}
-  />
-</div>
+              <i className="bi bi-search me-2"></i>
+              <input type="search" placeholder="Search products..." className="border-0 bg-transparent" style={{ outline: "none", width: "100%" }}/>
+            </div>
 
             <div className="d-flex align-items-center gap-2 desktop-icons">
               <Link to="/wishlist" className="text-primary fs-4 text-decoration-none icon-link"><i className="bi bi-heart-fill"></i></Link>
               <Link to="/cart" className="text-primary fs-4 text-decoration-none icon-link"><i className="bi bi-cart-fill"></i></Link>
 
               {login ? (
-  <>
-    <i
-      className="bi bi-person-circle text-primary fs-3 icon-link"
-      style={{ cursor: "pointer" }}
-      onClick={handleProfileClick}
-    ></i>
-    <button className="btn btn-outline-danger btn-sm fw-bold" onClick={handleLogout}>
-      Logout
-    </button>
-  </>
-) : (
-  <button
-    className="btn btn-outline-primary btn-sm fw-bold"
-    onClick={() => navigate("/signup")}
-  >
-    Sign Up
-  </button>
-)}
-
+                <>
+                  <i className="bi bi-person-circle text-primary fs-3 icon-link" style={{ cursor: "pointer" }}onClick={handleProfileClick}></i>
+                  <button className="btn btn-outline-danger btn-sm fw-bold" onClick={handleLogout}>Logout</button>
+                </>
+              ) : (
+                <button className="btn btn-outline-primary btn-sm fw-bold" onClick={() => navigate("/signup")}>Sign Up</button>)}
             </div>
           </div>
         </div>
@@ -101,11 +73,7 @@ export default function Navbar() {
 
         <div className="search-box mb-3 w-100">
           <i className="bi bi-search me-2"></i>
-          <input
-            type="search"
-            placeholder="Search..."
-            className="border-0 bg-transparent w-100"
-            style={{ outline: "none" }}
+          <input type="search" placeholder="Search..." className="border-0 bg-transparent w-100"style={{ outline: "none" }}
           />
         </div>
 
@@ -118,15 +86,10 @@ export default function Navbar() {
           <Link to="/Addseller" className="list-group-item list-group-item-action drawer-link" onClick={closeDrawer}>Seller</Link>
           <Link to="/help" className="list-group-item list-group-item-action drawer-link" onClick={closeDrawer}>Help</Link>
         </div>
-<div className="search-box mb-3 w-100">
-  <i className="bi bi-search me-2"></i>
-  <input
-    type="search"
-    placeholder="Search..."
-    className="border-0 bg-transparent w-100"
-    style={{ outline: "none" }}
-  />
-</div>
+        <div className="search-box mb-3 w-100">
+          <i className="bi bi-search me-2"></i>
+          <input type="search" placeholder="Search..." className="border-0 bg-transparent w-100"style={{ outline: "none" }}/>
+        </div>
 
         <div className="mt-4 d-flex gap-3 justify-content-center">
           <Link to="/wishlist" onClick={closeDrawer}><i className="bi bi-heart-fill text-primary fs-4"></i></Link>
@@ -134,39 +97,26 @@ export default function Navbar() {
 
           {login ? (
             <>
-              <i
-                className="bi bi-person-circle text-primary fs-4"
-                style={{ cursor: "pointer" }}
+              <i className="bi bi-person-circle text-primary fs-4" style={{ cursor: "pointer" }}
                 onClick={() => {
                   closeDrawer();
                   handleProfileClick();
                 }}
               ></i>
-              <button
-                className="btn btn-outline-danger btn-sm fw-bold"
-                onClick={() => {
+              <button className="btn btn-outline-danger btn-sm fw-bold" onClick={() => {
                   closeDrawer();
                   handleLogout();
-                }}
-              >
+                }}>
                 Logout
               </button>
             </>
-          ) : (
-            <button
-              className="btn btn-outline-primary btn-sm fw-bold"
-              onClick={() => {
+            ) : (
+            <button className="btn btn-outline-primary btn-sm fw-bold" onClick={() => {
                 closeDrawer();
                 navigate("/signup");
-              }}
-            >
-              Sign Up
-            </button>
-          )}
+              }}>Sign Up</button>)}
         </div>
       </div>
-
-      {/* Backdrop */}
       {drawerOpen && <div className="drawer-backdrop" onClick={closeDrawer}></div>}
     </>
   );
