@@ -10,7 +10,7 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import AuthProvider from "./context/AuthContext";
-import AddSeller from "./pages/Admin/Addseller";
+import Addseller from "./pages/Admin/Addseller";
 
 const App = () => {
   return (
@@ -20,7 +20,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/seller" element={<AddSeller />} />
+          <Route path="/seller" element={<Addseller />} />
 
           {/* Protected profile route */}
           <Route path="/profile"

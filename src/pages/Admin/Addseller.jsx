@@ -71,7 +71,7 @@ const Addseller = () => {
         <div className="col-lg-8 col-md-10">
           <div className="card shadow-sm">
             <div className="card-body">
-              <h2 className="text-center mb-4">E-commerce Seller Registration</h2>
+              <h2 className="text-center mb-4 ">E-Shop Seller Registration</h2>
               <form onSubmit={handleSubmit}>
                 {/* Full Name */}
                 <div className="mb-3">
