@@ -1,31 +1,39 @@
-import { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
-export default function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [login, setLogin] = useState(false);
+  const [user, setUser] = useState(null);
 
-  // When app loads → check if user is logged in (from sessionStorage)
+  // Component mount hone par localStorage check karo
   useEffect(() => {
-    const savedLogin = sessionStorage.getItem("isLoggedIn") === "true";
-    setLogin(savedLogin);
+    const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
+    
+    if (token && savedUser) {
+      setLogin(true);
+      setUser(JSON.parse(savedUser));
+    }
   }, []);
 
-  // Login function
-  const loginUser = () => {
-    sessionStorage.setItem("isLoggedIn", "true"); // store in sessionStorage
-    setLogin(true);
+  const loginUser = (token, userData) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setLogin(true);  // State update karo
+    setUser(userData);
   };
 
-  // Logout function
   const logoutUser = () => {
-    sessionStorage.removeItem("isLoggedIn");
-    setLogin(false);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLogin(false);  // State update karo
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ login, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ login, user, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};

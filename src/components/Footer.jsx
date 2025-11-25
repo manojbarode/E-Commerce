@@ -1,96 +1,58 @@
 export default function Footer() {
   return (
-    <>
-      <link 
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" 
-        rel="stylesheet" 
-      />
-      
-      <footer className="bg-dark text-white py-5 rounded-top-4 position-fixed-bottom">
-        <div className="container ">
-          <div className="row g-4 ">
-            
-            {/* Logo & About */}
-            <div className="col-12 col-sm-6 col-md-3">
-              <h2 className="h4 fw-bold mb-3">E-Shop</h2>
-              <p className="text-white-50">
-                Best online shopping platform for all your needs.
-              </p>
-            </div>
+    <footer className="bg-dark text-white py-5 mt-5">
+      <div className="container">
+        <div className="row g-4">
 
-            {/* Quick Links */}
-            <div className="col-12 col-sm-6 col-md-3">
-              <h3 className="h5 fw-semibold mb-3">Quick Links</h3>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Home</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Shop</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Cart</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Contact</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Categories */}
-            <div className="col-12 col-sm-6 col-md-3">
-              <h3 className="h5 fw-semibold mb-3">Categories</h3>
-              <ul className="list-unstyled">
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Electronics</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Fashion</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Home & Kitchen</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Beauty</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Kidz</a>
-                </li>
-                <li className="mb-2">
-                  <a href="#" className="text-white-50 text-decoration-none hover-link">Sports</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Social Links */}
-            <div className="col-12 col-sm-6 col-md-3">
-              <h3 className="h5 fw-semibold mb-3">Address</h3>
-              <div className="d-flex gap-3">
-                <p className="text-white-50 text-decoration-none hover-link items-center gap-2">
-                 Near Shagun Tower, Vijay Nagar, Indore, Madhya Pradesh 452010 +918889174066</p>
-              </div>
-            </div>
+          <div className="col-12 col-md-3">
+            <h2 className="h4 fw-bold">E-Shop</h2>
+            <p className="text-white-50">
+              Best online shopping platform for all your needs.
+            </p>
           </div>
 
-          <hr className="border-secondary my-4" />
+          <div className="col-6 col-md-3">
+            <h5 className="fw-semibold">Quick Links</h5>
+            <ul className="list-unstyled">
+              <li><a className="text-white-50 text-decoration-none hover-link" href="#">Home</a></li>
+              <li><a className="text-white-50 text-decoration-none hover-link" href="#">Shop</a></li>
+              <li><a className="text-white-50 text-decoration-none hover-link" href="#">Cart</a></li>
+              <li><a className="text-white-50 text-decoration-none hover-link" href="#">Contact</a></li>
+            </ul>
+          </div>
 
-          <p className="text-center text-white-50 mb-0">
-            © 2025 E-Shop. All Rights Reserved.
-          </p>
+          <div className="col-6 col-md-3">
+            <h5 className="fw-semibold">Categories</h5>
+            <ul className="list-unstyled">
+              <li><span className="text-white-50">Electronics</span></li>
+              <li><span className="text-white-50">Fashion</span></li>
+              <li><span className="text-white-50">Home & Kitchen</span></li>
+              <li><span className="text-white-50">Beauty</span></li>
+              <li><span className="text-white-50">Kids</span></li>
+              <li><span className="text-white-50">Sports</span></li>
+            </ul>
+          </div>
+
+          <div className="col-12 col-md-3">
+            <h5 className="fw-semibold">Address</h5>
+            <p className="text-white-50">
+              Near Shagun Tower, Vijay Nagar, Indore, MP 452010 <br />
+              +91 88891 74066
+            </p>
+          </div>
+
         </div>
-      </footer>
+
+        <hr className="border-secondary my-4" />
+
+        <p className="text-center text-white-50 mb-0">
+          © 2025 E-Shop. All Rights Reserved.
+        </p>
+      </div>
 
       <style>{`
-        .hover-link:hover {
-          color: white !important;
-          transition: color 0.2s;
-        }
-        
-        .hover-icon:hover {
-          color: white !important;
-          transition: color 0.2s;
-        }
+        .hover-link:hover { color: #fff !important; }
       `}</style>
-    </>
+    </footer>
   );
 }
