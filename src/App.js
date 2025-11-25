@@ -7,8 +7,8 @@ import Home from "./pages/Home";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AddSeller from "./pages/Admin/Addseller";
 import Login from "./pages/Login";
+import Addseller from "./pages/Admin/Addseller";
 
 const App = () => {
   return (
@@ -17,10 +17,8 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/seller" element={<AddSeller />} />
-        <Route
-          path="/profile"
-          element={
+        <Route path="/seller" element={<Addseller />} />
+        <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
