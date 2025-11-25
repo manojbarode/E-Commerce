@@ -6,10 +6,10 @@ export const AuthProvider = ({ children }) => {
   const [login, setLogin] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Component mount hone par localStorage check karo
+  // Component mount hone par sessionStorage check karo
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    const token = sessionStorage.getItem('token');
+    const savedUser = sessionStorage.getItem('user');
     
     if (token && savedUser) {
       setLogin(true);
@@ -18,16 +18,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginUser = (token, userData) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setLogin(true);  // State update karo
+    // 🔥 Ab hum sessionStorage use kar rahe hain
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('user', JSON.stringify(userData));
+
+    setLogin(true);
     setUser(userData);
   };
 
   const logoutUser = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setLogin(false);  // State update karo
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+
+    setLogin(false);
     setUser(null);
   };
 
