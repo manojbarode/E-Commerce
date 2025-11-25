@@ -1,308 +1,235 @@
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "../Css/seller.css";
+import axiosInstance from "../../api/axiosConfig";
 
-const Addseller = () => {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    mobile: "",
-    businessName: "",
-    businessType: "",
-    gstNumber: "",
-    panNumber: "",
-    warehouseAddress: "",
-    city: "",
-    state: "",
-    pincode: "",
-    bankAccountName: "",
-    bankAccountNumber: "",
-    ifscCode: "",
-    bankName: "",
-    category: "",
-    productCount: "",
-  });
+const sellerRegister = (data) => axiosInstance.post("/seller/register", data);
+const sellerLogin = (data) => axiosInstance.post("/seller/login", data);
 
+const initialForm = {
+  fullName: "",
+  email: "",
+  mobile: "",
+  businessName: "",
+  businessType: "",
+  gstNumber: "",
+  panNumber: "",
+  warehouseAddress: "",
+  city: "",
+  state: "",
+  pincode: "",
+  bankAccountName: "",
+  bankAccountNumber: "",
+  ifscCode: "",
+  bankName: "",
+  category: "",
+  productCount: "",
+  password: "",
+  confirmPassword: "",
+};
+
+export default function SellerAuth() {
+  const [mode, setMode] = useState("register");
+  const [formData, setFormData] = useState(initialForm);
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (mode === "register") {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    } else {
+      setLoginData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
-  const validate = () => {
+  const validateRegister = () => {
     const newErrors = {};
-    // Full Name validation: no numbers or special characters
-    if (!/^[a-zA-Z ]+$/.test(formData.fullName)) {
-      newErrors.fullName = "Name can only contain letters and spaces";
-    }
-    if (!formData.fullName) newErrors.fullName = "Full Name is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.mobile) newErrors.mobile = "Mobile Number is required";
-    if (!formData.businessName) newErrors.businessName = "Business Name is required";
-    if (!formData.businessType) newErrors.businessType = "Business Type is required";
-    if (!formData.gstNumber) newErrors.gstNumber = "GST Number is required";
-    if (!formData.panNumber) newErrors.panNumber = "PAN Number is required";
-    if (!formData.warehouseAddress) newErrors.warehouseAddress = "Warehouse Address is required";
-    if (!formData.city) newErrors.city = "City is required";
-    if (!formData.state) newErrors.state = "State is required";
-    if (!formData.pincode) newErrors.pincode = "Pincode is required";
-    if (!formData.bankAccountName) newErrors.bankAccountName = "Account Holder Name is required";
-    if (!formData.bankAccountNumber) newErrors.bankAccountNumber = "Account Number is required";
-    if (!formData.ifscCode) newErrors.ifscCode = "IFSC Code is required";
-    if (!formData.bankName) newErrors.bankName = "Bank Name is required";
-    if (!formData.category) newErrors.category = "Product Category is required";
-    if (!formData.productCount) newErrors.productCount = "Product count is required";
+
+    [
+      "fullName","email","mobile","businessName","businessType",
+      "gstNumber","panNumber","warehouseAddress","city","state","pincode"
+    ].forEach((field) => {
+      if (!formData[field]) newErrors[field] = `${field} is required`;
+    });
+
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
+
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const validateLogin = () => {
+    const newErrors = {};
+    if (!loginData.email) newErrors.email = "Email is required";
+    if (!loginData.password) newErrors.password = "Password is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (validate()) {
-      console.log("Form Data:", formData);
-      alert("Form Submitted Successfully!");
+    if (!validateRegister()) return;
+    setLoading(true);
+    try {
+      const payload = { ...formData };
+      delete payload.confirmPassword;
+      const res = await sellerRegister(payload);
+      const { token, fullName } = res.data;
+      localStorage.setItem("sellerToken", token);
+      localStorage.setItem("sellerName", fullName);
+      alert("Seller registered successfully!");
+      setFormData(initialForm);
+    } catch (err) {
+      alert(err.response?.data || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateLogin()) return;
+    setLoading(true);
+    try {
+      const res = await sellerLogin(loginData);
+      const { token, fullName } = res.data;
+      localStorage.setItem("sellerToken", token);
+      localStorage.setItem("sellerName", fullName);
+      alert("Logged in successfully!");
+    } catch (err) {
+      alert(err.response?.data || "Invalid credentials");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container py-5">
-      <div className="row justify-content-center">
-        <div className="col-lg-8 col-md-10">
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <h2 className="text-center mb-4 ">E-Shop Seller Registration</h2>
-              <form onSubmit={handleSubmit}>
-                {/* Full Name */}
-                <div className="mb-3">
-                  <label className="form-label">Full Name</label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    className={`form-control ${errors.fullName ? "is-invalid" : ""}`}
-                    value={formData.fullName}
-                    onChange={handleChange}
-                  />
-                  {errors.fullName && <div className="invalid-feedback">{errors.fullName}</div>}
-                </div>
+    <div className="seller-auth-page">
+      <div className="seller-auth-glass container py-4 py-lg-5">
+        <div className="row g-0 shadow-lg rounded-4 overflow-hidden seller-flex-equal">
 
-                {/* Email */}
+          {/* LEFT PANEL */}
+          <div className="col-lg-6 seller-auth-left d-flex flex-column justify-content-between">
+            <div>
+              <span className="badge bg-light text-dark mb-3 px-3 py-2 rounded-pill">
+                E-Shop Seller Portal
+              </span>
+              <h2 className="text-white fw-bold mb-3">
+                Grow your business <br />
+                with <span className="text-warning">E-Shop</span>
+              </h2>
+              <p className="text-light small mb-4">
+                Sell your products with confidence. Manage listings, orders & payouts — all in one dashboard.
+              </p>
+            </div>
+            <div className="text-light small">
+              <div className="seller-dot-line"><div className="seller-dot" /> Fast payouts</div>
+              <div className="seller-dot-line"><div className="seller-dot" /> Secure protection policy</div>
+              <div className="seller-dot-line"><div className="seller-dot" /> Premium seller dashboard</div>
+            </div>
+          </div>
+
+          {/* RIGHT PANEL */}
+          <div className="col-lg-6 bg-white p-4 p-md-5 seller-right-balanced">
+            {/* Tabs */}
+            <div className="d-flex justify-content-center mb-4 gap-4">
+              <button
+                type="button"
+                className={`seller-tab ${mode === "login" ? "active" : ""}`}
+                onClick={() => { setMode("login"); setErrors({}); }}>
+                Login
+              </button>
+              <button
+                type="button"
+                className={`seller-tab ${mode === "register" ? "active" : ""}`}
+                onClick={() => { setMode("register"); setErrors({}); }}>
+                Register
+              </button>
+            </div>
+
+            {/* LOGIN FORM */}
+            {mode === "login" ? (
+              <form onSubmit={handleLoginSubmit}>
+                <h3 className="fw-semibold mb-3 text-center">Welcome Back 👋</h3>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
                   <input
                     type="email"
                     name="email"
-                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
-                    value={formData.email}
+                    value={loginData.email}
                     onChange={handleChange}
+                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
                   />
                   {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
-
-                {/* Mobile */}
                 <div className="mb-3">
-                  <label className="form-label">Mobile Number</label>
+                  <label className="form-label">Password</label>
                   <input
-                    type="tel"
-                    name="mobile"
-                    className={`form-control ${errors.mobile ? "is-invalid" : ""}`}
-                    value={formData.mobile}
+                    type="password"
+                    name="password"
+                    value={loginData.password}
                     onChange={handleChange}
+                    className={`form-control ${errors.password ? "is-invalid" : ""}`}
                   />
-                  {errors.mobile && <div className="invalid-feedback">{errors.mobile}</div>}
+                  {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
-
-                {/* Business Name */}
-                <div className="mb-3">
-                  <label className="form-label">Business Name</label>
-                  <input
-                    type="text"
-                    name="businessName"
-                    className={`form-control ${errors.businessName ? "is-invalid" : ""}`}
-                    value={formData.businessName}
-                    onChange={handleChange}
-                  />
-                  {errors.businessName && <div className="invalid-feedback">{errors.businessName}</div>}
-                </div>
-
-                {/* Business Type */}
-                <div className="mb-3">
-                  <label className="form-label">Business Type</label>
-                  <select
-                    name="businessType"
-                    className={`form-select ${errors.businessType ? "is-invalid" : ""}`}
-                    value={formData.businessType}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select Type</option>
-                    <option value="Individual">Individual</option>
-                    <option value="Proprietorship">Proprietorship</option>
-                    <option value="Partnership">Partnership</option>
-                    <option value="Private Limited">Private Limited</option>
-                    <option value="LLP">LLP</option>
-                  </select>
-                  {errors.businessType && <div className="invalid-feedback">{errors.businessType}</div>}
-                </div>
-
-                {/* GST Number */}
-                <div className="mb-3">
-                  <label className="form-label">GST Number</label>
-                  <input
-                    type="text"
-                    name="gstNumber"
-                    className={`form-control ${errors.gstNumber ? "is-invalid" : ""}`}
-                    value={formData.gstNumber}
-                    onChange={handleChange}
-                  />
-                  {errors.gstNumber && <div className="invalid-feedback">{errors.gstNumber}</div>}
-                </div>
-
-                {/* PAN Number */}
-                <div className="mb-3">
-                  <label className="form-label">PAN Number</label>
-                  <input
-                    type="text"
-                    name="panNumber"
-                    className={`form-control ${errors.panNumber ? "is-invalid" : ""}`}
-                    value={formData.panNumber}
-                    onChange={handleChange}
-                  />
-                  {errors.panNumber && <div className="invalid-feedback">{errors.panNumber}</div>}
-                </div>
-
-                {/* Warehouse Address */}
-                <div className="mb-3">
-                  <label className="form-label">Warehouse Address</label>
-                  <textarea
-                    name="warehouseAddress"
-                    className={`form-control ${errors.warehouseAddress ? "is-invalid" : ""}`}
-                    value={formData.warehouseAddress}
-                    onChange={handleChange}
-                  ></textarea>
-                  {errors.warehouseAddress && <div className="invalid-feedback">{errors.warehouseAddress}</div>}
-                </div>
-
-                {/* City */}
-                <div className="mb-3">
-                  <label className="form-label">City</label>
-                  <input
-                    type="text"
-                    name="city"
-                    className={`form-control ${errors.city ? "is-invalid" : ""}`}
-                    value={formData.city}
-                    onChange={handleChange}
-                  />
-                  {errors.city && <div className="invalid-feedback">{errors.city}</div>}
-                </div>
-
-                {/* State */}
-                <div className="mb-3">
-                  <label className="form-label">State</label>
-                  <input
-                    type="text"
-                    name="state"
-                    className={`form-control ${errors.state ? "is-invalid" : ""}`}
-                    value={formData.state}
-                    onChange={handleChange}
-                  />
-                  {errors.state && <div className="invalid-feedback">{errors.state}</div>}
-                </div>
-
-                {/* Pincode */}
-                <div className="mb-3">
-                  <label className="form-label">Pincode</label>
-                  <input
-                    type="text"
-                    name="pincode"
-                    className={`form-control ${errors.pincode ? "is-invalid" : ""}`}
-                    value={formData.pincode}
-                    onChange={handleChange}
-                  />
-                  {errors.pincode && <div className="invalid-feedback">{errors.pincode}</div>}
-                </div>
-
-                {/* Bank Account */}
-                <div className="mb-3">
-                  <label className="form-label">Bank Account Name</label>
-                  <input
-                    type="text"
-                    name="bankAccountName"
-                    className={`form-control ${errors.bankAccountName ? "is-invalid" : ""}`}
-                    value={formData.bankAccountName}
-                    onChange={handleChange}
-                  />
-                  {errors.bankAccountName && <div className="invalid-feedback">{errors.bankAccountName}</div>}
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Bank Account Number</label>
-                  <input
-                    type="text"
-                    name="bankAccountNumber"
-                    className={`form-control ${errors.bankAccountNumber ? "is-invalid" : ""}`}
-                    value={formData.bankAccountNumber}
-                    onChange={handleChange}
-                  />
-                  {errors.bankAccountNumber && <div className="invalid-feedback">{errors.bankAccountNumber}</div>}
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">IFSC Code</label>
-                  <input
-                    type="text"
-                    name="ifscCode"
-                    className={`form-control ${errors.ifscCode ? "is-invalid" : ""}`}
-                    value={formData.ifscCode}
-                    onChange={handleChange}
-                  />
-                  {errors.ifscCode && <div className="invalid-feedback">{errors.ifscCode}</div>}
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Bank Name</label>
-                  <input
-                    type="text"
-                    name="bankName"
-                    className={`form-control ${errors.bankName ? "is-invalid" : ""}`}
-                    value={formData.bankName}
-                    onChange={handleChange}
-                  />
-                  {errors.bankName && <div className="invalid-feedback">{errors.bankName}</div>}
-                </div>
-
-                {/* Product Info */}
-                <div className="mb-3">
-                  <label className="form-label">Product Category</label>
-                  <input
-                    type="text"
-                    name="category"
-                    className={`form-control ${errors.category ? "is-invalid" : ""}`}
-                    value={formData.category}
-                    onChange={handleChange}
-                  />
-                  {errors.category && <div className="invalid-feedback">{errors.category}</div>}
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Approx Number of Products</label>
-                  <input
-                    type="number"
-                    name="productCount"
-                    className={`form-control ${errors.productCount ? "is-invalid" : ""}`}
-                    value={formData.productCount}
-                    onChange={handleChange}
-                  />
-                  {errors.productCount && <div className="invalid-feedback">{errors.productCount}</div>}
-                </div>
-
-                <div className="d-grid mt-3">
-                  <button type="submit" className="btn btn-danger">
-                    Register
-                  </button>
-                </div>
+                <button className="seller-btn-gradient mt-2" disabled={loading}>
+                  {loading ? "Logging in..." : "Login"}
+                </button>
               </form>
-            </div>
+            ) : (
+              /* REGISTER FORM */
+              <>
+                <h3 className="fw-semibold mb-3 text-center">Create Seller Account</h3>
+                <div className="seller-scrollable-form row">
+                  {/* LEFT COLUMN */}
+                  <div className="col-md-6">
+                    {["fullName","email","mobile","businessName","businessType","gstNumber","panNumber","warehouseAddress","city"].map(field => (
+                      <div className="mb-3" key={field}>
+                        <label className="form-label">{field.replace(/([A-Z])/g," $1")}</label>
+                        <input
+                          type="text"
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleChange}
+                          className={`form-control ${errors[field] ? "is-invalid" : ""}`}
+                        />
+                        {errors[field] && <div className="invalid-feedback">{errors[field]}</div>}
+                      </div>
+                    ))}
+                  </div>
+                  {/* RIGHT COLUMN */}
+                  <div className="col-md-6">
+                    {["bankAccountName","bankAccountNumber","ifscCode","bankName","category","productCount","password","confirmPassword","state","pincode"].map(field => (
+                      <div className="mb-3" key={field}>
+                        <label className="form-label">{field.replace(/([A-Z])/g," $1")}</label>
+                        <input
+                          type={field.toLowerCase().includes("password") ? "password" : "text"}
+                          name={field}
+                          value={formData[field]}
+                          onChange={handleChange}
+                          className={`form-control ${errors[field] ? "is-invalid" : ""}`}
+                        />
+                        {errors[field] && <div className="invalid-feedback">{errors[field]}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button className="seller-submit-btn mt-2" onClick={handleRegisterSubmit} disabled={loading}>
+                  {loading ? "Creating account..." : "Register"}
+                </button>
+              </>
+            )}
+
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Addseller;
+}
