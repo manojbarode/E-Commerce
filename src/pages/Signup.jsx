@@ -1,101 +1,119 @@
 import React, { useState } from "react";
+import { signupUser } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+// import "./Signup.css"; // optional for extra custom styles
 
-const AuthForm = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+const Signup = () => {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
-  const toggleForm = () => setIsSignUp(!isSignUp);
-
-  const handleSignInSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sign In submitted");
-  };
+    try {
+      const data = await signupUser({ name, email, password });
+      console.log("Signup successful:", data);
+      setMessage("Signup successful! Redirecting to login...");
+      setPassword("");
 
-  const handleSignUpSubmit = (e) => {
-    e.preventDefault();
-    console.log("Sign Up submitted with Name:", name);
-  };
-
-  // Name input change handler - only letters allowed
-  const handleNameChange = (e) => {
-    const value = e.target.value;
-    const lettersOnly = value.replace(/[^a-zA-Z ]/g, ""); // remove numbers & special chars
-    setName(lettersOnly);
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (err) {
+      if (
+        err === "Already Exists User!" ||
+        err?.toLowerCase().includes("already exists")
+      ) {
+        setMessage("User already registered! Redirecting to login...");
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setMessage(err);
+      }
+      console.error("Signup error:", err);
+    }
   };
 
   return (
-    <div className="container py-5">
+    <div className="container py-5" style={{ background: "#f8f9fa" }}>
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
       />
       <div className="row justify-content-center">
-        <div className="col-md-8 col-lg-6">
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <h2 className="text-center mb-4">{isSignUp ? "Sign Up" : "Sign In"}</h2>
+        <div className="col-md-7 col-lg-5">
+          <div className="card shadow-lg border-0 rounded-4 p-4">
+            <h2 className="text-center mb-4 fw-bold" style={{ color: "#dc3545" }}>
+              Sign Up
+            </h2>
 
-              <div className="d-flex justify-content-center mb-3">
-                <a href="#" className="btn btn-outline-primary mx-1">
-                  <i className="fa fa-facebook"></i>
-                </a>
-                <a href="#" className="btn btn-outline-danger mx-1">
-                  <i className="fa fa-google-plus"></i>
-                </a>
-                <a href="#" className="btn btn-outline-primary mx-1">
-                  <i className="fa fa-linkedin"></i>
-                </a>
-              </div>
-              <p className="text-center mb-4">
-                {isSignUp ? "or use your email for registration" : "or use your account"}
-              </p>
-
-              <form onSubmit={isSignUp ? handleSignUpSubmit : handleSignInSubmit}>
-                {isSignUp && (
-                  <div className="mb-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Name"
-                      value={name}
-                      onChange={handleNameChange}
-                      required
-                    />
-                  </div>
-                )}
-                <div className="mb-3">
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Email"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    className="form-control"
-                    placeholder="Password"
-                    required
-                  />
-                </div>
-                <div className="d-grid mb-3">
-                  <button type="submit" className="btn btn-danger">
-                    {isSignUp ? "Sign Up" : "Sign In"}
-                  </button>
-                </div>
-              </form>
-
-              <p className="text-center">
-                {isSignUp
-                  ? "Already have an account? "
-                  : "Don't have an account? "}
-                <button className="btn btn-link p-0" onClick={toggleForm}>
-                  {isSignUp ? "Sign In" : "Sign Up"}
-                </button>
-              </p>
+            {/* Social login buttons */}
+            <div className="d-flex justify-content-center mb-3">
+              <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
+                <i className="fa fa-facebook"></i>
+              </a>
+              <a href="#" className="btn btn-outline-danger btn-sm mx-1 rounded-circle shadow-sm">
+                <i className="fa fa-google-plus"></i>
+              </a>
+              <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
+                <i className="fa fa-linkedin"></i>
+              </a>
             </div>
+            <p className="text-center text-muted mb-4" style={{ fontSize: "0.9rem" }}>
+              or use your email for registration
+            </p>
+
+            {/* Message */}
+            {message && <p className="text-center text-danger">{message}</p>}
+
+            <form onSubmit={handleSignupSubmit}>
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) =>
+                    setName(e.target.value.replace(/[^a-zA-Z ]/g, ""))
+                  }
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="email"
+                  className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="password"
+                  className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="d-grid mb-3">
+                <button
+                  type="submit"
+                  className="btn btn-danger btn-gradient shadow-sm rounded-pill fw-bold"
+                  style={{ padding: "0.5rem", fontSize: "1rem" }}
+                >
+                  Sign Up
+                </button>
+              </div>
+            </form>
+
+            <p className="text-center mt-3">
+              Already have an account?{" "}
+              <button className="btn btn-link p-0 fw-semibold"onClick={() => navigate("/login")}>Login</button>
+            </p>
           </div>
         </div>
       </div>
@@ -103,4 +121,4 @@ const AuthForm = () => {
   );
 };
 
-export default AuthForm;
+export default Signup;
