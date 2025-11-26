@@ -190,7 +190,7 @@ export default function SellerAuth() {
                 <div className="seller-scrollable-form row">
                   {/* LEFT COLUMN */}
                   <div className="col-md-6">
-                    {["fullName","email","mobile","businessName","businessType","gstNumber","panNumber","warehouseAddress","city"].map(field => (
+                    {["FullName","Email","Mobile","BusinessName","BusinessType","GstNumber","PanNumber","WarehouseAddress","City"].map(field => (
                       <div className="mb-3" key={field}>
                         <label className="form-label">{field.replace(/([A-Z])/g," $1")}</label>
                         <input
@@ -206,7 +206,7 @@ export default function SellerAuth() {
                   </div>
                   {/* RIGHT COLUMN */}
                   <div className="col-md-6">
-                    {["bankAccountName","bankAccountNumber","ifscCode","bankName","category","productCount","password","confirmPassword","state","pincode"].map(field => (
+                    {["BankAccountName","BankAccountNumber","IfscCode","BankName","Category","ProductCount","Password","ConfirmPassword","State","Pincode"].map(field => (
                       <div className="mb-3" key={field}>
                         <label className="form-label">{field.replace(/([A-Z])/g," $1")}</label>
                         <input
