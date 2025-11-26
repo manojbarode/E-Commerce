@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import "../Css/seller.css";
-import axiosInstance from "../../api/axiosConfig";
+import { registerSeller, loginSeller } from "../../api/SellApi";
 
-const sellerRegister = (data) => axiosInstance.post("/seller/register", data);
-const sellerLogin = (data) => axiosInstance.post("/seller/login", data);
-
-// 🔥 Mapping Frontend → Backend field names
 const fieldMap = {
   FullName: "fullName",
   Email: "email",
@@ -105,32 +101,37 @@ export default function SellerAuth() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ⭐ REGISTER SUBMIT
   const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateRegister()) return;
+  e.preventDefault();
+  if (!validateRegister()) return;
 
-    setLoading(true);
-    try {
-      let payload = convertKeys(formData);
-      delete payload.confirmPassword;
+  setLoading(true);
+  try {
+    let payload = convertKeys(formData);
+    delete payload.confirmPassword;
 
-      const res = await sellerRegister(payload);
-      const { token, fullName } = res.data;
+    const data = await registerSeller(payload);
+    const { token, fullName } = data;
 
-      localStorage.setItem("sellerToken", token);
-      localStorage.setItem("sellerName", fullName);
+    localStorage.setItem("sellerToken", token);
+    localStorage.setItem("sellerName", fullName);
 
-      alert("Seller registered successfully!");
-      setFormData(initialForm);
-    } catch (err) {
-      alert(err.response?.data || "Something went wrong");
-    } finally {
-      setLoading(false);
+    alert("Seller registered successfully!");
+    setFormData(initialForm);
+  } catch (err) {
+    console.log("Error response:", err.response);
+    if (err.response && err.response.data) {
+      const message = err.response.data.error || JSON.stringify(err.response.data);
+      alert(message);
+    } else {
+      alert("Something went wrong");
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // ⭐ LOGIN SUBMIT
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!validateLogin()) return;
@@ -142,7 +143,7 @@ export default function SellerAuth() {
         password: loginData.Password,
       };
 
-      const res = await sellerLogin(payload);
+      const res = await loginSeller(payload);
       const { token, fullName } = res.data;
 
       localStorage.setItem("sellerToken", token);

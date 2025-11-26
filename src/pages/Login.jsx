@@ -19,11 +19,9 @@ const Login = () => {
     const data = await apiLoginUser({ email, password });
     console.log("✅ API Response:", data);
     
-    // ✅ Check karo token directly string hai ya object mein
     const token = typeof data === 'string' ? data : data.token;
     
     if (token) {
-      // User object nahi mil raha to email se basic object banao
       const userData = data.user || { email: email };
       
       loginUser(token, userData);
