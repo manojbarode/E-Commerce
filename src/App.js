@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Addseller from "./pages/Admin/Addseller";
+import HelpDesk from "./pages/help";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/Addseller" element={<Addseller />} />
+        <Route path="/help" element={<HelpDesk />}/>
         <Route path="/profile" element={
             <ProtectedRoute>
               <Profile />
