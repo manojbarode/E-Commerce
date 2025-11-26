@@ -121,7 +121,7 @@ export default function SellerAuth() {
   } catch (err) {
     console.log("Error response:", err.response);
     if (err.response && err.response.data) {
-      const message = err.response.data.error || JSON.stringify(err.response.data);
+      const message =err.response.data.message || err.response.data.error || JSON.stringify(err.response.data);
       alert(message);
     } else {
       alert("Something went wrong");
