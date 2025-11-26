@@ -1,32 +1,120 @@
-import { useContext } from "react";
+import React, { useState } from "react";
+import { signupUser } from "../api/authApi";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { toast } from "react-toastify";
+import 'react-toastify/ReactToastify.css';
 
-export default function Signup() {
-  const { loginUser } = useContext(AuthContext);
+const Signup = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-    loginUser(); // signup ke baad login
-    navigate("/");
-  };
+  const handleSignupSubmit = async (e) => {
+  e.preventDefault();
+  
+  try {
+    const data = await signupUser({ name, email, password });
+
+    if (data) {
+      toast.success("Signup successful! Please login.");
+      navigate("/login"); // ✅ Signup ke baad login page
+    }
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Signup failed!");
+  }
+};
+
 
   return (
-    <div className="container mt-5">
-      <h2>Signup</h2>
-      <form onSubmit={handleSignup}>
-        <div className="mb-3">
-          <input type="text" placeholder="Name" className="form-control" required />
+    <div className="container py-5" style={{ background: "#f8f9fa" }}>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+      />
+      <div className="row justify-content-center">
+        <div className="col-md-7 col-lg-5">
+          <div className="card shadow-lg border-0 rounded-4 p-4">
+            <h2 className="text-center mb-4 fw-bold" style={{ color: "#dc3545" }}>
+              Sign Up
+            </h2>
+
+            <div className="d-flex justify-content-center mb-3">
+              <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
+                <i className="fa fa-facebook"></i>
+              </a>
+              <a href="#" className="btn btn-outline-danger btn-sm mx-1 rounded-circle shadow-sm">
+                <i className="fa fa-google-plus"></i>
+              </a>
+              <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
+                <i className="fa fa-linkedin"></i>
+              </a>
+            </div>
+            <p className="text-center text-muted mb-4" style={{ fontSize: "0.9rem" }}>
+              or use your email for registration
+            </p>
+
+            {message && <p className="text-center text-danger">{message}</p>}
+
+            <form onSubmit={handleSignupSubmit}>
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) =>
+                    setName(e.target.value.replace(/[^a-zA-Z ]/g, ""))
+                  }
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="email"
+                  className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="password"
+                  className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="d-grid mb-3">
+                <button
+                  type="submit"
+                  className="btn btn-danger btn-gradient shadow-sm rounded-pill fw-bold"
+                  style={{ padding: "0.5rem", fontSize: "1rem" }}
+                >
+                  Sign Up
+                </button>
+              </div>
+            </form>
+
+            <p className="text-center mt-3">
+              Already have an account?{" "}
+              <button className="btn btn-link p-0 fw-semibold" onClick={() => navigate("/login")}>
+                Login
+              </button>
+            </p>
+          </div>
         </div>
-        <div className="mb-3">
-          <input type="email" placeholder="Email" className="form-control" required />
-        </div>
-        <div className="mb-3">
-          <input type="password" placeholder="Password" className="form-control" required />
-        </div>
-        <button type="submit" className="btn btn-success">Signup</button>
-      </form>
+      </div>
     </div>
   );
-}
+};
+
+export default Signup;

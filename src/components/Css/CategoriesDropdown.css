@@ -1,3 +1,4 @@
+/* === DESKTOP MEGA MENU STYLES === */
 .dropdown-container {
   position: relative;
   display: inline-block;
@@ -57,17 +58,17 @@
 /* Base dropdown item */
 .dropdown-item {
   position: relative;
-  /* deep blue */
-  text-decoration: none !important; /* remove underline */
+  text-decoration: none !important;
   font-weight: 500;
   transition: color 0.3s;
-  padding-bottom: 3px; /* space for underline */
+  padding-bottom: 3px;
+  color: #555 !important;
 }
 
 /* Hover text color */
 .dropdown-item:hover {
-  color: #0056b3 !important; /* slightly brighter deep blue */
-  text-decoration: none !important; /* ensure no underline appears */
+  color: #0056b3 !important;
+  text-decoration: none !important;
 }
 
 /* Animated underline */
@@ -91,13 +92,11 @@
 /* Clothes */
 .category-column:nth-child(1) .dropdown-item::after {
   background: linear-gradient(to right, #60a5fa, #2563eb);
-  color: #007bff;
 }
 
 /* Shoes */
 .category-column:nth-child(2) .dropdown-item::after {
   background: linear-gradient(to right, #c084fc, #9333ea);
-  color:#9333ea;
 }
 
 /* Electronics */
@@ -124,14 +123,18 @@
 .category-column:nth-child(7) .dropdown-item::after {
   background: linear-gradient(to right, #10b981, #047857);
 }
-/* MOBILE CATEGORY ACCORDION */
+
+/* === MOBILE CATEGORY ACCORDION STYLES === */
 .mobile-category {
   width: 100%;
+  padding: 0;
 }
 
 .mobile-category-item {
+  /* Separator lines for categories in the drawer */
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
+  margin-bottom: 0px;
 }
 
 .mobile-category-header {
@@ -140,11 +143,24 @@
   font-weight: 600;
   font-size: 16px;
   cursor: pointer;
+  color: #555;
+  padding: 5px 0; /* Internal padding */
+  transition: color 0.3s;
+}
+
+.mobile-category-header:hover {
+  color: #2563eb;
 }
 
 .mobile-category-list {
+  list-style: none;
   margin-top: 10px;
   padding-left: 10px;
+  margin-bottom: 0;
+}
+
+.mobile-category-list li {
+  margin-bottom: 3px;
 }
 
 .mobile-category-link {
@@ -152,20 +168,15 @@
   padding: 5px 0;
   color: #333;
   text-decoration: none;
+  font-weight: 400;
+  font-size: 15px;
+  border-left: 3px solid transparent;
+  padding-left: 10px;
+  transition: background-color 0.2s, border-left-color 0.2s;
 }
 
 .mobile-category-link:hover {
   color: #0d6efd;
-}
-
-/* Desktop CSS remains untouched */
-.custom-drawer {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 80%;
-  height: 100vh;
-  background: white;
-  transition: 0.3s;
-  overflow-y: auto;  /* ✅ SCROLL ENABLE */
+  background-color: #f0f0f0;
+  border-left-color: #0d6efd;
 }

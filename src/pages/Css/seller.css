@@ -1,0 +1,150 @@
+/* PAGE BASE */
+.seller-auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #fef7f0;
+}
+
+.seller-auth-glass {
+  max-width: 1120px;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* LEFT PANEL */
+.seller-auth-left {
+  background: linear-gradient(135deg, #1e3c72, #2a5298, #f97316);
+  color: #fff;
+  padding: 30px;
+  border-radius: 20px 20px 0 0;
+}
+
+/* RIGHT PANEL */
+.seller-right-balanced {
+  background: #fff;
+  padding: 30px;
+  border-radius: 0 0 20px 20px;
+}
+
+/* Tabs */
+.seller-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  color: #6b7280;
+}
+
+.seller-tab.active {
+  color: #ef4444;
+  border-bottom-color: #ef4444;
+}
+
+/* Scrollable form */
+.seller-scrollable-form {
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  margin-bottom: 80px; /* space for sticky button */
+}
+
+.seller-scrollable-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.seller-scrollable-form::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ff6b6b, #ff8e53);
+  border-radius: 10px;
+}
+
+/* Sticky submit button */
+.seller-submit-btn {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  padding: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.seller-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
+}
+
+.seller-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* DOTS */
+.seller-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #facc15;
+}
+
+.seller-dot-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+  .seller-auth-glass {
+    flex-direction: column;
+  }
+
+  .seller-auth-left {
+    border-radius: 20px 20px 0 0;
+  }
+
+  .seller-right-balanced {
+    border-radius: 0 0 20px 20px;
+    padding: 20px;
+  }
+
+  .seller-scrollable-form {
+    max-height: 50vh;
+  }
+}
+/* BUTTONS (shared for login & register) */
+.seller-btn-gradient {
+  width: 100%;
+  padding: 12px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.seller-btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4);
+}
+
+.seller-btn-gradient:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
