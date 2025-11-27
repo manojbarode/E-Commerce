@@ -53,7 +53,6 @@ export default function SellerAuth() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // 🔥 Convert PascalCase frontend fields → camelCase backend
   const convertKeys = (obj) => {
     const converted = {};
     Object.keys(obj).forEach((key) => {
@@ -132,30 +131,32 @@ export default function SellerAuth() {
 };
 
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateLogin()) return;
+ const handleLoginSubmit = async (e) => {
+  e.preventDefault();
+  if (!validateLogin()) return;
 
-    setLoading(true);
-    try {
-      const payload = {
-        email: loginData.Email,
-        password: loginData.Password,
-      };
+  setLoading(true);
+  try {
+    const payload = {
+      email: loginData.Email,
+      password: loginData.Password,
+    };
 
-      const res = await loginSeller(payload);
-      const { token, fullName } = res.data;
+    const res = await loginSeller(payload);
 
-      localStorage.setItem("sellerToken", token);
-      localStorage.setItem("sellerName", fullName);
+    const { token, fullName } = res;
 
-      alert("Logged in successfully!");
-    } catch (err) {
-      alert(err.response?.data || "Invalid credentials");
-    } finally {
-      setLoading(false);
-    }
-  };
+    localStorage.setItem("sellerToken", token);
+    localStorage.setItem("sellerName", fullName);
+
+    alert("Logged in successfully!");
+  } catch (err) {
+    alert(err.message || "Invalid credentials");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="seller-auth-page">
@@ -176,6 +177,14 @@ export default function SellerAuth() {
                 Sell your products with confidence. Manage listings, orders & payouts — all in one dashboard.
               </p>
             </div>
+          {mode === "register" && (
+            <div className="text-center my-3">
+              <img src="SellerHome.png" alt="No Image" className="img-fluid rounded"/>
+            </div>
+          )}
+
+
+
             <div className="text-light small">
               <div className="seller-dot-line"><div className="seller-dot" /> Fast payouts</div>
               <div className="seller-dot-line"><div className="seller-dot" /> Secure protection policy</div>
