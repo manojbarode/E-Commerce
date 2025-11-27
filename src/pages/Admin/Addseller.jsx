@@ -179,7 +179,7 @@ export default function SellerAuth() {
             </div>
           {mode === "register" && (
             <div className="text-center my-3">
-              <img src="SellerHome.png" alt="No Image" className="img-fluid rounded"/>
+              <img src="SellerHome.png" alt="E-shop seller graphic" className="img-fluid rounded"/>
             </div>
           )}
 
