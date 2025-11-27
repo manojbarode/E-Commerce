@@ -196,17 +196,10 @@ export default function SellerAuth() {
           <div className="col-lg-6 bg-white p-4 p-md-5 seller-right-balanced">
             {/* Tabs */}
             <div className="d-flex justify-content-center mb-4 gap-4">
-              <button
-                type="button"
-                className={`seller-tab ${mode === "login" ? "active" : ""}`}
-                onClick={() => { setMode("login"); setErrors({}); }}>
-                Login
-              </button>
-              <button
-                type="button"
-                className={`seller-tab ${mode === "register" ? "active" : ""}`}
-                onClick={() => { setMode("register"); setErrors({}); }}>
-                Register
+              <button type="button" className={`seller-tab ${mode === "login" ? "active" : ""}`}
+                onClick={() => { setMode("login"); setErrors({}); }}>Login</button>
+              <button type="button"className={`seller-tab ${mode === "register" ? "active" : ""}`}
+                onClick={() => { setMode("register"); setErrors({}); }}>Register
               </button>
             </div>
 
@@ -217,23 +210,14 @@ export default function SellerAuth() {
 
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    name="Email"
-                    value={loginData.Email}
-                    onChange={handleChange}
-                    className={`form-control ${errors.Email ? "is-invalid" : ""}`}
-                  />
+                  <input type="email"name="Email"value={loginData.Email}onChange={handleChange}
+                    className={`form-control ${errors.Email ? "is-invalid" : ""}`}/>
                   {errors.Email && <div className="invalid-feedback">{errors.Email}</div>}
                 </div>
 
                 <div className="mb-3">
                   <label className="form-label">Password</label>
-                  <input
-                    type="password"
-                    name="Password"
-                    value={loginData.Password}
-                    onChange={handleChange}
+                  <input type="password" name="Password" value={loginData.Password}onChange={handleChange}
                     className={`form-control ${errors.Password ? "is-invalid" : ""}`}
                   />
                   {errors.Password && <div className="invalid-feedback">{errors.Password}</div>}
@@ -245,7 +229,6 @@ export default function SellerAuth() {
               </form>
             ) : (
               <>
-                {/* REGISTER FORM */}
                 <h3 className="fw-semibold mb-3 text-center">Create Seller Account</h3>
 
                 <div className="seller-scrollable-form row">
