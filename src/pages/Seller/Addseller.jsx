@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "../Css/seller.css";
+import "./Css/Seller.css";
 import { registerSeller, loginSeller } from "../../api/SellApi";
-
+import { useNavigate } from "react-router-dom";
 const fieldMap = {
   FullName: "fullName",
   Email: "email",
@@ -52,6 +52,7 @@ export default function SellerAuth() {
   const [loginData, setLoginData] = useState({ Email: "", Password: "" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const convertKeys = (obj) => {
     const converted = {};
@@ -150,6 +151,7 @@ export default function SellerAuth() {
     localStorage.setItem("sellerName", fullName);
 
     alert("Logged in successfully!");
+    navigate("/sellerdashboard");
   } catch (err) {
     alert(err.message || "Invalid credentials");
   } finally {

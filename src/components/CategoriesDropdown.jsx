@@ -12,11 +12,9 @@ const categories = {
   "Sports & Outdoors": ["Fitness", "Sportswear", "Camping"]
 };
 
-// closeDrawer प्रॉप जोड़ा गया
 export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
   const [openCategory, setOpenCategory] = useState(null);
 
-  // MOBILE MENU VERSION (Accordion)
   if (mobile) {
     return (
       <div className="mobile-category">
