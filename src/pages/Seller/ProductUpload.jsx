@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Css/ProductUpload.css";
+import { ProductAdd } from "../../api/productApi";
 
 export default function ProductUpload() {
   const [form, setForm] = useState({
@@ -15,10 +16,8 @@ export default function ProductUpload() {
   });
 
   const [extra, setExtra] = useState({});
+  const [loading, setLoading] = useState(false);
 
-  // ----------------------
-  // CATEGORY & SUBCATEGORY
-  // ----------------------
   const categoryData = {
     "Clothes": ["Men's Wear", "Women's Wear", "Kids"],
     "Shoes": ["Men's Shoes", "Women's Shoes"],
@@ -28,9 +27,6 @@ export default function ProductUpload() {
     "Home & Kitchen": ["Furniture", "Cookware"],
   };
 
-  // ----------------------
-  // CATEGORY SPECIFIC FIELDS
-  // ----------------------
   const dynamicFields = {
     "Clothes": ["size", "color", "material", "brand", "gender", "sleeve_type", "fit", "pattern"],
     "Shoes": ["size", "color", "brand", "material", "gender"],
@@ -40,9 +36,6 @@ export default function ProductUpload() {
     "Home & Kitchen": ["material", "dimensions", "weight", "brand"],
   };
 
-  // ----------------------
-  // FORM HANDLERS
-  // ----------------------
   const handleBaseChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -57,11 +50,31 @@ export default function ProductUpload() {
     setForm({ ...form, images: files });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const finalData = { ...form, extra };
-    console.log("Final Product Data:", finalData);
-    alert("✅ Product ready to submit! Check console.");
+    try {
+      setLoading(true);
+      const response = await ProductAdd(finalData); // API call
+      console.log("Product saved:", response);
+      alert("✅ Product added successfully!");
+      setForm({
+        title: "",
+        description: "",
+        price: "",
+        stock: "",
+        category: "",
+        subcategory: "",
+        sellerId: "",
+        images: [],
+      });
+      setExtra({});
+    } catch (error) {
+      console.error("Error adding product:", error);
+      alert("❌ Failed to add product!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,7 +82,6 @@ export default function ProductUpload() {
       <div className="card shadow-lg p-5 rounded-4 form-card">
         <h2 className="mb-4 text-center fw-bold">🛍 Add New Product</h2>
         <form onSubmit={handleSubmit}>
-
           {/* Title */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Product Title</label>
@@ -142,7 +154,9 @@ export default function ProductUpload() {
             </>
           )}
 
-          <button type="submit" className="btn btn-gradient w-100 btn-lg mt-4 fw-bold">Submit Product</button>
+          <button type="submit" className="btn btn-gradient w-100 btn-lg mt-4 fw-bold" disabled={loading}>
+            {loading ? "Submitting..." : "Submit Product"}
+          </button>
         </form>
       </div>
     </div>
