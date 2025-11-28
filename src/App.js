@@ -13,6 +13,7 @@ import HelpDesk from "./pages/help";
 import ProductUpload from "./pages/Seller/ProductUpload";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import SellerDashboard from "./pages/Seller/SellerDashboard1/SellerDashboard";
+import OffersPage from "./pages/Offers";
 
 
 
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/Addseller" element={<Addseller />} />
+        <Route path="/offers" element={<OffersPage/>}/>
         <Route path="/help" element={<HelpDesk />}/>
         <Route path="/dashboard" element={<AdminDashboard/>}/>
         <Route path="/sellerdashboard" element={<SellerDashboard/>}/>
