@@ -1,0 +1,43 @@
+.stats-card {
+  border-radius: 1rem;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+/* Icons */
+.stats-icon {
+  opacity: 0.4;
+}
+
+/* Gradient examples for different card types */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #11998e, #38ef7d);
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+}
+
+.bg-gradient-danger {
+  background: linear-gradient(135deg, #fc4a1a, #f7b733);
+}
+
+/* Text */
+h6 {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+h4 {
+  font-weight: 700;
+  font-size: 1.6rem;
+}

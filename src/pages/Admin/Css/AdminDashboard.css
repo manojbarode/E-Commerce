@@ -1,0 +1,48 @@
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 10px;
+}
+
+/* Main Dashboard */
+.dashboard-main {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar-admin {
+  background: linear-gradient(90deg,#6a11cb,#2575fc);
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  border-radius: 0 0 15px 15px;
+}
+
+/* Cards Gradient */
+.bg-gradient-primary { background: linear-gradient(90deg,#6a11cb,#2575fc);}
+.bg-gradient-success { background: linear-gradient(90deg,#00b09b,#96c93d);}
+.bg-gradient-warning { background: linear-gradient(90deg,#f7971e,#ffd200);}
+.bg-gradient-danger  { background: linear-gradient(90deg,#ff416c,#ff4b2b);}
+
+/* Chart Cards */
+.chart-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+/* Table Card */
+.card-table {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}

@@ -1,0 +1,37 @@
+/* Card Gradient */
+.form-card {
+    background: linear-gradient(to right, #ffffff, #f0f8ff);
+}
+
+/* Button Gradient */
+.btn-gradient {
+    background: linear-gradient(90deg, #007bff, #6610f2);
+    color: #fff;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Image Preview */
+.preview-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border: 2px solid #007bff;
+    transition: transform 0.2s;
+}
+
+.preview-img:hover {
+    transform: scale(1.1);
+    border-color: #6610f2;
+}
+
+/* Input Focus */
+.form-control:focus {
+    border-color: #6610f2;
+    box-shadow: 0 0 5px rgba(102,16,242,0.5);
+}
