@@ -21,38 +21,55 @@ export default function Product() {
   return (
     <div className="container mt-5">
       <h2 className="mb-4 fw-bold text-center">Featured Products</h2>
-      <div className="row">
+      <div className="row justify-content-center g-3">
         {products.map((product) => (
-          <div key={product.id} className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-            <div className="card h-100 shadow-sm product-card">
-
+          <div
+            key={product.id}
+            className="col-6 col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch"
+          >
+            <div className="card shadow-sm product-card w-100 d-flex flex-column">
+              
+              {/* Main Image */}
               <Link to={`/product/${product.id}`} className="position-relative">
                 <img
                   src={product.images[0]}
-                  className="card-img-top product-img-full rounded-2"
                   alt={product.title}
+                  className="card-img-top product-img-full rounded-2"
                 />
-                <span className="badge bg-danger position-absolute top-0 start-0 m-2">New</span>
+                <span className="badge bg-danger position-absolute top-0 start-0 m-2">
+                  New
+                </span>
               </Link>
 
-              <div className="card-body d-flex flex-column">
-                
-                {/* TRUNCATED TITLE */}
+              {/* Thumbnails for multiple images */}
+              {product.images.length > 1 && (
+                <div className="d-flex gap-1 mt-2 px-2">
+                  {product.images.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`thumb-${idx}`}
+                      className="thumbnail-img rounded"
+                      onClick={(e) => {
+                        e.target.closest(".card").querySelector(".product-img-full").src = img;
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Card Body */}
+              <div className="card-body d-flex flex-column p-3">
                 <h5 className="card-title text-truncate" title={product.title}>
                   {product.title}
                 </h5>
-
-                {/* TRUNCATED DESCRIPTION */}
                 <p className="card-text text-truncate" title={product.description}>
                   {product.description}
                 </p>
-
-                <p className="fw-bold mt-auto">₹ {product.price}</p>
-
+                <p className="fw-bold mt-auto price">₹ {product.price}</p>
                 <button className="btn btn-success w-100 mb-2">Add to Cart</button>
                 <button className="btn btn-warning w-100">Buy Now</button>
               </div>
-
             </div>
           </div>
         ))}
