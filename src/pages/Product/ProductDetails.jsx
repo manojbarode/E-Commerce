@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./Css/ProductDetails.css";
+import "./ProductDetails.css";
 import { getProductById } from "../../api/productApi";
 
 export default function ProductDetails() {
@@ -14,7 +13,7 @@ export default function ProductDetails() {
         const res = await getProductById(id);
         setProduct(res);
       } catch (err) {
-        console.error("Error fetching product details:", err);
+        console.error(err);
       }
     };
     fetchProduct();
@@ -47,23 +46,20 @@ export default function ProductDetails() {
             )}
           </div>
         </div>
-
-        {/* Product Info */}
         <div className="col-md-6">
           <h2>{product.title}</h2>
           <p className="text-muted">{product.category} / {product.subcategory}</p>
           <h4 className="text-primary">₹ {product.price}</h4>
           <p className="mt-3">{product.description}</p>
           <p><strong>Stock:</strong> {product.stock}</p>
-
           <h5 className="mt-4">Specifications</h5>
           <ul>
             {Object.entries(product.extra).map(([key, value], idx) => (
               <li key={idx}><strong>{key.replace("_"," ")}:</strong> {value}</li>
             ))}
           </ul>
-
-          <button className="btn btn-success mt-3">Add to Cart</button>
+          <button className="btn btn-success mt-3 me-2">Add to Cart</button>
+          <button className="btn btn-warning mt-3">Buy Now</button>
         </div>
       </div>
     </div>

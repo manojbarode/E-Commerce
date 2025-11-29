@@ -3,19 +3,19 @@ import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
 import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/Layout";
-import Home from "./pages/Home";
-import Signup from "./pages/Signup";
-import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Login from "./pages/Login";
+
 import Addseller from "./pages/Seller/Addseller";
-import HelpDesk from "./pages/help";
+import HelpDesk from "./pages/Extra/help";
 import ProductUpload from "./pages/Seller/ProductUpload";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import SellerDashboard from "./pages/Seller/SellerDashboard1/SellerDashboard";
-import OffersPage from "./pages/Offers";
-
-
+import OffersPage from "./pages/Extra/Offers";
+import Home from "./pages/Home/Home";
+import Login from "./pages/Login/Login";
+import Signup from "./pages/SignUP/Signup";
+import Profile from "./pages/Profile/Profile";
+import ProductDetails from "./pages/Product/ProductDetails";
 
 const App = () => {
   return (
@@ -25,19 +25,27 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/Addseller" element={<Addseller />} />
-        <Route path="/offers" element={<OffersPage/>}/>
-        <Route path="/help" element={<HelpDesk />}/>
-        <Route path="/dashboard" element={<AdminDashboard/>}/>
-        <Route path="/sellerdashboard" element={<SellerDashboard/>}/>
+        <Route path="/offers" element={<OffersPage />} />
+        <Route path="/help" element={<HelpDesk />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/sellerdashboard" element={<SellerDashboard />} />
         <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
-        <Route path="/profile" element={
+
+        {/* Protected Route */}
+        <Route
+          path="/profile"
+          element={
             <ProtectedRoute>
               <Profile />
             </ProtectedRoute>
           }
         />
+
+        {/* Product Details Route */}
+        <Route path="/product/:id" element={<ProductDetails />} />
       </Route>
     </Routes>
   );
-}
-export default App
+};
+
+export default App;

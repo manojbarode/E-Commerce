@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { signupUser } from "../api/authApi";
+import { signupUser } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { toast } from "react-toastify";

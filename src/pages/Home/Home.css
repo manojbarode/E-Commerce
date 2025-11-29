@@ -1,0 +1,26 @@
+.hero-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 10px;
+}
+
+@media (max-width: 1200px) { .hero-img { height: 400px; } }
+@media (max-width: 992px)  { .hero-img { height: 350px; } }
+@media (max-width: 768px)  { .hero-img { height: 280px; } }
+@media (max-width: 576px)  { .hero-img { height: 220px; } }
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 20px;
+}
+
+.carousel-indicators button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin: 0 5px;
+}

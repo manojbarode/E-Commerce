@@ -1,7 +1,13 @@
+import React from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./Home.css";
+import Product from "../Product/Products";
+
 export default function Home() {
   return (
-    <div className="mt-4">
-      <div id="heroCarousel" className="carousel slide" data-bs-ride="carousel">
+    <div className="home-container">
+      {/* Hero Carousel */}
+      <div id="heroCarousel" className="carousel slide mb-5" data-bs-ride="carousel">
         <div className="carousel-indicators">
           <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" className="active"></button>
           <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
@@ -29,56 +35,9 @@ export default function Home() {
           <span className="carousel-control-next-icon"></span>
         </button>
       </div>
-      <style>{`
-        .hero-img {
-          width: 100%;
-          height: 500px;
-          object-fit: cover;
-          object-position: center;
-        }
-        
-        @media (max-width: 1200px) {
-          .hero-img { 
-            height: 400px; 
-          }
-        }
-        
-        @media (max-width: 992px) {
-          .hero-img { 
-            height: 350px; 
-          }
-        }
-        
-        @media (max-width: 768px) {
-          .hero-img { 
-            height: 280px; 
-          }
-        }
-        
-        @media (max-width: 576px) {
-          .hero-img { 
-            height: 220px; 
-          }
-        }
-        
-        .carousel-inner {
-          border-radius: 0;
-        }
-        
-        .carousel-control-prev-icon,
-        .carousel-control-next-icon {
-          background-color: rgba(0, 0, 0, 0.5);
-          border-radius: 50%;
-          padding: 20px;
-        }
-        
-        .carousel-indicators button {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          margin: 0 5px;
-        }
-      `}</style>
+
+      {/* Featured Products */}
+      <Product />
     </div>
   );
 }

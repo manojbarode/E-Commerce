@@ -1,0 +1,9 @@
+.product-card { transition: transform 0.3s; }
+.product-card:hover { transform: translateY(-5px); }
+
+.product-img { height: 200px; object-fit: cover; border-radius: 4px; }
+
+.new-badge { position: absolute; top: 10px; left: 10px; font-size: 0.8rem; }
+
+.btn-primary { background: linear-gradient(45deg, #6a11cb, #2575fc); border: none; }
+.btn-warning { background: linear-gradient(45deg, #f7971e, #ffd200); border: none; }
