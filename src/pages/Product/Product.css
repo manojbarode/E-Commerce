@@ -1,9 +1,25 @@
-.product-card { transition: transform 0.3s; }
-.product-card:hover { transform: translateY(-5px); }
+/* IMAGE FULLY VISIBLE */
+.product-img-full {
+  width: 100%;
+  height: auto;        /* Full height of image, no cut */
+  max-height: 300px;   /* Optional max height for very tall images */
+  object-fit: contain; /* Ensure image fits inside card */
+}
 
-.product-img { height: 200px; object-fit: cover; border-radius: 4px; }
+/* SHORT DESCRIPTION - one line */
+.text-truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
-.new-badge { position: absolute; top: 10px; left: 10px; font-size: 0.8rem; }
+/* MOBILE RESPONSIVE */
+@media (max-width: 576px) {
+  .card-title {
+    font-size: 16px;
+  }
 
-.btn-primary { background: linear-gradient(45deg, #6a11cb, #2575fc); border: none; }
-.btn-warning { background: linear-gradient(45deg, #f7971e, #ffd200); border: none; }
+  .text-truncate {
+    font-size: 13px;
+  }
+}
