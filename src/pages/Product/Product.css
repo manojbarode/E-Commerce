@@ -22,3 +22,13 @@
     font-size: 12px;
   }
 }
+/* Custom card border */
+.product-card {
+  border: 2px solid #FF5733; 
+  border-radius: 10px;        
+  transition: transform 0.2s, border-color 0.2s; 
+}
+.product-card:hover {
+  border-color: #33C3FF; 
+  transform: translateY(-3px);
+}

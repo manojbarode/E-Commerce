@@ -24,7 +24,7 @@ export default function Product() {
       <div className="row">
         {products.map((product) => (
           <div key={product.id} className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
-            <div className="card h-100 shadow-sm">
+            <div className="card h-100 shadow-sm product-card">
 
               <Link to={`/product/${product.id}`} className="position-relative">
                 <img
