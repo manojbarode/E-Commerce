@@ -26,7 +26,6 @@ export default function Product() {
           <div key={product.id} className="col-6 col-sm-6 col-md-4 col-lg-3 mb-4">
             <div className="card h-100 shadow-sm">
 
-              {/* IMAGE FULLY VISIBLE */}
               <Link to={`/product/${product.id}`} className="position-relative">
                 <img
                   src={product.images[0]}
@@ -37,9 +36,13 @@ export default function Product() {
               </Link>
 
               <div className="card-body d-flex flex-column">
-                <h5 className="card-title">{product.title}</h5>
+                
+                {/* TRUNCATED TITLE */}
+                <h5 className="card-title text-truncate" title={product.title}>
+                  {product.title}
+                </h5>
 
-                {/* SHORT DESCRIPTION */}
+                {/* TRUNCATED DESCRIPTION */}
                 <p className="card-text text-truncate" title={product.description}>
                   {product.description}
                 </p>

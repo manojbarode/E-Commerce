@@ -1,25 +1,24 @@
-/* IMAGE FULLY VISIBLE */
+/* FULL IMAGE VISIBLE */
 .product-img-full {
   width: 100%;
-  height: auto;        /* Full height of image, no cut */
-  max-height: 300px;   /* Optional max height for very tall images */
-  object-fit: contain; /* Ensure image fits inside card */
+  height: auto;        /* Keep full image */
+  max-height: 300px;   /* Optional max height */
+  object-fit: contain; /* Never crop */
 }
 
-/* SHORT DESCRIPTION - one line */
+/* TRUNCATE DESCRIPTION AND TITLE */
 .text-truncate {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* MOBILE RESPONSIVE */
+/* MOBILE */
 @media (max-width: 576px) {
   .card-title {
-    font-size: 16px;
+    font-size: 14px;
   }
-
-  .text-truncate {
-    font-size: 13px;
+  .card-text {
+    font-size: 12px;
   }
 }
