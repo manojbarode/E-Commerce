@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Css/ProductUpload.css";
-import { ProductAdd } from "../../api/productApi";
+import { ProductAdd, uploadMultipleToCloudinary } from "../../api/productApi";
+import axios from "axios";
 
 export default function ProductUpload() {
   const [form, setForm] = useState({
@@ -12,11 +13,12 @@ export default function ProductUpload() {
     category: "",
     subcategory: "",
     sellerId: "",
-    images: [],
+    images: [],   
   });
 
   const [extra, setExtra] = useState({});
   const [loading, setLoading] = useState(false);
+  const [localImages, setLocalImages] = useState([]);
 
   const categoryData = {
     "Clothes": ["Men's Wear", "Women's Wear", "Kids"],
@@ -46,55 +48,47 @@ export default function ProductUpload() {
   };
 
   const handleImageChange = (e) => {
-    const files = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
+    const files = Array.from(e.target.files);
+    setLocalImages(files.map(file => URL.createObjectURL(file)));
     setForm({ ...form, images: files });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const finalData = { ...form, extra };
-    try {
-      setLoading(true);
-      const response = await ProductAdd(finalData); // API call
-      console.log("Product saved:", response);
-      alert("✅ Product added successfully!");
-      setForm({
-        title: "",
-        description: "",
-        price: "",
-        stock: "",
-        category: "",
-        subcategory: "",
-        sellerId: "",
-        images: [],
-      });
-      setExtra({});
-    } catch (error) {
-      console.error("Error adding product:", error);
-      alert("❌ Failed to add product!");
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    setLoading(true);
+    const uploadedUrls = await uploadMultipleToCloudinary(form.images);
+    const finalData = { ...form, images: uploadedUrls, extra };
+    await ProductAdd(finalData);
+    alert("✅ Product added successfully!");
+    setForm({title: "",description: "",price: "",stock: "",category: "",subcategory: "",sellerId: "",images: [],});
+    setLocalImages([]);
+    setExtra({});
+  } 
+  catch (error) 
+  {
+    console.error("Error adding product:", error);
+    alert("❌ Failed to add product!");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="container mt-5 mb-5">
       <div className="card shadow-lg p-5 rounded-4 form-card">
         <h2 className="mb-4 text-center fw-bold">🛍 Add New Product</h2>
         <form onSubmit={handleSubmit}>
-          {/* Title */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Product Title</label>
             <input type="text" name="title" className="form-control form-control-lg" onChange={handleBaseChange} placeholder="Enter product title" required />
           </div>
 
-          {/* Description */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Description</label>
             <textarea name="description" rows="3" className="form-control form-control-lg" onChange={handleBaseChange} placeholder="Write detailed description" required></textarea>
           </div>
-
-          {/* Price & Stock */}
           <div className="row mb-3">
             <div className="col-md-6 mb-3 mb-md-0">
               <label className="form-label fw-semibold">Price</label>
@@ -106,13 +100,10 @@ export default function ProductUpload() {
             </div>
           </div>
 
-          {/* Seller ID */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Seller ID</label>
             <input type="text" name="sellerId" className="form-control form-control-lg" onChange={handleBaseChange} placeholder="Enter seller ID" required />
           </div>
-
-          {/* Category */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Category</label>
             <select name="category" className="form-select form-select-lg" onChange={(e) => {handleBaseChange(e); setExtra({});}} required>
@@ -120,8 +111,6 @@ export default function ProductUpload() {
               {Object.keys(categoryData).map((cat, i) => (<option key={i} value={cat}>{cat}</option>))}
             </select>
           </div>
-
-          {/* Subcategory */}
           {form.category && (
             <div className="mb-3">
               <label className="form-label fw-semibold">Subcategory</label>
@@ -132,16 +121,13 @@ export default function ProductUpload() {
             </div>
           )}
 
-          {/* Images */}
           <div className="mb-4">
             <label className="form-label fw-semibold">Product Images</label>
             <input type="file" multiple accept="image/*" className="form-control form-control-lg" onChange={handleImageChange} />
             <div className="mt-2 d-flex flex-wrap gap-2">
-              {form.images.map((img, i) => <img key={i} src={img} alt="preview" className="preview-img rounded" />)}
+              {localImages.map((img, i) => <img key={i} src={img} alt="preview" className="preview-img rounded" width={100} />)}
             </div>
           </div>
-
-          {/* Dynamic Extra Fields */}
           {form.category && (
             <>
               <h5 className="mt-4 mb-3 text-primary fw-bold">🔧 {form.category} Specifications</h5>
@@ -155,7 +141,7 @@ export default function ProductUpload() {
           )}
 
           <button type="submit" className="btn btn-gradient w-100 btn-lg mt-4 fw-bold" disabled={loading}>
-            {loading ? "Submitting..." : "Submit Product"}
+            {loading ? "Uploading..." : "Submit Product"}
           </button>
         </form>
       </div>
