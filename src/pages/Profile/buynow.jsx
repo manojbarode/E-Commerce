@@ -14,55 +14,6 @@ const navigate = useNavigate();
     pincode: "",
   });
 
-<<<<<<< HEAD
-  const [errors, setErrors] = useState({});
-
-  const indianStates = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
-    "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
-    "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
-    "Uttar Pradesh", "Uttarakhand", "West Bengal",
-    "Andaman and Nicobar Islands", "Chandigarh", "Dadra & Nagar Haveli",
-    "Daman & Diu", "Delhi", "Jammu & Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
-  ];
-
-  const validateForm = () => {
-    let newErrors = {};
-
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
-    if (!formData.mobile.trim() || formData.mobile.length !== 10)
-      newErrors.mobile = "Enter valid 10-digit mobile number";
-    if (!formData.address.trim()) newErrors.address = "Address is required";
-    if (!formData.locality.trim()) newErrors.locality = "Locality is required";
-    if (!state) newErrors.state = "State is required";
-    if (!formData.pincode.trim() || formData.pincode.length !== 6)
-      newErrors.pincode = "Enter valid 6-digit PIN code";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      alert("Address Saved Successfully ✔");
-      setShowForm(false);
-    }
-  };
-
-  return (
-    <div className="container">
-
-      {/* Header */}
-        <div
-    className="d-flex align-items-center py-3"
-    style={{ borderBottom: "2px solid blueviolet", cursor: "pointer" }}
-    onClick={() => setShowForm(!showForm)}
-  >
-    <Plus size={20} color="blueviolet" className="me-2" />
-=======
   const price = 2499;
   const total = price * qty;
 
@@ -84,7 +35,6 @@ const navigate = useNavigate();
             </h2>
             <p className="text-gray-600">Men Navy Blue</p>
             <p className="text-xl font-bold mt-2">₹{price}</p>
->>>>>>> main
 
     <span
       className="fw-semibold"
