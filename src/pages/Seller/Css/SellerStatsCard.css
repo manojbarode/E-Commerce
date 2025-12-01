@@ -1,43 +1,85 @@
+/* Card container */
 .stats-card {
-  border-radius: 1rem;
-  color: #fff;
-  transition: all 0.3s ease;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s ease;
 }
 
 .stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Icons */
-.stats-icon {
-  opacity: 0.4;
+/* Top border color */
+.stats-top-line {
+  height: 4px;
+  transition: 0.3s ease;
 }
 
-/* Gradient examples for different card types */
-.bg-gradient-primary {
+.stats-card:hover .stats-top-line {
+  height: 6px;
+}
+
+/* Gradient Backgrounds */
+.bg-primary-gradient {
   background: linear-gradient(135deg, #6a11cb, #2575fc);
 }
 
-.bg-gradient-success {
-  background: linear-gradient(135deg, #11998e, #38ef7d);
+.bg-warning-gradient {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
 }
 
-.bg-gradient-warning {
-  background: linear-gradient(135deg, #f7971e, #ffd200);
+.bg-success-gradient {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
 }
 
-.bg-gradient-danger {
-  background: linear-gradient(135deg, #fc4a1a, #f7b733);
+/* Icon box */
+.stats-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  font-size: 1.7rem;
 }
 
-/* Text */
-h6 {
-  font-weight: 500;
+/* Footer */
+.stats-footer {
   font-size: 0.9rem;
+  font-weight: 600;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 12px;
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.3s ease;
 }
 
-h4 {
-  font-weight: 700;
-  font-size: 1.6rem;
+.stats-card:hover .stats-footer {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-value {
+    font-size: 1.6rem !important;
+  }
+
+  .stats-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-value {
+    font-size: 1.4rem !important;
+  }
+
+  .stats-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
 }

@@ -20,12 +20,12 @@ import ProductDetails from "./pages/Product/ProductDetails";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BuyNow from "./pages/Profile/buynow";
+import SellerLogout from "./pages/Seller/SellerDashboard1/SellerLogout";
 
 const App = () => {
   return (
     <>
-      {/* Toast Container ALWAYS OUTSIDE Routes */}
-      <ToastContainer />
+      <ToastContainer position="top-center" />
 
       <Routes>
         <Route element={<Layout />}>
@@ -39,6 +39,7 @@ const App = () => {
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
           <Route path="/Profile/buynow" element={<BuyNow/>}/>
+          <Route path="/sellerlogout" element={<SellerLogout />} />
     
 
           <Route

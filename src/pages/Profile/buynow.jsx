@@ -4,17 +4,15 @@ import { Minus, Plus, CreditCard, Smartphone, Truck } from "lucide-react";
 export default function BuyNow() {
   const [qty, setQty] = useState(1);
 
-  const price = 2499; // Product base price
+  const price = 2499;
   const total = price * qty;
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 flex flex-col lg:flex-row gap-6">
-      
-      {/* Left Section – Product Details */}
+
       <div className="bg-white p-5 rounded-2xl shadow-lg w-full lg:w-2/3">
         <h1 className="text-xl font-bold mb-4">Buy Now</h1>
 
-        {/* Product Card */}
         <div className="flex items-center gap-4 border p-4 rounded-xl">
           <img
             src="https://via.placeholder.com/120"
