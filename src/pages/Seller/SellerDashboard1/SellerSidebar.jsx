@@ -84,4 +84,4 @@ export default function SellerSidebar({ isOpen, closeDrawer }) {
       </aside>
     </>
   );
-}
+} 
