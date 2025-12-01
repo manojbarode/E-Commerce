@@ -106,3 +106,44 @@
     height: 170px;
   }
 }
+
+@media (max-width: 576px) {
+
+  .product-card {
+    padding-bottom: 5px;
+    height: auto;              /* Auto adjust for small screen */
+  }
+
+  .product-img-full {
+    height: 110px !important;  /* Reduced from 130px → 110px */
+  }
+
+  .thumbnail-img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .card-body {
+    padding: 6px !important;   /* Reduced from 8px */
+  }
+
+  .card-title {
+    font-size: 12px;        
+    margin-bottom: 3px;
+  }
+
+  .card-text {
+    font-size: 10px;        
+    margin-bottom: 3px;
+  }
+
+  .price {
+    font-size: 13px;
+    margin-bottom: 5px;
+  }
+
+  button {
+    padding: 4px 0;         
+    font-size: 11px;
+  }
+}
