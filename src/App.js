@@ -15,6 +15,7 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/SignUP/Signup";
 import Profile from "./pages/Profile/Profile";
+import BuyNow from "./pages/Profile/buynow";
 import ProductDetails from "./pages/Product/ProductDetails";
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/offers" element={<OffersPage />} />
         <Route path="/help" element={<HelpDesk />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/buynow" element={<BuyNow/>}/>
         <Route path="/sellerdashboard" element={<SellerDashboard />} />
         <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
 
