@@ -15,12 +15,12 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/SignUP/Signup";
 import Profile from "./pages/Profile/Profile";
-import BuyNow from "./pages/Profile/buynow";
 import ProductDetails from "./pages/Product/ProductDetails";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BuyNow from "./pages/Profile/buynow";
+import PaymentForm from "./Payment/payment";
 
 const App = () => {
   return (
@@ -40,6 +40,7 @@ const App = () => {
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
           <Route path="/Profile/buynow" element={<BuyNow/>}/>
+          <Route path="/payment" element={<PaymentForm/>}/>
     
 
           <Route
