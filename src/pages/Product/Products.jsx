@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import "./Product.css";
 import { ShowProduct } from "../../api/productApi";
+import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
+
+  // 🔥 AuthContext se login value le rahe hain
+  const { login } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -18,10 +23,32 @@ export default function Product() {
     fetchProducts();
   }, []);
 
+  // ---------- Login Check Functions ----------
+  const handleAddToCart = () => {
+    if (!login) {
+      toast.warning("Please login first to add items to cart!", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+      return;
+    }
+    toast.success("Added to cart!", { position: "top-center" });
+  };
+
+  const handleBuyNow = () => {
+    if (!login) {
+      toast.error("Login required before making a purchase!", {
+        position: "top-center",
+        autoClose: 1500,
+      });
+      return;
+    }
+    toast.success("Proceeding to checkout...");
+  };
+
   return (
     <div className="container mt-5">
       <h2 className="mb-4 fw-bold text-center">Featured Products</h2>
-
       <div className="row justify-content-center g-3">
 
         {products.map((product) => (
@@ -31,7 +58,6 @@ export default function Product() {
           >
             <div className="card h-100 shadow-sm product-card w-100">
 
-              {/* Main Image */}
               <Link to={`/product/${product.id}`} className="position-relative">
                 <img
                   src={product.images[0]}
@@ -62,21 +88,25 @@ export default function Product() {
                 </div>
               )}
 
-              {/* Card Body */}
               <div className="card-body d-flex flex-column p-3">
                 <h5 className="card-title text-truncate">{product.title}</h5>
-
-                <p className="card-text text-truncate">
-                  {product.description}
-                </p>
-
+                <p className="card-text text-truncate">{product.description}</p>
                 <p className="fw-bold mt-auto price">₹ {product.price}</p>
 
-                <button className="btn btn-success w-100 mb-2">
+                {/* --- Button Login Check --- */}
+                <button
+                  className="btn btn-success w-100 mb-2"
+                  onClick={handleAddToCart}
+                >
                   Add to Cart
                 </button>
 
-                <button className="btn btn-warning w-100">Buy Now</button>
+                <button
+                  className="btn btn-warning w-100"
+                  onClick={handleBuyNow}
+                >
+                  Buy Now
+                </button>
               </div>
 
             </div>
