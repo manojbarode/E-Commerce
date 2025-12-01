@@ -18,35 +18,43 @@ import Profile from "./pages/Profile/Profile";
 import BuyNow from "./pages/Profile/buynow";
 import ProductDetails from "./pages/Product/ProductDetails";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import BuyNow from "./pages/Profile/buynow";
+
 const App = () => {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/Addseller" element={<Addseller />} />
-        <Route path="/offers" element={<OffersPage />} />
-        <Route path="/help" element={<HelpDesk />} />
-        <Route path="/dashboard" element={<AdminDashboard />} />
-        <Route path="/buynow" element={<BuyNow/>}/>
-        <Route path="/sellerdashboard" element={<SellerDashboard />} />
-        <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
+    <>
+      {/* Toast Container ALWAYS OUTSIDE Routes */}
+      <ToastContainer />
 
-        {/* Protected Route */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/Addseller" element={<Addseller />} />
+          <Route path="/offers" element={<OffersPage />} />
+          <Route path="/help" element={<HelpDesk />} />
+          <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="/sellerdashboard" element={<SellerDashboard />} />
+          <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
+          <Route path="/Profile/buynow" element={<BuyNow/>}/>
+    
 
-        {/* Product Details Route */}
-        <Route path="/product/:id" element={<ProductDetails />} />
-      </Route>
-    </Routes>
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/product/:id" element={<ProductDetails />} />
+        </Route>
+      </Routes>
+    </>
   );
 };
 
