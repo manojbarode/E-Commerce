@@ -1,3 +1,91 @@
-.carousel-inner img { height: 400px; object-fit: cover; }
-.btn-success { background: linear-gradient(45deg, #28a745, #218838); border: none; }
-.btn-warning { background: linear-gradient(45deg, #ffc107, #e0a800); border: none; }
+/* Container layout */
+.product-details-wrapper {
+  display: flex;
+  gap: 2rem;
+  max-width: 100%;
+}
+
+/* Left side: image container */
+.product-image-wrapper {
+  flex: 1;
+  max-width: 600px; /* fixed max width for image side */
+}
+
+/* Right side: info container */
+.product-info-wrapper {
+  flex: 1;
+  max-height: 600px; /* fixed height */
+  overflow-y: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Carousel images: full width, height auto */
+.carousel-inner img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background-color: #f9fafb;
+}
+
+/* Carousel controls styling */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 10px;
+}
+
+/* Buttons styling */
+.btn-success {
+  background: linear-gradient(45deg, #28a745, #218838);
+  border: none;
+  transition: transform 0.2s;
+}
+
+.btn-success:hover {
+  transform: scale(1.05);
+}
+
+.btn-warning {
+  background: linear-gradient(45deg, #ffc107, #e0a800);
+  border: none;
+  transition: transform 0.2s;
+}
+
+.btn-warning:hover {
+  transform: scale(1.05);
+}
+
+/* Page spacing */
+.container {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+/* Back to Home button */
+.back-home-btn {
+  display: inline-block;
+  background-color: #495057;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+
+.back-home-btn:hover,
+.back-home-btn:focus {
+  background-color: #343a40;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: #f8f9fa;
+  outline: none;
+  text-decoration: none;
+}
