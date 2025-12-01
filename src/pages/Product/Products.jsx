@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Product.css";
 import { ShowProduct } from "../../api/productApi";
 import { AuthContext } from "../../context/AuthContext";
@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   // 🔥 AuthContext se login value le rahe hain
   const { login } = useContext(AuthContext);
@@ -37,13 +38,11 @@ export default function Product() {
 
   const handleBuyNow = () => {
     if (!login) {
-      toast.error("Login required before making a purchase!", {
-        position: "top-center",
-        autoClose: 1500,
-      });
+      toast.error("Login required before making a purchase!", {position: "top-center",autoClose: 1500,});
       return;
     }
     toast.success("Proceeding to checkout...");
+    navigate("/Profile/buynow")
   };
 
   return (
@@ -93,20 +92,13 @@ export default function Product() {
                 <p className="card-text text-truncate">{product.description}</p>
                 <p className="fw-bold mt-auto price">₹ {product.price}</p>
 
-                {/* --- Button Login Check --- */}
                 <button
                   className="btn btn-success w-100 mb-2"
                   onClick={handleAddToCart}
                 >
                   Add to Cart
                 </button>
-
-                <button
-                  className="btn btn-warning w-100"
-                  onClick={handleBuyNow}
-                >
-                  Buy Now
-                </button>
+                <button className="btn btn-warning w-100" onClick={handleBuyNow}>Buy Now</button>
               </div>
 
             </div>

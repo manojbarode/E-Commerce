@@ -19,6 +19,7 @@ import ProductDetails from "./pages/Product/ProductDetails";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BuyNow from "./pages/Profile/buynow";
 
 const App = () => {
   return (
@@ -37,6 +38,8 @@ const App = () => {
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
+          <Route path="/Profile/buynow" element={<BuyNow/>}/>
+    
 
           <Route
             path="/profile"
