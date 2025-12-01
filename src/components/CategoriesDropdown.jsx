@@ -12,7 +12,7 @@ const categories = {
   "Sports & Outdoors": ["Fitness", "Sportswear", "Camping"]
 };
 
-export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
+export default function CategoriesDropdown({ mobile = false, closeDrawer, onCategorySelect }) {
   const [openCategory, setOpenCategory] = useState(null);
 
   if (mobile) {
@@ -20,8 +20,6 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
       <div className="mobile-category">
         {Object.entries(categories).map(([cat, items], index) => (
           <div key={index} className="mobile-category-item">
-            
-            {/* Category title */}
             <div
               className="mobile-category-header"
               onClick={() => setOpenCategory(openCategory === index ? null : index)}
@@ -30,7 +28,6 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
               <i className={`bi bi-chevron-${openCategory === index ? "up" : "down"}`}></i>
             </div>
 
-            {/* Sub-Category Links */}
             {openCategory === index && (
               <ul className="mobile-category-list">
                 {items.map((item, i) => (
@@ -38,7 +35,10 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
                     <Link
                       to={`/products/${item.toLowerCase().replace(/\s/g, "-")}`}
                       className="mobile-category-link"
-                      onClick={closeDrawer} // 👈 क्लिक पर ड्रावर बंद करें
+                      onClick={() => {
+                        if (closeDrawer) closeDrawer();
+                        if (onCategorySelect) onCategorySelect(item);
+                      }}
                     >
                       {item}
                     </Link>
@@ -46,18 +46,15 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
                 ))}
               </ul>
             )}
-
           </div>
         ))}
       </div>
     );
   }
 
-  // DESKTOP VERSION (Mega Menu)
   return (
     <div className="dropdown-container">
       <div className="dropdown-toggle text-secondary">Categories</div>
-
       <div className="mega-menu">
         {Object.entries(categories).map(([category, items], index) => (
           <div key={index} className="category-column">
@@ -68,6 +65,7 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer }) {
                   <Link
                     to={`/products/${item.toLowerCase().replace(/\s/g, '-')}`}
                     className="dropdown-item"
+                    onClick={() => onCategorySelect && onCategorySelect(item)}
                   >
                     {item}
                   </Link>

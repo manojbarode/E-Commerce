@@ -14,6 +14,7 @@ const navigate = useNavigate();
     pincode: "",
   });
 
+<<<<<<< HEAD
   const [errors, setErrors] = useState({});
 
   const indianStates = [
@@ -61,6 +62,29 @@ const navigate = useNavigate();
     onClick={() => setShowForm(!showForm)}
   >
     <Plus size={20} color="blueviolet" className="me-2" />
+=======
+  const price = 2499;
+  const total = price * qty;
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-6 flex flex-col lg:flex-row gap-6">
+
+      <div className="bg-white p-5 rounded-2xl shadow-lg w-full lg:w-2/3">
+        <h1 className="text-xl font-bold mb-4">Buy Now</h1>
+
+        <div className="flex items-center gap-4 border p-4 rounded-xl">
+          <img
+            src="https://via.placeholder.com/120"
+            alt="Product"
+            className="w-24 h-24 object-cover rounded-lg"
+          />
+          <div>
+            <h2 className="text-lg font-semibold">
+              Adidas Sports Running Shoes
+            </h2>
+            <p className="text-gray-600">Men Navy Blue</p>
+            <p className="text-xl font-bold mt-2">₹{price}</p>
+>>>>>>> main
 
     <span
       className="fw-semibold"

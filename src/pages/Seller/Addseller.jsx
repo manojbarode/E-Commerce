@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Css/Seller.css";
 import { registerSeller, loginSeller } from "../../api/SellApi";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 const fieldMap = {
   FullName: "fullName",
   Email: "email",
@@ -150,10 +151,10 @@ export default function SellerAuth() {
     localStorage.setItem("sellerToken", token);
     localStorage.setItem("sellerName", fullName);
 
-    alert("Logged in successfully!");
+    toast.success("Logged in successfully!")
     navigate("/sellerdashboard");
   } catch (err) {
-    alert(err.message || "Invalid credentials");
+    toast.err(err.message || "Invalid credentials");
   } finally {
     setLoading(false);
   }

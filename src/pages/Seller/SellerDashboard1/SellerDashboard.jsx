@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import SellerSidebar from "./SellerSidebar";
 import SellerStatsCard from "./SellerStatsCard";
 import { Line, Pie } from "react-chartjs-2";
@@ -13,7 +14,6 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-import { useNavigate } from "react-router-dom";
 import "../Css/SellerDashboard.css";
 
 ChartJS.register(
@@ -39,6 +39,9 @@ export default function SellerDashboard() {
   const [sales, setSales] = useState([]);
   const [categoryStats, setCategoryStats] = useState([]);
 
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
     const sellerId = localStorage.getItem("sellerId");
 
@@ -58,82 +61,145 @@ export default function SellerDashboard() {
       .catch(console.log);
   }, []);
 
+  // 🔍 Filter Logic
+  const filteredCategories = categoryStats.filter((c) =>
+    (c.category || c.name).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredSales = sales.filter((s) =>
+    s.month.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // 🔵 Sales Chart Data
   const salesData = {
-    labels: sales.map((s) => s.month) || ["Jan", "Feb", "Mar"],
+    labels: filteredSales.map((s) => s.month),
     datasets: [
       {
         label: "Monthly Sales",
-        data: sales.map((s) => s.amount) || [1000, 2000, 3000],
+        data: filteredSales.map((s) => s.amount),
         borderColor: "#6a11cb",
-        backgroundColor: "rgba(106,17,203,0.2)",
+        backgroundColor: "rgba(106,17,203,0.15)",
         tension: 0.4,
+        fill: true,
       },
     ],
   };
 
-  const categoryData = {
-    labels: categoryStats.map((c) => c.category) || ["Clothes", "Electronics", "Shoes"],
+  // 🟠 Pie Chart Data
+  const pieData = {
+    labels: filteredCategories.map((c) => c.category || c.name),
     datasets: [
       {
         label: "Products per Category",
-        data: categoryStats.map((c) => c.count) || [5, 3, 2],
-        backgroundColor: ["#6a11cb","#2575fc","#ff6a00","#ff3cac","#1de9b6","#f9d423"],
+        data: filteredCategories.map((c) => c.count || c.total),
+        backgroundColor: [
+          "#6a11cb",
+          "#2575fc",
+          "#ff6a00",
+          "#ff3cac",
+          "#1de9b6",
+          "#f9d423",
+        ],
+        borderWidth: 2,
+        borderColor: "#fff",
       },
     ],
   };
 
   return (
-    <div className="seller-dashboard-wrapper d-flex">
-      <SellerSidebar />
-      <div className="dashboard-content flex-grow-1 p-4">
-        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-          <h2 className="fw-bold mb-2">Welcome, Seller 👋</h2>
+    <div className="dashboard-container">
+
+      <SellerSidebar isOpen={sidebarOpen} closeDrawer={() => setSidebarOpen(false)} />
+
+      <button
+        className="sidebar-toggle-btn d-lg-none"
+        onClick={() => setSidebarOpen((prev) => !prev)}
+      >
+        <i className={`bi ${sidebarOpen ? "bi-x-lg" : "bi-list"}`}></i>
+      </button>
+
+      {/* MAIN */}
+      <main className="dashboard-main container-fluid">
+
+        {/* Header */}
+        <header className="dashboard-header">
+          <div>
+            <h2 className="dashboard-title">Welcome Back 👋</h2>
+            <p className="dashboard-subtitle">Here’s your daily store performance</p>
+          </div>
+
           <button
-            className="btn btn-gradient text-white mb-2"
-            onClick={() => navigate("/SellerPage/product-upload")}
+            className="btn add-product-btn"
+            onClick={() => navigate("/sellerpage/product-upload")}
           >
-            ➕ Add New Product
+            <i className="bi bi-plus-circle me-2"></i>
+            Add Product
           </button>
+        </header>
+
+        {/* 🔍 Search Bar */}
+        <div className="search-bar-container mb-4">
+          <input
+            type="text"
+            className="form-control search-bar"
+            placeholder="Search category or month..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
 
         {/* Stats Cards */}
-        <div className="stats-cards d-flex flex-wrap gap-3 mb-4">
-          <SellerStatsCard
-            title="Total Products"
-            value={stats.totalProducts}
-            icon="bi-box-seam"
-            color="bg-primary"
-          />
-          <SellerStatsCard
-            title="Total Orders"
-            value={stats.totalOrders}
-            icon="bi-cart-check"
-            color="bg-warning"
-          />
-          <SellerStatsCard
-            title="Revenue"
-            value={`₹${stats.totalRevenue}`}
-            icon="bi-currency-rupee"
-            color="bg-success"
-          />
+        <div className="row g-3 mb-4">
+          <div className="col-12 col-md-6 col-lg-4">
+            <SellerStatsCard title="Total Products" value={stats.totalProducts} icon="bi-box-seam" color="primary" />
+          </div>
+          <div className="col-12 col-md-6 col-lg-4">
+            <SellerStatsCard title="Total Orders" value={stats.totalOrders} icon="bi-cart-check" color="warning" />
+          </div>
+          <div className="col-12 col-md-6 col-lg-4">
+            <SellerStatsCard title="Revenue" value={`₹${stats.totalRevenue}`} icon="bi-currency-rupee" color="success" />
+          </div>
         </div>
 
         {/* Charts */}
-        <div className="row gap-4">
-          <div className="col-lg-6 col-12">
-            <div className="card shadow-sm p-3 rounded-4 chart-card">
-              <h5 className="mb-3 fw-bold">Monthly Sales</h5>
-              <Line data={salesData} />
+        <div className="row g-3">
+          {/* LINE CHART */}
+          <div className="col-12 col-lg-6">
+            <div className="dashboard-card">
+              <h5 className="chart-title">
+                <i className="bi bi-graph-up me-2"></i>
+                Monthly Sales
+              </h5>
+
+              <div className="chart-wrapper">
+                <Line data={salesData} options={{ responsive: true, maintainAspectRatio: false }} />
+              </div>
             </div>
           </div>
-          <div className="col-lg-6 col-12">
-            <div className="card shadow-sm p-3 rounded-4 chart-card">
-              <h5 className="mb-3 fw-bold">Products per Category</h5>
-              <Pie data={categoryData} />
+
+          {/* PIE CHART */}
+          <div className="col-12 col-lg-6">
+            <div className="dashboard-card">
+              <h5 className="chart-title">
+                <i className="bi bi-pie-chart me-2"></i>
+                Category Distribution
+              </h5>
+
+              <div className="chart-wrapper">
+                <Pie
+                  data={pieData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: "bottom" } },
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+      </main>
     </div>
   );
 }
