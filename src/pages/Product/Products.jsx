@@ -9,8 +9,8 @@ export default function Product() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const products = await ShowProduct();
-        setProducts(products);
+        const data = await ShowProduct();
+        setProducts(data);
       } catch (err) {
         console.error(err);
       }
@@ -22,13 +22,14 @@ export default function Product() {
     <div className="container mt-5">
       <h2 className="mb-4 fw-bold text-center">Featured Products</h2>
       <div className="row justify-content-center g-3">
+
         {products.map((product) => (
           <div
             key={product.id}
-            className="col-6 col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch"
+            className="col-6 col-sm-4 col-md-3 col-lg-2 d-flex align-items-stretch"
           >
-            <div className="card shadow-sm product-card w-100 d-flex flex-column">
-              
+            <div className="card h-100 shadow-sm product-card w-100">
+
               {/* Main Image */}
               <Link to={`/product/${product.id}`} className="position-relative">
                 <img
@@ -41,18 +42,20 @@ export default function Product() {
                 </span>
               </Link>
 
-              {/* Thumbnails for multiple images */}
+              {/* Thumbnails */}
               {product.images.length > 1 && (
                 <div className="d-flex gap-1 mt-2 px-2">
                   {product.images.map((img, idx) => (
                     <img
                       key={idx}
                       src={img}
-                      alt={`thumb-${idx}`}
+                      alt="thumbnail"
                       className="thumbnail-img rounded"
-                      onClick={(e) => {
-                        e.target.closest(".card").querySelector(".product-img-full").src = img;
-                      }}
+                      onClick={(e) =>
+                        (e.target
+                          .closest(".card")
+                          .querySelector(".product-img-full").src = img)
+                      }
                     />
                   ))}
                 </div>
@@ -60,19 +63,18 @@ export default function Product() {
 
               {/* Card Body */}
               <div className="card-body d-flex flex-column p-3">
-                <h5 className="card-title text-truncate" title={product.title}>
-                  {product.title}
-                </h5>
-                <p className="card-text text-truncate" title={product.description}>
-                  {product.description}
-                </p>
+                <h5 className="card-title text-truncate">{product.title}</h5>
+                <p className="card-text text-truncate">{product.description}</p>
                 <p className="fw-bold mt-auto price">₹ {product.price}</p>
+
                 <button className="btn btn-success w-100 mb-2">Add to Cart</button>
                 <button className="btn btn-warning w-100">Buy Now</button>
               </div>
+
             </div>
           </div>
         ))}
+
       </div>
     </div>
   );
