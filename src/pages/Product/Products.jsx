@@ -21,6 +21,7 @@ export default function Product() {
   return (
     <div className="container mt-5">
       <h2 className="mb-4 fw-bold text-center">Featured Products</h2>
+
       <div className="row justify-content-center g-3">
 
         {products.map((product) => (
@@ -64,10 +65,17 @@ export default function Product() {
               {/* Card Body */}
               <div className="card-body d-flex flex-column p-3">
                 <h5 className="card-title text-truncate">{product.title}</h5>
-                <p className="card-text text-truncate">{product.description}</p>
+
+                <p className="card-text text-truncate">
+                  {product.description}
+                </p>
+
                 <p className="fw-bold mt-auto price">₹ {product.price}</p>
 
-                <button className="btn btn-success w-100 mb-2">Add to Cart</button>
+                <button className="btn btn-success w-100 mb-2">
+                  Add to Cart
+                </button>
+
                 <button className="btn btn-warning w-100">Buy Now</button>
               </div>
 

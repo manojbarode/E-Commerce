@@ -1,49 +1,64 @@
-/* =======================
-   BASE CARD (Desktop)
-   ======================= */
+/* ================================
+   PRODUCT CARD STYLING
+================================ */
+
 .product-card {
   border: 2px solid #FF5733;
   border-radius: 10px;
-  transition: transform 0.2s, border-color 0.2s;
+  transition: border-color 0.2s ease;
+  overflow: hidden;              /* image zoom ko card ke andar rakhega */
 }
 
 .product-card:hover {
-  border-color: #33C3FF;
-  transform: translateY(-3px);
+  border-color: #33C3FF;         /* only border changes */
 }
 
-/* Main Product Image */
+/* ================================
+   MAIN PRODUCT IMAGE (ZOOM ON HOVER)
+================================ */
+
 .product-img-full {
   width: 100%;
   height: 180px;
+  margin-top: 10px;
   object-fit: contain;
   background-color: #f8f9fa;
-  display: block;
+  border-radius: 8px;
+
+  transition: transform 0.35s ease-in-out;  /* smooth zoom */
 }
 
-/* Thumbnails */
+.product-img-full:hover {
+  transform: scale(1.07);         /* IMAGE zoom only */
+}
+
+/* ================================
+   THUMBNAILS
+================================ */
+
 .thumbnail-img {
   width: 40px;
   height: 40px;
   object-fit: cover;
   cursor: pointer;
   border: 1px solid #ddd;
-  transition: border-color 0.2s;
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
 }
 
 .thumbnail-img:hover {
   border-color: #007bff;
 }
 
+/* Prevent text overflow */
 .text-truncate {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-/* =======================
-   📱 FINAL MOBILE VERSION
-   ======================= */
+
+
 @media (max-width: 576px) {
 
   .product-card {
@@ -53,6 +68,7 @@
 
   .product-img-full {
     height: 110px !important;
+    margin-top: 4px;
   }
 
   .thumbnail-img {
@@ -85,31 +101,20 @@
   }
 }
 
-/* =======================
-   ⭐ LARGE SCREENS (5 Cards / Row)
-   ======================= */
 @media (min-width: 1200px) {
   .col-lg-2 {
     flex: 0 0 20%;
-    max-width: 20%;  /* 5 cards per row */
+    max-width: 20%;
   }
 
   .product-img-full {
     height: 160px;
   }
 }
-@media (min-width: 768px) and (max-width: 1199px) {
 
+
+@media (min-width: 768px) and (max-width: 1199px) {
   .product-img-full {
     height: 170px;
   }
 }
-.product-img-full {
-  margin-top: 10px;
-}
-@media (max-width: 576px) {
-  .product-img-full {
-    margin-top: 4px;
-  }
-}
-
