@@ -37,7 +37,7 @@ export default function Footer() {
             <h5 className="fw-semibold">Address</h5>
             <p className="text-white-50">
               Near Shagun Tower, Vijay Nagar, Indore, MP 452010 <br />
-              +91 88891 74066
+              +91 8889174066
             </p>
           </div>
 
