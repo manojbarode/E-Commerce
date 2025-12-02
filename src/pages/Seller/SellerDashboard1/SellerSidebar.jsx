@@ -19,55 +19,35 @@ export default function SellerSidebar({ isOpen, closeDrawer }) {
 
   return (
     <>
-      {/* Overlay for Mobile */}
       {isOpen && (
         <div className="sidebar-overlay d-lg-none" onClick={closeDrawer}></div>
       )}
 
       {/* Sidebar */}
       <aside className={`seller-sidebar ${isOpen ? "open" : ""}`}>
-        
-        {/* Extra top spacing for premium UI */}
-        <div className="sidebar-top-space d-none d-lg-block"></div>
-
-        {/* Header */}
-        <div className="sidebar-header d-flex align-items-center justify-content-between px-3 py-3">
-          <div className="d-flex align-items-center gap-3">
-            <div className="sidebar-logo d-flex align-items-center justify-content-center">
-              <i className="bi bi-shop"></i>
-            </div>
-            <div>
-              <h4 className="mb-0 fw-bold text-white">E-Shop</h4>
-              <small className="text-white-50">Seller Portal</small>
-            </div>
+        <div className="sidebar-header px-3 py-3 d-flex align-items-center gap-3">
+          <div className="sidebar-logo d-flex align-items-center justify-content-center">
+            <i className="bi bi-shop"></i>
+          </div>
+          <div>
+            <h4 className="mb-0 text-white fw-bold">E-Shop</h4>
+            <small className="text-white-50">Seller Portal</small>
           </div>
 
-          {/* Close btn for mobile */}
-          <button
-            className="btn sidebar-close-btn d-lg-none"
-            onClick={closeDrawer}
-          >
+          {/* Close button mobile */}
+          <button className="btn sidebar-close-btn d-lg-none" onClick={closeDrawer}>
             <i className="bi bi-x-lg"></i>
           </button>
         </div>
 
-        {/* Menu */}
-        <nav className="sidebar-menu px-3 mt-3 flex-grow-1">
+        <nav className="sidebar-menu px-3 mt-3">
           <ul className="nav flex-column">
             {menuItems.map((item) => {
               const active = location.pathname === item.path;
               return (
                 <li key={item.path} className="nav-item mb-2">
-                  <Link
-                    to={item.path}
-                    className={`nav-link sidebar-link ${
-                      active ? "active" : ""
-                    }`}
-                    onClick={closeDrawer}
-                  >
-                    <i className={`bi ${item.icon} me-3`}></i>
-                    {item.name}
-                    {active && <span className="active-indicator"></span>}
+                  <Link to={item.path}className={`nav-link sidebar-link ${active ? "active" : ""}`}onClick={closeDrawer}>
+                    <i className={`bi ${item.icon} me-3`}></i>{item.name}
                   </Link>
                 </li>
               );
@@ -75,11 +55,11 @@ export default function SellerSidebar({ isOpen, closeDrawer }) {
           </ul>
         </nav>
 
-        {/* Footer */}
+        {/* Footer logout */}
         <div className="sidebar-footer p-3">
           <button className="btn sidebar-logout w-100" onClick={handleLogout}>
-            <i className="bi bi-box-arrow-right me-2"></i> Logout
-            </button>
+            <i className="bi bi-box-arrow-right me-2"></i>Logout
+          </button>
         </div>
       </aside>
     </>
