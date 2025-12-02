@@ -21,6 +21,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BuyNow from "./pages/Profile/buynow";
 import SellerLogout from "./pages/Seller/SellerDashboard1/SellerLogout";
+import PaymentForm from "./Payment/payment";
 
 const App = () => {
   return (
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
           <Route path="/Profile/buynow" element={<BuyNow/>}/>
           <Route path="/sellerlogout" element={<SellerLogout />} />
+          <Route path="/payment" element={<PaymentForm/>}/>
     
 
           <Route

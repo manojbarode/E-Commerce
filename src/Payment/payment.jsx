@@ -41,65 +41,88 @@ export default function PaymentForm() {
         padding: "40px 20px",
       }}
     >
+      <style>{`
+        .payment-card { transition: all 0.3s ease; }
+        .payment-card:hover { transform: scale(1.04); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        .selected-payment {
+          border: 3px solid #667eea !important;
+          transform: scale(1.07);
+          box-shadow: 0 0 18px rgba(102,126,234,0.6);
+        }
+      `}</style>
+
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-lg-6 col-md-8">
-
             <div className="card border-0 shadow-lg" style={{ borderRadius: "20px" }}>
               <div className="card-body p-4 p-md-5">
-
                 <div className="text-center">
-  <h4
-    className="fw-bold mb-4"
-    style={{
-      whiteSpace: "nowrap",
-      fontSize: "clamp(20px, 4vw, 26px)", // auto responsive text size
-    }}
-  >
-    Choose Payment Method
-  </h4>
+                  <h4 className="fw-bold mb-4" style={{ fontSize: "clamp(20px, 4vw, 26px)" }}>
+                    Choose Payment Method
+                  </h4>
+
+                  {/* Payment Selection Cards */}
                   <div className="row g-3">
                     {paymentOptions.map((option) => (
                       <div className="col-6" key={option.value}>
                         <div
-                          className={`card h-100 border-0 shadow-sm ${
-                            paymentMethod === option.value ? "border-primary" : ""
+                          className={`card h-100 border-0 shadow-sm position-relative payment-card ${
+                            paymentMethod === option.value ? "selected-payment" : ""
                           }`}
                           style={{
                             cursor: "pointer",
                             borderRadius: "15px",
-                            transition: "all 0.3s ease",
-                            border: paymentMethod === option.value ? "3px solid #667eea" : "none",
-                            transform: paymentMethod === option.value ? "scale(1.05)" : "scale(1)",
                           }}
                           onClick={() => setPaymentMethod(option.value)}
                         >
+                          {paymentMethod === option.value && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "10px",
+                                right: "10px",
+                                background: "#28a745",
+                                color: "#fff",
+                                borderRadius: "50%",
+                                width: "24px",
+                                height: "24px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              ✓
+                            </div>
+                          )}
+
                           <div className="card-body text-center p-3">
                             <div
                               className="d-flex align-items-center justify-content-center mb-2"
                               style={{
-                                width: "50px",
-                                height: "50px",
+                                width: "55px",
+                                height: "55px",
                                 margin: "0 auto",
                                 background: option.gradient,
-                                borderRadius: "12px",
-                                fontSize: "1.5rem",
+                                borderRadius: "14px",
+                                fontSize: "1.8rem",
                               }}
                             >
                               {option.icon}
                             </div>
-                            <small className="fw-semibold">{option.label}</small>
+                            <small className="fw-bold">{option.label}</small>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Form Fields */}
+                  {/* Form area */}
                   {paymentMethod && (
                     <div
                       style={{
-                        animation: "fadeIn 0.5s ease-in",
+                        animation: "fadeIn 0.5s",
                         background: "#f8f9fa",
                         padding: "20px",
                         borderRadius: "15px",
@@ -107,15 +130,6 @@ export default function PaymentForm() {
                         marginBottom: "20px",
                       }}
                     >
-                      <style>
-                        {`
-                          @keyframes fadeIn {
-                            from { opacity: 0; transform: translateY(-10px); }
-                            to { opacity: 1; transform: translateY(0); }
-                          }
-                        `}
-                      </style>
-
                       {paymentMethod === "upi" && (
                         <div className="mb-3">
                           <label className="form-label fw-semibold">📱 UPI ID</label>
@@ -126,7 +140,6 @@ export default function PaymentForm() {
                             placeholder="yourname@upi"
                             value={formData.upiId}
                             onChange={handleChange}
-                            style={{ borderRadius: "10px" }}
                           />
                         </div>
                       )}
@@ -142,8 +155,7 @@ export default function PaymentForm() {
                               placeholder="1234 5678 9012 3456"
                               value={formData.cardNumber}
                               onChange={handleChange}
-                              maxLength="19"
-                              style={{ borderRadius: "10px" }}
+                              maxLength={19}
                             />
                           </div>
 
@@ -156,7 +168,6 @@ export default function PaymentForm() {
                               placeholder="John Doe"
                               value={formData.cardName}
                               onChange={handleChange}
-                              style={{ borderRadius: "10px" }}
                             />
                           </div>
 
@@ -170,8 +181,7 @@ export default function PaymentForm() {
                                 placeholder="MM"
                                 value={formData.expMonth}
                                 onChange={handleChange}
-                                maxLength="2"
-                                style={{ borderRadius: "10px" }}
+                                maxLength={2}
                               />
                             </div>
 
@@ -184,8 +194,7 @@ export default function PaymentForm() {
                                 placeholder="YYYY"
                                 value={formData.expYear}
                                 onChange={handleChange}
-                                maxLength="4"
-                                style={{ borderRadius: "10px" }}
+                                maxLength={4}
                               />
                             </div>
 
@@ -198,8 +207,7 @@ export default function PaymentForm() {
                                 placeholder="•••"
                                 value={formData.cvv}
                                 onChange={handleChange}
-                                maxLength="3"
-                                style={{ borderRadius: "10px" }}
+                                maxLength={3}
                               />
                             </div>
                           </div>
@@ -209,8 +217,8 @@ export default function PaymentForm() {
                       {paymentMethod === "cod" && (
                         <div className="text-center py-4">
                           <div className="display-1 mb-3">💵</div>
-                          <h5 className="text-muted">Pay with cash on delivery</h5>
-                          <p className="text-muted small mb-0">No additional charges</p>
+                          <h5 className="fw-bold">Cash on Delivery</h5>
+                          <p className="text-muted small mb-0">No extra charges</p>
                         </div>
                       )}
                     </div>
@@ -224,18 +232,15 @@ export default function PaymentForm() {
                       borderRadius: "12px",
                       padding: "15px",
                       fontSize: "1.1rem",
-                       marginTop: "20px",
                     }}
                   >
                     🔒 Complete Payment
                   </button>
 
-                  <small className="text-muted d-block mt-3">🔐 Your payment is secure and encrypted</small>
+                  <small className="text-muted d-block mt-3">🔐 Your payment is 100% secure</small>
                 </div>
-
               </div>
             </div>
-
           </div>
         </div>
       </div>

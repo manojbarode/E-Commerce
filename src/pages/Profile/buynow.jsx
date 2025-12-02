@@ -1,18 +1,25 @@
-import React, { useState } from "react";
-import { Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function AddAddress() {
+export default function AddressBook() {
+
+  const [addresses, setAddresses] = useState(() => {
+    const stored = localStorage.getItem("addresses");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [state, setState] = useState("");
-  const [qty, setQty] = useState(1);
-  const navigate = useNavigate();
+  const [editIndex, setEditIndex] = useState(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
     address: "",
     locality: "",
+    landmark: "",
+    state: "",
     pincode: "",
   });
 
@@ -27,134 +34,287 @@ export default function AddAddress() {
     "Uttarakhand", "West Bengal"
   ];
 
-  const price = 2499;
-  const total = price * qty;
+  useEffect(() => {
+    localStorage.setItem("addresses", JSON.stringify(addresses));
+  }, [addresses]);
+
+  const handleAddNew = () => {
+    setEditIndex(null);
+    setFormData({
+      fullName: "",
+      mobile: "",
+      address: "",
+      locality: "",
+      landmark: "",
+      state: "",
+      pincode: "",
+    });
+    setErrors({});
+    setShowForm(true);
+  };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+    setFormData(addresses[index]);
+    setShowForm(true);
+  };
+
+  const handleDelete = (index) => {
+    if (window.confirm("Are you sure you want to delete this address?")) {
+      const updated = addresses.filter((_, i) => i !== index);
+      setAddresses(updated);
+      if (selectedIndex === index) setSelectedIndex(null);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
 
-    if (!formData.fullName) newErrors.fullName = "Full name is required";
-    if (!formData.mobile || formData.mobile.length !== 10) newErrors.mobile = "Enter valid 10-digit number";
+    if (!formData.fullName) newErrors.fullName = "Full Name is required";
+    if (!formData.mobile || formData.mobile.length !== 10)
+      newErrors.mobile = "Enter valid 10-digit number";
     if (!formData.address) newErrors.address = "Address is required";
     if (!formData.locality) newErrors.locality = "Locality is required";
-    if (!state) newErrors.state = "Select state";
-    if (!formData.pincode || formData.pincode.length !== 6) newErrors.pincode = "Enter valid 6-digit pincode";
+    if (!formData.state) newErrors.state = "Select state";
+    if (!formData.pincode || formData.pincode.length !== 6)
+      newErrors.pincode = "Enter valid 6-digit pincode";
 
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      navigate("/payment");
+      if (editIndex !== null) {
+        const updated = [...addresses];
+        updated[editIndex] = formData;
+        setAddresses(updated);
+      } else {
+        setAddresses([...addresses, formData]);
+      }
+
+      setShowForm(false);
+      setSelectedIndex(editIndex !== null ? editIndex : addresses.length);
+      setEditIndex(null);
     }
   };
 
+  const handleContinue = () => {
+    if (selectedIndex == null) {
+      alert("Please select an address.");
+      return;
+    }
+    alert("Proceeding to payment with selected address!");
+    console.log("Selected Address:", addresses[selectedIndex]);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="container py-4">
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-address-card {
+            display: flex;
+            flex-direction: column;
+          }
+          
+          .mobile-address-info {
+            width: 100%;
+            margin-bottom: 12px;
+          }
+          
+          .mobile-btn-container {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+          }
+          
+          .mobile-btn-container button {
+            flex: 1;
+          }
+          
+          .mobile-radio-hide {
+            display: none;
+          }
+        }
+        
+        @media (min-width: 769px) {
+          .desktop-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+        }
+      `}</style>
 
-      <div className="bg-white p-5 rounded-2xl shadow-lg w-full lg:w-2/3 mx-auto">
-        <h1 className="text-xl font-bold mb-4">Buy Now</h1>
+      <div className="card shadow p-4">
+        <h4 className="fw-bold mb-3">Choose Delivery Address</h4>
 
-        <div className="flex items-center gap-4 border p-4 rounded-xl">
-          <img
-            src="https://via.placeholder.com/120"
-            alt="Product"
-            className="w-24 h-24 object-cover rounded-lg"
-          />
-          <div>
-            <h2 className="text-lg font-semibold">Adidas Sports Running Shoes</h2>
-            <p className="text-gray-600">Men Navy Blue</p>
-            <p className="text-xl font-bold mt-2">₹{price}</p>
+        {addresses.length > 0 && (
+          <div className="mb-4">
+            {addresses.map((addr, idx) => (
+              <div
+                key={idx}
+                className={`card p-3 mb-3 border ${
+                  selectedIndex === idx ? "border-primary shadow-sm" : "border-secondary"
+                }`}
+              >
+                <div className="desktop-layout mobile-address-card">
+                  {/* Address Info */}
+                  <div 
+                    onClick={() => setSelectedIndex(idx)} 
+                    className="flex-grow-1 mobile-address-info"
+                    style={{ cursor: "pointer" }}
+                  >
+                    <strong>{addr.fullName}</strong> — {addr.mobile}
+                    <p className="text-muted mb-0">
+                      {addr.address}, {addr.locality}, {addr.state} — {addr.pincode}
+                    </p>
+                  </div>
 
-            <span
-              onClick={() => setShowForm(true)}
-              style={{ cursor: "pointer" }}
-              className="text-blue-700 font-semibold flex items-center gap-1 mt-3"
-            >
-              <Plus size={18} /> Add a new address
-            </span>
+                  {/* Radio Button - Hidden on Mobile */}
+                  <input
+                    type="radio"
+                    name="selectedAddress"
+                    checked={selectedIndex === idx}
+                    onChange={() => setSelectedIndex(idx)}
+                    className="me-2 mobile-radio-hide"
+                  />
+
+                  {/* Edit and Delete Buttons */}
+                  <div className="mobile-btn-container d-flex gap-2">
+                    <button 
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => handleEdit(idx)}
+                    >
+                      <Pencil size={16} className="me-1" />
+                      <span className="d-none d-md-inline">Edit</span>
+                    </button>
+
+                    <button 
+                      className="btn btn-sm btn-outline-danger"
+                      onClick={() => handleDelete(idx)}
+                    >
+                      <Trash2 size={16} className="me-1" />
+                      <span className="d-none d-md-inline">Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
 
-        {/* Address Form */}
+        {!showForm && (
+          <button
+            className="btn btn-outline-primary w-100 fw-semibold mb-3 d-flex justify-content-center align-items-center gap-2"
+            onClick={handleAddNew}
+          >
+            <Plus size={18} /> Add New Address
+          </button>
+        )}
+
         {showForm && (
-          <form className="mt-4" onSubmit={handleSubmit}>
+          <div className="border p-3 rounded bg-light">
+            <div className="row g-2">
+              <div className="col-md-6">
+                <label className="form-label">Full Name</label>
+                <input
+                  className="form-control"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                />
+                {errors.fullName && <small className="text-danger">{errors.fullName}</small>}
+              </div>
 
-            <div className="mb-3">
-              <label className="form-label">Full Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-              />
-              {errors.fullName && <small className="text-danger">{errors.fullName}</small>}
+              <div className="col-md-6">
+                <label className="form-label">Mobile Number</label>
+                <input
+                  className="form-control"
+                  maxLength={10}
+                  value={formData.mobile}
+                  onChange={(e) =>
+                    setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })
+                  }
+                />
+                {errors.mobile && <small className="text-danger">{errors.mobile}</small>}
+              </div>
+
+              <div className="col-md-12">
+                <label className="form-label">Address</label>
+                <textarea
+                  className="form-control"
+                  rows="2"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                />
+                {errors.address && <small className="text-danger">{errors.address}</small>}
+              </div>
+
+              <div className="col-md-6">
+                <label className="form-label">Landmark</label>
+                <input
+                  className="form-control"
+                  value={formData.landmark}
+                  onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
+                />
+                {errors.landmark && <small className="text-danger">{errors.landmark}</small>}
+              </div>
+
+              <div className="col-md-6">
+                <label className="form-label">Locality</label>
+                <input
+                  className="form-control"
+                  value={formData.locality}
+                  onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
+                />
+                {errors.locality && <small className="text-danger">{errors.locality}</small>}
+              </div>
+
+              <div className="col-md-6">
+                <label className="form-label">State</label>
+                <select
+                  className="form-select"
+                  value={formData.state}
+                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                >
+                  <option value="">Select State</option>
+                  {indianStates.map((st, i) => (
+                    <option key={i} value={st}>{st}</option>
+                  ))}
+                </select>
+                {errors.state && <small className="text-danger">{errors.state}</small>}
+              </div>
+
+              <div className="col-md-6">
+                <label className="form-label">Pincode</label>
+                <input
+                  className="form-control"
+                  maxLength={6}
+                  value={formData.pincode}
+                  onChange={(e) =>
+                    setFormData({ ...formData, pincode: e.target.value.replace(/[^0-9]/g, "") })
+                  }
+                />
+                {errors.pincode && <small className="text-danger">{errors.pincode}</small>}
+              </div>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Mobile Number</label>
-              <input
-                type="text"
-                className="form-control"
-                maxLength={10}
-                value={formData.mobile}
-                onChange={(e) =>
-                  setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })
-                }
-              />
-              {errors.mobile && <small className="text-danger">{errors.mobile}</small>}
+            <div className="d-flex gap-2 mt-3">
+              <button onClick={handleSubmit} className="btn btn-primary w-50">
+                {editIndex !== null ? "Update" : "Save"}
+              </button>
+              <button className="btn btn-secondary w-50" onClick={() => setShowForm(false)}>
+                Cancel
+              </button>
             </div>
+          </div>
+        )}
 
-            <div className="mb-3">
-              <label className="form-label">Address</label>
-              <textarea
-                className="form-control"
-                rows="2"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              />
-              {errors.address && <small className="text-danger">{errors.address}</small>}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Locality</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.locality}
-                onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
-              />
-              {errors.locality && <small className="text-danger">{errors.locality}</small>}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">State</label>
-              <select className="form-select" value={state} onChange={(e) => setState(e.target.value)}>
-                <option value="">Select State</option>
-                {indianStates.map((st, i) => (
-                  <option key={i} value={st}>{st}</option>
-                ))}
-              </select>
-              {errors.state && <small className="text-danger">{errors.state}</small>}
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Pin Code</label>
-              <input
-                type="text"
-                className="form-control"
-                maxLength={6}
-                value={formData.pincode}
-                onChange={(e) =>
-                  setFormData({ ...formData, pincode: e.target.value.replace(/[^0-9]/g, "") })
-                }
-              />
-              {errors.pincode && <small className="text-danger">{errors.pincode}</small>}
-            </div>
-
-            <button type="submit" className="btn btn-primary w-100">
-              Save Address
-            </button>
-          </form>
+        {addresses.length > 0 && !showForm && (
+          <button
+            className="btn btn-success w-100 mt-4"
+            onClick={handleContinue}
+          >
+            Continue to Payment
+          </button>
         )}
       </div>
     </div>
