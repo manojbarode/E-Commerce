@@ -1,0 +1,35 @@
+/* For Mobile Screens */
+@media (max-width: 768px) {
+  .mobile-address-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobile-address-info {
+    width: 100%;
+    margin-bottom: 12px;
+  }
+
+  .mobile-btn-container {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .mobile-btn-container button {
+    flex: 1;
+  }
+
+  .mobile-radio-hide {
+    display: none;
+  }
+}
+
+/* For Desktop Screens */
+@media (min-width: 769px) {
+  .desktop-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

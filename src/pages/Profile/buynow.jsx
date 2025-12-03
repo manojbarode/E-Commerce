@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useNavigate } from "react-router-dom";
+import "./buynow.css";
 
 export default function AddressBook() {
-  const navigate = useNavigate();
-
   const [addresses, setAddresses] = useState(() => {
     const stored = localStorage.getItem("addresses");
     return stored ? JSON.parse(stored) : [];
@@ -15,14 +13,8 @@ export default function AddressBook() {
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    mobile: "",
-    address: "",
-    locality: "",
-    landmark: "",
-    state: "",
-    pincode: "",
+  const [formData, setFormData] = useState({fullName: "",mobile: "",address: "",locality: "",
+    landmark: "",state: "",pincode: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -42,14 +34,7 @@ export default function AddressBook() {
 
   const handleAddNew = () => {
     setEditIndex(null);
-    setFormData({
-      fullName: "",
-      mobile: "",
-      address: "",
-      locality: "",
-      landmark: "",
-      state: "",
-      pincode: "",
+    setFormData({fullName: "",mobile: "",address: "",locality: "",landmark: "",state: "",pincode: "",
     });
     setErrors({});
     setShowForm(true);
@@ -111,84 +96,37 @@ export default function AddressBook() {
 
   return (
     <div className="container py-4">
-      <style>{`
-        @media (max-width: 768px) {
-          .mobile-address-card {
-            display: flex;
-            flex-direction: column;
-          }
-          
-          .mobile-address-info {
-            width: 100%;
-            margin-bottom: 12px;
-          }
-          
-          .mobile-btn-container {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-          }
-          
-          .mobile-btn-container button {
-            flex: 1;
-          }
-          
-          .mobile-radio-hide {
-            display: none;
-          }
-        }
-        
-        @media (min-width: 769px) {
-          .desktop-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-        }
-      `}</style>
-
       <div className="card shadow p-4">
         <h4 className="fw-bold mb-3">Choose Delivery Address</h4>
 
         {addresses.length > 0 && (
           <div className="mb-4">
             {addresses.map((addr, idx) => (
-              <div
-                key={idx}
+              <div key={idx}
                 className={`card p-3 mb-3 border ${
                   selectedIndex === idx ? "border-primary shadow-sm" : "border-secondary"
                 }`}
               >
                 <div className="desktop-layout mobile-address-card">
-                  {/* Address Info */}
-                  <div 
-                    onClick={() => setSelectedIndex(idx)} 
-                    className="flex-grow-1 mobile-address-info"
+                  
+                  <div onClick={() => setSelectedIndex(idx)} className="flex-grow-1 mobile-address-info"
                     style={{ cursor: "pointer" }}
                   >
                     <strong>{addr.fullName}</strong> — {addr.mobile}
-                    <p className="text-muted mb-0">
-                      {addr.address}, {addr.locality}, {addr.state} — {addr.pincode}
+                    <p className="text-muted mb-0">{addr.address}, {addr.locality}, {addr.state} — {addr.pincode}
                     </p>
                   </div>
 
-                  {/* Radio Button - Hidden on Mobile */}
-                  <input
-                    type="radio"
-                    name="selectedAddress"
-                    checked={selectedIndex === idx}
-                    onChange={() => setSelectedIndex(idx)}
-                    className="me-2 mobile-radio-hide"
+                  <input type="radio" name="selectedAddress" checked={selectedIndex === idx}
+                    onChange={() => setSelectedIndex(idx)} className="me-2 mobile-radio-hide"
                   />
 
-                  {/* Edit and Delete Buttons */}
                   <div className="mobile-btn-container d-flex gap-2">
                     <button 
                       className="btn btn-sm btn-outline-primary"
                       onClick={() => handleEdit(idx)}
                     >
-                      <Pencil size={16} className="me-1" />
-                      <span className="d-none d-md-inline">Edit</span>
+                      <Pencil size={16} className="me-1" /><span className="d-none d-md-inline">Edit</span>
                     </button>
 
                     <button 
@@ -216,12 +154,11 @@ export default function AddressBook() {
 
         {showForm && (
           <div className="border p-3 rounded bg-light">
+            
             <div className="row g-2">
               <div className="col-md-6">
                 <label className="form-label">Full Name</label>
-                <input
-                  className="form-control"
-                  value={formData.fullName}
+                <input className="form-control" value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 />
                 {errors.fullName && <small className="text-danger">{errors.fullName}</small>}
@@ -229,10 +166,7 @@ export default function AddressBook() {
 
               <div className="col-md-6">
                 <label className="form-label">Mobile Number</label>
-                <input
-                  className="form-control"
-                  maxLength={10}
-                  value={formData.mobile}
+                <input className="form-control" maxLength={10}value={formData.mobile}
                   onChange={(e) =>
                     setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })
                   }
@@ -242,10 +176,7 @@ export default function AddressBook() {
 
               <div className="col-md-12">
                 <label className="form-label">Address</label>
-                <textarea
-                  className="form-control"
-                  rows="2"
-                  value={formData.address}
+                <textarea className="form-control" rows="2"value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 />
                 {errors.address && <small className="text-danger">{errors.address}</small>}
@@ -253,10 +184,8 @@ export default function AddressBook() {
 
               <div className="col-md-6">
                 <label className="form-label">Landmark</label>
-                <input
-                  className="form-control"
-                  value={formData.landmark}
-                  onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
+                <input className="form-control"value={formData.landmark}
+                onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
                 />
                 {errors.landmark && <small className="text-danger">{errors.landmark}</small>}
               </div>
@@ -304,7 +233,10 @@ export default function AddressBook() {
               <button onClick={handleSubmit} className="btn btn-primary w-50">
                 {editIndex !== null ? "Update" : "Save"}
               </button>
-              <button className="btn btn-secondary w-50" onClick={() => setShowForm(false)}>
+              <button
+                className="btn btn-secondary w-50"
+                onClick={() => setShowForm(false)}
+              >
                 Cancel
               </button>
             </div>

@@ -6,6 +6,7 @@ import { Line, Pie } from "react-chartjs-2";
 
 import {Chart as ChartJS,CategoryScale,LinearScale,PointElement,LineElement,Title,Tooltip,Legend,ArcElement,} from "chart.js";
 import "../Css/SellerDashboard.css";
+import { getCategoryStats, getMonthlySales, getSellerStats } from "../../../api/SellApi";
 ChartJS.register(CategoryScale,LinearScale,PointElement,LineElement,Title,Tooltip,Legend,ArcElement);
 
 export default function SellerDashboard() {
@@ -23,20 +24,12 @@ export default function SellerDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const sellerId = localStorage.getItem("sellerId");
+  const sellerId = localStorage.getItem("sellerId");
 
-    fetch(`/api/seller/${sellerId}/stats`)
-      .then((res) => res.json())
-      .then((data) => setStats(data));
-
-    fetch(`/api/seller/${sellerId}/sales`)
-      .then((res) => res.json())
-      .then((data) => setSales(data));
-
-    fetch(`/api/seller/${sellerId}/category-stats`)
-      .then((res) => res.json())
-      .then((data) => setCategoryStats(data));
-  }, []);
+  getSellerStats(sellerId).then(setStats);
+  getMonthlySales(sellerId).then(setSales);
+  getCategoryStats(sellerId).then(setCategoryStats);
+}, []);
 
   const filteredCategories = categoryStats.filter((c) =>
     (c.category || c.name).toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,7 +44,7 @@ export default function SellerDashboard() {
     datasets: [
       {
         label: "Monthly Sales",
-        data: filteredSales.map((s) => s.amount),
+        data: filteredSales.map((s) => s.amount ||s.totalAmount),
         borderColor: "#6a11cb",
         backgroundColor: "rgba(106,17,203,0.15)",
         tension: 0.4,
