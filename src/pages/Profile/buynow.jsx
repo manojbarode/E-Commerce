@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./buynow.css";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function AddressBook() {
   const [addresses, setAddresses] = useState(() => {
     const stored = localStorage.getItem("addresses");
     return stored ? JSON.parse(stored) : [];
   });
-
+  let navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
@@ -86,10 +88,11 @@ export default function AddressBook() {
 
   const handleContinue = () => {
     if (selectedIndex == null) {
-      alert("Please select an address.");
+      toast.error("Please select an address.");
       return;
     }
-    alert("Proceeding to payment with selected address!");
+    toast.success("Proceeding to payment with selected address!");
+    navigate("/payment");
     console.log("Selected Address:", addresses[selectedIndex]);
   };
 
