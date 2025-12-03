@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from "react-router-dom";
 
 export default function AddressBook() {
+  const navigate = useNavigate();
 
   const [addresses, setAddresses] = useState(() => {
     const stored = localStorage.getItem("addresses");
@@ -103,6 +105,7 @@ export default function AddressBook() {
       return;
     }
     alert("Proceeding to payment with selected address!");
+    navigate('/payment');
     console.log("Selected Address:", addresses[selectedIndex]);
   };
 
