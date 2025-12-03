@@ -91,13 +91,8 @@ export default function AddressBook() {
       toast.error("Please select an address.");
       return;
     }
-<<<<<<< HEAD
-    toast.success("Proceeding to payment with selected address!");
-    navigate("/payment");
-=======
     alert("Proceeding to payment with selected address!");
     navigate('/payment');
->>>>>>> 97ef7348eaac161d13da04d553b842fcbbce743c
     console.log("Selected Address:", addresses[selectedIndex]);
   };
 
