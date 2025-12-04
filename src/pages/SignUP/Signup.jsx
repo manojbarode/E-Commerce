@@ -12,21 +12,25 @@ const Signup = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
-  const handleSignupSubmit = async (e) => {
+const handleSignupSubmit = async (e) => {
   e.preventDefault();
-  
+
   try {
-   const res = await signupUser({ name, email, password });
-if (res?.data) {
-  toast.success("Signup successful! Please login.");
-  navigate("/login");
-}
+    const res = await signupUser({ name, email, password });
+
+    if (res?.success) {
+      toast.success(res.message);
+      navigate("/login");
+    } else {
+      toast.error(res?.message || "Signup failed!");
+    }
 
   } catch (error) {
     console.error(error);
-    toast.error("Signup failed!");
+    toast.error(error?.message || "Signup failed!");
   }
 };
+
 
 
   return (
