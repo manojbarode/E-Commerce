@@ -25,7 +25,7 @@ if (!loginData || !loginData.token) {
 }
 
 localStorage.setItem("token", loginData.token);
-localStorage.setItem("customerId", loginData.userId);
+localStorage.setItem("customerId", String(loginData.userId));
 localStorage.setItem("name", loginData.name);
 localStorage.setItem("email", loginData.email);
 console.log("customerID: " + loginData.userId);
@@ -35,9 +35,6 @@ loginUser(loginData.token, {
   name: loginData.name, 
   email: loginData.email 
 });
-
-
-    toast.success("Login successful! Redirecting...");
     setTimeout(() => navigate("/"), 500);
 
   } catch (err) {

@@ -2,8 +2,8 @@ import axiosInstance from "./axiosConfig";
 
 const BASE_PATH = "address";
 
-export const getAddresses = async () => {
-  const res = await axiosInstance.get(BASE_PATH);
+export const getAddresses = async (userId) => {
+  const res = await axiosInstance.get(`${BASE_PATH}/${userId}`);
   return res.data.data;
 };
 

@@ -34,17 +34,27 @@ export default function AddressBook() {
   ];
 
   useEffect(() => {
+     const userId = localStorage.getItem("customerId");
+  if (userId) {
     fetchAddresses();
+  }
   }, []);
 
-  const fetchAddresses = async () => {
-    try {
-      const data = await getAddresses();
-      setAddresses(data);
-    } catch (err) {
-      toast.error("Failed to fetch addresses");
+ const fetchAddresses = async () => {
+  try {
+    const userId = localStorage.getItem("customerId");
+    if (!userId) {
+      toast.error("User not logged in!");
+      return;
     }
-  };
+    const response = await getAddresses(Number(userId));
+    setAddresses(response);
+    console.log(response);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to fetch addresses");
+  }
+};
 
   const handleAddNew = () => {
     setEditIndex(null);
@@ -85,8 +95,6 @@ export default function AddressBook() {
 
  const handleSubmit = async (e) => {
   e.preventDefault();
-
-  // Validate form fields
   const newErrors = {};
   if (!formData.fullName.trim()) newErrors.fullName = "Full Name is required";
   if (!formData.mobile || formData.mobile.length !== 10) newErrors.mobile = "Enter valid 10-digit number";
