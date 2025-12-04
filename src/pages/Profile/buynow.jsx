@@ -93,17 +93,8 @@ export default function AddressBook() {
     }
   };
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
-  const newErrors = {};
-  if (!formData.fullName.trim()) newErrors.fullName = "Full Name is required";
-  if (!formData.mobile || formData.mobile.length !== 10) newErrors.mobile = "Enter valid 10-digit number";
-  if (!formData.address) newErrors.address = "Address is required";
-  if (!formData.locality) newErrors.locality = "Locality is required";
-  if (!formData.state) newErrors.state = "Select state";
-  if (!formData.pincode || formData.pincode.length !== 6) newErrors.pincode = "Enter valid 6-digit pincode";
-  setErrors(newErrors);
-  if (Object.keys(newErrors).length !== 0) return;
 
   try {
     const userId = localStorage.getItem("customerId");
@@ -113,19 +104,32 @@ export default function AddressBook() {
     }
 
     const payload = { ...formData, userId: Number(userId) };
-    const savedAddress = await addAddress(payload);
 
-    setAddresses([...addresses, savedAddress]);
-    toast.success("Address saved!");
+    if (editIndex !== null) {
+      const id = addresses[editIndex].id;
+      const updatedAddress = await updateAddress(id, payload);
+
+      const updatedList = [...addresses];
+      updatedList[editIndex] = updatedAddress;
+      setAddresses(updatedList);
+
+      toast.success("Address updated successfully");
+    } else {
+      const savedAddress = await addAddress(payload);
+      setAddresses([...addresses, savedAddress]);
+      toast.success("Address saved successfully");
+    }
+
     setShowForm(false);
     setFormData({
       fullName: "", mobile: "", address: "", locality: "", landmark: "", state: "", pincode: ""
     });
 
   } catch (err) {
-    toast.error("Failed to save address");
+    toast.error("Failed to save/update address");
   }
 };
+
 
 
   const handleContinue = () => {
