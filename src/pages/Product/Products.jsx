@@ -41,7 +41,6 @@ export default function Product() {
       toast.error("Login required before making a purchase!", {position: "top-center",autoClose: 1500,});
       return;
     }
-    toast.success("Proceeding to checkout...");
     navigate("/Profile/buynow")
   };
 
