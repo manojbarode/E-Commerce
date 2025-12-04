@@ -3,6 +3,7 @@ import { loginUser as apiLoginUser } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -11,30 +12,41 @@ const Login = () => {
   const navigate = useNavigate();
   const { loginUser } = useContext(AuthContext);
 
-  const handleLoginSubmit = async (e) => {
+ const handleLoginSubmit = async (e) => {
   e.preventDefault();
   setMessage("");
-  
+
   try {
-    const data = await apiLoginUser({ email, password });
-    console.log("✅ API Response:", data);
-    
-    const token = typeof data === 'string' ? data : data.token;
-    
-    if (token) {
-      const userData = data.user || { email: email };
-      
-      loginUser(token, userData);
-      setMessage("Login successful! Redirecting...");
-      setTimeout(() => navigate("/"), 500);
-    } else {
-      setMessage("Login failed. Please try again.");
-    }
+   const loginData = await apiLoginUser({ email, password });
+
+if (!loginData || !loginData.token) {
+  toast.error("Login failed. Please try again.");
+  return;
+}
+
+localStorage.setItem("token", loginData.token);
+localStorage.setItem("customerId", loginData.userId);
+localStorage.setItem("name", loginData.name);
+localStorage.setItem("email", loginData.email);
+console.log("customerID: " + loginData.userId);
+
+loginUser(loginData.token, { 
+  id: loginData.userId, 
+  name: loginData.name, 
+  email: loginData.email 
+});
+
+
+    toast.success("Login successful! Redirecting...");
+    setTimeout(() => navigate("/"), 500);
+
   } catch (err) {
-    console.error("❌ Error:", err);
-    setMessage("Invalid email or password.");
+    toast.error("Invalid email or password.");
   }
 };
+
+
+
 
   return (
     <div style={{ background: "#f8f9fa", padding: "60px 0" }}>

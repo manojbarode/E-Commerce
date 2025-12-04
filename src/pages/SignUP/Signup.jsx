@@ -16,12 +16,11 @@ const Signup = () => {
   e.preventDefault();
   
   try {
-    const data = await signupUser({ name, email, password });
-
-    if (data) {
-      toast.success("Signup successful! Please login.");
-      navigate("/login"); // ✅ Signup ke baad login page
-    }
+   const res = await signupUser({ name, email, password });
+if (res?.data) {
+  toast.success("Signup successful! Please login.");
+  navigate("/login");
+}
 
   } catch (error) {
     console.error(error);
