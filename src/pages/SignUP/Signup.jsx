@@ -18,11 +18,8 @@ const handleSignupSubmit = async (e) => {
   try {
     const res = await signupUser({ name, email, password });
 
-    console.log("Signup Response:", res);
-
-    // Check based on your ApiResponse format
     if (res && Number(res.status) === 201) {
-      toast.success(res.message || "Signup Successful!");
+      toast.success(res.message);
       navigate("/login");
     } else {
       toast.error(res.message || "Signup failed!");
@@ -32,6 +29,7 @@ const handleSignupSubmit = async (e) => {
     toast.error(error?.message || "Signup failed!");
   }
 };
+
 
 
 

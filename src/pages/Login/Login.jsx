@@ -17,30 +17,34 @@ const Login = () => {
   setMessage("");
 
   try {
-   const loginData = await apiLoginUser({ email, password });
+    const loginData = await apiLoginUser({ email, password });
 
-if (!loginData || !loginData.token) {
-  toast.error("Login failed. Please try again.");
-  return;
-}
+    if (!loginData || !loginData.token) {
+      toast.error("Login failed. Please try again.");
+      return;
+    }
 
-localStorage.setItem("token", loginData.token);
-localStorage.setItem("customerId", String(loginData.userId));
-localStorage.setItem("name", loginData.name);
-localStorage.setItem("email", loginData.email);
-console.log("customerID: " + loginData.userId);
+    // Save values
+    localStorage.setItem("token", loginData.token);
+    localStorage.setItem("customerId", String(loginData.userId));
+    localStorage.setItem("name", loginData.name);
+    localStorage.setItem("email", loginData.email);
 
-loginUser(loginData.token, { 
-  id: loginData.userId, 
-  name: loginData.name, 
-  email: loginData.email 
-});
+    // Context update
+    loginUser(loginData.token, {
+      id: loginData.userId,
+      name: loginData.name,
+      email: loginData.email
+    });
+
+    toast.success("Login successful!");
     setTimeout(() => navigate("/"), 500);
 
   } catch (err) {
-    toast.error("Invalid email or password.");
+    toast.error(err?.message || "Invalid email or password.");
   }
 };
+
 
 
 

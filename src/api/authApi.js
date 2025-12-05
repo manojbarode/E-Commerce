@@ -12,7 +12,7 @@ export const signupUser = async (userData) => {
 export const loginUser = async (credentials) => {
   try {
     const response = await axiosInstance.post("/auth/login", credentials);
-    return response.data.data; 
+    return response.data.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }

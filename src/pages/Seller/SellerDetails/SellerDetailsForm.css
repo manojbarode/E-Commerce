@@ -1,0 +1,84 @@
+/* Background Section */
+.seller-container {
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+/* Card with Glass Effect */
+.seller-card-premium {
+  width: 100%;
+  max-width: 900px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(18px);
+  border-radius: 20px;
+  padding: 40px;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Main Title */
+.seller-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 30px;
+  margin-bottom: 25px;
+  background: linear-gradient(90deg, #fff, #d1e3ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Section header */
+.section-title {
+  margin: 25px 0 15px 5px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #e6efff;
+}
+
+/* Premium Inputs */
+.input-premium {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.12);
+  transition: 0.2s ease;
+}
+
+.input-premium:focus {
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(102, 148, 255, 0.5);
+}
+
+/* Premium Button */
+.btn-premium {
+  margin-top: 30px;
+  background: linear-gradient(120deg, #f6d365, #fda085);
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  color: #333;
+  transition: 0.3s ease;
+}
+
+.btn-premium:hover {
+  background: linear-gradient(120deg, #fda085, #f6d365);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}

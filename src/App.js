@@ -4,8 +4,6 @@ import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
-
-import Addseller from "./pages/Seller/Addseller";
 import HelpDesk from "./pages/Extra/help";
 import ProductUpload from "./pages/Seller/ProductUpload";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -22,6 +20,9 @@ import "react-toastify/dist/ReactToastify.css";
 import BuyNow from "./pages/Profile/buynow";
 import SellerLogout from "./pages/Seller/SellerDashboard1/SellerLogout";
 import PaymentForm from "./Payment/payment";
+import SellerAuth from "./pages/Seller/SellerAuth/Seller";
+import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
+// import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
 
 const App = () => {
   return (
@@ -33,7 +34,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/Addseller" element={<Addseller />} />
+          <Route path="/Addseller" element={<SellerAuth />} />
           <Route path="/offers" element={<OffersPage />} />
           <Route path="/help" element={<HelpDesk />} />
           <Route path="/dashboard" element={<AdminDashboard />} />
@@ -41,6 +42,7 @@ const App = () => {
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
           <Route path="/Profile/buynow" element={<BuyNow/>}/>
           <Route path="/sellerlogout" element={<SellerLogout />} />
+          <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/payment" element={<PaymentForm/>}/>
     
 
