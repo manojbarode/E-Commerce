@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "./SellerDetailsForm.css";
+import { sellerDetails } from "../../../api/SellApi";
 
 export default function SellerForm() {
   const navigate = useNavigate();
@@ -29,10 +30,27 @@ export default function SellerForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    toast.success("Design Updated!");
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+
+  try {
+    const sellerId = Number(localStorage.getItem("sellerId"));
+    const response = await sellerDetails(sellerId, form);
+
+    toast.success(response.message);
+    if (!sellerId) {
+  toast.error("Seller ID not found. Please login again.");
+  return;
+}
+
+    navigate("/sellerdashboard");
+  } catch (error) {
+    toast.error(error.message || "Something went wrong!");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const sections = [
     {

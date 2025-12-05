@@ -18,6 +18,16 @@ export const loginSeller = async (credentials) => {
   }
 };
 
+export const sellerDetails = async (sellerId, formData) => {
+  try {
+    const response = await axiosInstance.post(`/seller/${sellerId}/business`, formData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+
 
 // export const getSellerStats = async(sellerId)=>{
 //   try

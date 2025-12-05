@@ -49,37 +49,32 @@ export default function SellerAuth() {
         toast.success(res.data.message || "Login Successful!");
         localStorage.setItem("sellerToken", res.data.data.token);
         localStorage.setItem("sellerName", res.data.data.fullName);
+        const sellerId = res.data.data.sellerId;
+        localStorage.setItem("sellerId", sellerId);
+        console.log("data"+sellerId);
         navigate("/sellerdashboard");
       } else {
         toast.error(res.data.message || "Login failed!");
       }
     } else {
-      const res = await registerSeller({
-        email: form.email,
-        mobile: form.mobile,
-        password: form.password,
-      });
+  const res = await registerSeller({
+    email: form.email,
+    mobile: form.mobile,
+    password: form.password,
+  });
 
-   if (res.data.status === 201) {
+  if (res.data.status === 201) {
     toast.success(res.data.message || "Registration Successful!");
-    // login after registration
-    const loginRes = await loginSeller({ email: form.email, password: form.password });
 
-    if (loginRes.data.status === 200 && loginRes.data.data?.token) {
-        toast.success("Logged in successfully!");
-        localStorage.setItem("sellerToken", loginRes.data.data.token);
-        localStorage.setItem("sellerName", loginRes.data.data.fullName);
-        navigate("/sellerdashboard");
-    } else {
-        toast.error(loginRes.data.message || "Login after registration failed!");
-        setTab("login");
-    }
-} else {
+    // After registration → switch to login tab
+    setTab("login");
+    setForm({ email: form.email, password: "", mobile: "" });
+
+  } else {
     toast.error(res.data.message || "Registration failed!");
+  }
 }
 
-
-    }
   } catch (err) {
     const msg =err?.response?.data?.message ||err?.response?.data?.error ||"Something went wrong!";
     toast.error(msg);
