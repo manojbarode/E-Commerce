@@ -68,7 +68,7 @@ export default function ProductUpload() {
 
         if (validFiles.length + invalidFiles.length === files.length) {
           if (invalidFiles.length > 0) {
-            alert(
+            toast.error(
               `⚠ The following images exceed ${MAX_WIDTH}x${MAX_HEIGHT}px:\n${invalidFiles.join(
                 "\n"
               )}`
@@ -89,7 +89,7 @@ export default function ProductUpload() {
     e.preventDefault();
 
     if (form.images.length === 0) {
-      alert("❌ Please upload at least one valid image!");
+      toast.error("Please upload at least one valid image!");
       return;
     }
 
@@ -100,7 +100,7 @@ export default function ProductUpload() {
 
       const finalData = {...form,images: uploadedUrls,extra,};
       await ProductAdd(finalData);
-      toast.success("✅ Product added successfully!");
+      toast.success("Product added successfully!");
       navigate("/sellerdashboard");
       setForm({title: "",description: "",price: "",stock: "",category: "",subcategory: "",sellerId: sellerId || "",
         images: [],});
@@ -110,7 +110,7 @@ export default function ProductUpload() {
     } 
     catch (error) 
     {
-      toast.error("❌ Failed to add product!");
+      toast.error("Failed to add product!");
     } 
     finally {
       setLoading(false);
