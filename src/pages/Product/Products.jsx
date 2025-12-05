@@ -8,23 +8,32 @@ import { toast } from "react-toastify";
 export default function Product() {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
-
-  // 🔥 AuthContext se login value le rahe hain
   const { login } = useContext(AuthContext);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await ShowProduct();
-        setProducts(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const fetchProducts = async () => {
+    try {
+      const response = await ShowProduct();
 
-  // ---------- Login Check Functions ----------
+      console.log("PRODUCTS:", response);
+
+      if (!response || !Array.isArray(response.data)) {
+        console.warn("Invalid API data");
+        setProducts([]);
+        return;
+      }
+
+      setProducts(response.data); // yahi array hai
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setProducts([]);
+    }
+  };
+
+  fetchProducts();
+}, []);
+
+  // ------------- Login Check -------------
   const handleAddToCart = () => {
     if (!login) {
       toast.warning("Please login first to add items to cart!", {
@@ -38,18 +47,26 @@ export default function Product() {
 
   const handleBuyNow = () => {
     if (!login) {
-      toast.error("Login required before making a purchase!", {position: "top-center",autoClose: 1500,});
+      toast.error("Login required before making a purchase!", {
+        position: "top-center",
+        autoClose: 1500,
+      });
       return;
     }
-    navigate("/Profile/buynow")
+    navigate("/Profile/buynow");
   };
 
   return (
     <div className="container mt-5">
       <h2 className="mb-4 fw-bold text-center">Featured Products</h2>
+
       <div className="row justify-content-center g-3">
 
-        {products.map((product) => (
+        {products.length === 0 && (
+          <p className="text-center text-muted">No products available</p>
+        )}
+
+        {Array.isArray(products) && products.map((product) => (
           <div
             key={product.id}
             className="col-6 col-sm-4 col-md-3 col-lg-2 d-flex align-items-stretch"
@@ -58,7 +75,11 @@ export default function Product() {
 
               <Link to={`/product/${product.id}`} className="position-relative">
                 <img
-                  src={product.images[0]}
+                  src={
+                    Array.isArray(product.images) && product.images.length > 0
+                      ? product.images[0]
+                      : "/no-image.png"
+                  }
                   alt={product.title}
                   className="card-img-top product-img-full rounded-2"
                 />
@@ -68,7 +89,7 @@ export default function Product() {
               </Link>
 
               {/* Thumbnails */}
-              {product.images.length > 1 && (
+              {Array.isArray(product.images) && product.images.length > 1 && (
                 <div className="d-flex gap-1 mt-2 px-2">
                   {product.images.map((img, idx) => (
                     <img
@@ -97,7 +118,13 @@ export default function Product() {
                 >
                   Add to Cart
                 </button>
-                <button className="btn btn-warning w-100" onClick={handleBuyNow}>Buy Now</button>
+
+                <button
+                  className="btn btn-warning w-100"
+                  onClick={handleBuyNow}
+                >
+                  Buy Now
+                </button>
               </div>
 
             </div>

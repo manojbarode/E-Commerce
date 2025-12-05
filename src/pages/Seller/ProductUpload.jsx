@@ -107,7 +107,7 @@ export default function ProductUpload() {
       setLocalImages([]);
       setExtra({});
     } catch (error) {
-      console.error("Error adding product:", error);
+      // console.error("Error adding product:", error);
       alert("❌ Failed to add product!");
     } finally {
       setLoading(false);

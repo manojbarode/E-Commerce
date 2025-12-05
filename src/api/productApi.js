@@ -39,15 +39,17 @@ export const uploadMultipleToCloudinary = async (files) => {
   }
 };
 
+
 export const ShowProduct = async () => {
   try {
     const response = await axiosInstance.get("/products/show");
-    return response.data;
+    return response.data; // poora object return ho raha
   } catch (error) {
-    console.error("SHOW PRODUCT ERROR:", error.response?.data || error.message);
-    throw error;
+    console.error("API ERROR:", error);
+    return { data: [] }; // fail-safe
   }
 };
+
 
 export const getProductById = async (id) => {
   try {
