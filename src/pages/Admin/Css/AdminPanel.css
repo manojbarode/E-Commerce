@@ -1,0 +1,100 @@
+/* src/components/Css/AdminPanel.css */
+
+.admin-dashboard {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+  color: #e5e7eb;
+}
+
+/* Header */
+.admin-header {
+  color: #e5e7eb;
+}
+
+.admin-title {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.admin-subtitle {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* Glassmorphism card */
+.admin-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 55%),
+    radial-gradient(circle at top right, rgba(129, 140, 248, 0.2), transparent 55%),
+    rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.85);
+}
+
+/* Inputs & select */
+.admin-input,
+.admin-select {
+  background-color: rgba(15, 23, 42, 0.9);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  color: #e5e7eb;
+}
+
+.admin-input::placeholder,
+.admin-select::placeholder {
+  color: #6b7280;
+}
+
+.admin-input:focus,
+.admin-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+}
+
+/* Buttons */
+.admin-btn {
+  border-radius: 0.75rem;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
+}
+
+.admin-btn-outline {
+  border-radius: 999px;
+}
+
+/* List */
+.admin-list {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.admin-list-item {
+  background: transparent;
+  border-color: rgba(31, 41, 55, 0.9);
+  color: #e5e7eb;
+}
+
+/* Scrollbar styling */
+.admin-list::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-list::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 999px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .admin-card {
+    border-radius: 1rem;
+  }
+}

@@ -5,7 +5,6 @@ import { Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HelpDesk from "./pages/Extra/help";
-import ProductUpload from "./pages/Seller/ProductUpload";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import SellerDashboard from "./pages/Seller/SellerDashboard1/SellerDashboard";
 import OffersPage from "./pages/Extra/Offers";
@@ -13,7 +12,6 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/SignUP/Signup";
 import Profile from "./pages/Profile/Profile";
-import ProductDetails from "./pages/Product/ProductDetails";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,7 +20,8 @@ import SellerLogout from "./pages/Seller/SellerDashboard1/SellerLogout";
 import PaymentForm from "./Payment/payment";
 import SellerAuth from "./pages/Seller/SellerAuth/Seller";
 import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
-// import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
+import ProductUpload from "./components/ProductUpload/ProductUpload";
+import ProductDetails from "./pages/Product/ProductDetails";
 
 const App = () => {
   return (
@@ -44,6 +43,8 @@ const App = () => {
           <Route path="/sellerlogout" element={<SellerLogout />} />
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/payment" element={<PaymentForm/>}/>
+          <Route path="/admin" element={<AdminDashboard/>}/>
+
     
 
           <Route
