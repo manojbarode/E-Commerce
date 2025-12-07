@@ -11,7 +11,6 @@ export default function Navbar() {
   const { login, logoutUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // const [searchVisible, setSearchVisible] = useState(false); // REMOVED
 
   const handleProfileClick = () => {
     login ? navigate("/profile") : navigate("/signup");
@@ -34,8 +33,6 @@ export default function Navbar() {
             eShop
           </span>
 
-          {/* Mobile Search Bar (Permanent and Inline on Small Screens) */}
-          {/* d-lg-none ensures it hides on desktop, while premium-mobile-search-inline-permanent styles it for mobile */}
           <div className="premium-search-box premium-mobile-search-inline-permanent d-lg-none">
             <i className="bi bi-search"></i>
             <input 
@@ -45,7 +42,6 @@ export default function Navbar() {
             />
           </div>
 
-          {/* Menu Items (Desktop & Collapsed Mobile Menu) */}
           <div className="collapse navbar-collapse" id="navbarContent">
             <ul className="navbar-nav mx-auto">
               <li className="nav-item">
@@ -83,7 +79,6 @@ export default function Navbar() {
               <input type="search" placeholder="Search products..." className="premium-search-input" />
             </div>
 
-            {/* Desktop Icons + Signup/Login */}
             <div className="premium-nav-icons d-none d-lg-flex">
               <Link to="/wishlist" className="premium-icon-btn icon-wishlist">
                 <i className="bi bi-heart"></i>
@@ -112,9 +107,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile Right Section (Icons) */}
           <div className="d-flex d-lg-none align-items-center gap-2">
-            {/* Search button removed here */}
 
             {login ? (
               <div className="premium-mobile-login-btn" onClick={handleProfileClick}>
@@ -134,10 +127,8 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Removed the entire Mobile Search conditional block */}
       </nav>
 
-      {/* Mobile Drawer (Remains the same) */}
       <div className={`premium-drawer ${drawerOpen ? "show" : ""}`}>
         <div className="premium-drawer-header">
           <h4>Menu</h4>
