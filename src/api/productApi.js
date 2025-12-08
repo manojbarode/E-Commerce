@@ -1,4 +1,3 @@
-import axios from "axios";
 import axiosInstance from "./axiosConfig";
 
 export const ProductAdd = async (productData, sellerId) => {
@@ -23,36 +22,37 @@ export const ProductAdd = async (productData, sellerId) => {
 export const uploadToCloudinary = async (file) => {
   try {
     const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "Ecommerce");
+    formData.append("file", file); // must be "file"
+    formData.append("upload_preset", "Ecommerce"); // unsigned preset
 
     const cloudName = "djbgoanwn";
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload?transformation=c_fill,w_1600,h_1600,q_auto:best`;
+    const res = await axiosInstance.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-    const res = await axios.post(url, formData);
     return res.data.secure_url;
 
   } catch (error) {
-    console.error("Cloudinary Upload ERROR:", error);
+    console.error("Cloudinary Upload ERROR:", error.response?.data || error.message);
     throw error;
   }
 };
 
+
 export const uploadMultipleToCloudinary = async (files) => {
   try {
     const uploads = files.map((file) => uploadToCloudinary(file));
-
     const results = await Promise.all(uploads);
-
     return results;
-
   } catch (error) {
     console.error("Multiple Cloudinary upload error:", error);
     throw error;
   }
 };
-
 
 export const ShowProduct = async () => {
   try {

@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 export default function Product() {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [expandedDesc, setExpandedDesc] = useState({});
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
@@ -26,7 +25,6 @@ export default function Product() {
         setProducts([]);
       }
     };
-
     fetchProducts();
   }, []);
 
@@ -78,10 +76,6 @@ export default function Product() {
     });
   };
 
-  const toggleDescription = (id) => {
-    setExpandedDesc((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
-
   return (
     <div className="product-page">
       <div className="container">
@@ -101,10 +95,6 @@ export default function Product() {
 
           {products.map((product) => {
             const isWishlisted = wishlist.includes(product.id);
-            const isExpanded = expandedDesc[product.id] || false;
-
-            const desc = product.description || "";
-            const showMore = desc.length > 80;
 
             return (
               <div key={product.id} className="product-card">
@@ -130,7 +120,6 @@ export default function Product() {
                     alt={product.title}
                     className="product-img-full"
                   />
-
                   <span className="badge new-badge position-absolute top-0 start-0 m-2">
                     New
                   </span>
@@ -168,18 +157,6 @@ export default function Product() {
                   </div>
 
                   <h5 className="card-title">{product.title}</h5>
-
-                  <p
-                    className={`card-text ${isExpanded ? "expanded" : ""}`}
-                    onClick={() => showMore && toggleDescription(product.id)}
-                  >
-                    {isExpanded ? desc : desc.slice(0, 80)}
-                    {showMore && (
-                      <span className="more-toggle">
-                        {isExpanded ? " show less" : "...more"}
-                      </span>
-                    )}
-                  </p>
 
                   <div className="price-row">
                     <span className="price">₹ {product.price}</span>

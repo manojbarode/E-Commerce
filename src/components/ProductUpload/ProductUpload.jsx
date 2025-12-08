@@ -10,7 +10,6 @@ export default function ProductUpload() {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [fields, setFields] = useState([]);
-
   const [form, setForm] = useState({
     categoryId: "",
     subcategoryId: "",
@@ -21,7 +20,6 @@ export default function ProductUpload() {
     images: [],
     previews: [],
   });
-
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -136,7 +134,6 @@ export default function ProductUpload() {
     <div className="container mt-5 mb-5">
       <div className="card shadow-lg p-5 rounded-4 form-card">
         <h2 className="text-center fw-bold mb-4">🛍 Add New Product</h2>
-
         <form onSubmit={handleSubmit}>
 
           {/* CATEGORY */}
@@ -241,7 +238,6 @@ export default function ProductUpload() {
           {/* IMAGE UPLOAD */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Product Images</label>
-
             <input
               type="file"
               multiple
@@ -271,7 +267,6 @@ export default function ProductUpload() {
           {form.previews.length > 0 && (
             <div className="preview-container mt-3">
               <h6 className="fw-bold">Image Preview</h6>
-
               <div className="d-flex gap-3 flex-wrap">
                 {form.previews.map((src, i) => (
                   <img key={i} src={src} alt="preview" className="img-preview-box" />

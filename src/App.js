@@ -17,12 +17,13 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BuyNow from "./pages/Profile/buynow";
 import SellerLogout from "./pages/Seller/SellerDashboard1/SellerLogout";
-import PaymentForm from "./Payment/payment";
 import SellerAuth from "./pages/Seller/SellerAuth/Seller";
 import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
 import ProductUpload from "./components/ProductUpload/ProductUpload";
 import ProductDetails from "./pages/Product/ProductDetails";
 import SellerProducts from "./pages/Seller/ProductManagment/Sellerproduct";
+import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
+import PaymentForm from "./Payment/payment";
 
 const App = () => {
   return (
@@ -30,15 +31,6 @@ const App = () => {
       {/* ToastContainer updated with very high z-index */}
       <ToastContainer
         position="top-center"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        toastStyle={{ zIndex: 200000 }} // <-- ensure it’s above drawer
       />
 
       <Routes>
@@ -55,9 +47,10 @@ const App = () => {
           <Route path="/Profile/buynow" element={<BuyNow/>}/>
           <Route path="/sellerlogout" element={<SellerLogout />} />
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
-          <Route path="/payment" element={<PaymentForm/>}/>
+          <Route path="/admin/payment-method" element={<PaymentMethodAddForm />} />
           <Route path="/sellerproduct" element={<SellerProducts/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
+          <Route path="/payment" element={<PaymentForm/>}/>
 
           <Route
             path="/profile"

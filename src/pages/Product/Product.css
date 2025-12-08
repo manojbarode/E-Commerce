@@ -43,6 +43,8 @@
   backdrop-filter: blur(16px);
   box-shadow: 0 15px 38px rgba(15, 23, 42, 0.75);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  min-height: 320px;
+  max-height: 320px;
 }
 
 .product-card:hover {
@@ -54,7 +56,7 @@
 
 .product-img-full {
   width: 100%;
-  aspect-ratio: 1/1;
+  height: 140px; /* adjust for card height */
   object-fit: contain;
   border-radius: 12px;
   background: radial-gradient(circle at top, #f9fafb, #e5e7eb);
@@ -75,34 +77,13 @@
   margin: 2px 0 2px;
   color: #f9fafb;
   display: -webkit-box;
-  line-clamp: 2;
+  -webkit-line-clamp: 1; /* single line since description removed */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .card-text {
-  font-size: 0.75rem;
-  color: #cbd5f5;
-  margin-bottom: 4px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  line-clamp: 2;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.card-text.expanded {
-  display: block;
-  line-clamp: unset;
-}
-
-.more-toggle {
-  font-size: 0.65rem;
-  color: #facc15;
-  cursor: pointer;
-  user-select: none;
-  margin-left: 2px;
+  display: none; /* description removed */
 }
 
 .tag-row {
@@ -176,7 +157,7 @@
 .thumbnail-row {
   display: flex;
   gap: 6px;
-  margin: 8px 0 5px;
+  margin-top: auto;
 }
 
 .thumbnail-img {
@@ -202,7 +183,7 @@
   display: flex;
   align-items: baseline;
   gap: 6px;
-  margin-top: auto;
+  margin-top: 4px;
   margin-bottom: 4px;
 }
 
