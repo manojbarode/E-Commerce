@@ -8,19 +8,19 @@ import { toast } from "react-toastify";
 export default function Product() {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [expandedDesc, setExpandedDesc] = useState({}); // Track expanded description per product
+  const [expandedDesc, setExpandedDesc] = useState({});
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await ShowProduct();
-        if (!response || !Array.isArray(response.data)) {
+        const response = await ShowProduct(); // returns array now
+        if (!response || !Array.isArray(response)) {
           setProducts([]);
           return;
         }
-        setProducts(response.data);
+        setProducts(response);
       } catch (err) {
         console.error("Error fetching products:", err);
         setProducts([]);
@@ -102,7 +102,9 @@ export default function Product() {
           {products.map((product) => {
             const isWishlisted = wishlist.includes(product.id);
             const isExpanded = expandedDesc[product.id] || false;
-            const showMore = product.description.length > 80;
+
+            const desc = product.description || "";
+            const showMore = desc.length > 80;
 
             return (
               <div key={product.id} className="product-card">
@@ -120,9 +122,9 @@ export default function Product() {
                 >
                   <img
                     src={
-                      Array.isArray(product.images) &&
-                      product.images.length > 0
-                        ? product.images[0]
+                      Array.isArray(product.imageUrls) &&
+                      product.imageUrls.length > 0
+                        ? product.imageUrls[0]
                         : "/no-image.png"
                     }
                     alt={product.title}
@@ -134,10 +136,10 @@ export default function Product() {
                   </span>
                 </Link>
 
-                {Array.isArray(product.images) &&
-                  product.images.length > 1 && (
+                {Array.isArray(product.imageUrls) &&
+                  product.imageUrls.length > 1 && (
                     <div className="thumbnail-row">
-                      {product.images.slice(0, 4).map((img, idx) => (
+                      {product.imageUrls.slice(0, 4).map((img, idx) => (
                         <img
                           key={idx}
                           src={img}
@@ -159,7 +161,9 @@ export default function Product() {
                       <span className="tag-chip">{product.category}</span>
                     )}
                     {product.subcategory && (
-                      <span className="tag-chip soft">{product.subcategory}</span>
+                      <span className="tag-chip soft">
+                        {product.subcategory}
+                      </span>
                     )}
                   </div>
 
@@ -169,9 +173,7 @@ export default function Product() {
                     className={`card-text ${isExpanded ? "expanded" : ""}`}
                     onClick={() => showMore && toggleDescription(product.id)}
                   >
-                    {isExpanded
-                      ? product.description
-                      : product.description.slice(0, 80)}
+                    {isExpanded ? desc : desc.slice(0, 80)}
                     {showMore && (
                       <span className="more-toggle">
                         {isExpanded ? " show less" : "...more"}
