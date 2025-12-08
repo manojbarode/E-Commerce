@@ -15,7 +15,7 @@ export default function Product() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await ShowProduct(); // returns array now
+        const response = await ShowProduct();
         if (!response || !Array.isArray(response)) {
           setProducts([]);
           return;

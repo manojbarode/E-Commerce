@@ -27,26 +27,32 @@ export const uploadToCloudinary = async (file) => {
     formData.append("upload_preset", "Ecommerce");
 
     const cloudName = "djbgoanwn";
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload?transformation=c_fill,w_1600,h_1600,q_auto:best`;
 
     const res = await axios.post(url, formData);
     return res.data.secure_url;
+
   } catch (error) {
-    console.error("Cloudinary upload error:", error.response?.data || error.message);
+    console.error("Cloudinary Upload ERROR:", error);
     throw error;
   }
 };
 
-
 export const uploadMultipleToCloudinary = async (files) => {
   try {
-    const urls = await Promise.all(files.map(file => uploadToCloudinary(file)));
-    return urls;
+    const uploads = files.map((file) => uploadToCloudinary(file));
+
+    const results = await Promise.all(uploads);
+
+    return results;
+
   } catch (error) {
     console.error("Multiple Cloudinary upload error:", error);
     throw error;
   }
 };
+
 
 export const ShowProduct = async () => {
   try {

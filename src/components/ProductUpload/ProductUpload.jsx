@@ -10,6 +10,7 @@ export default function ProductUpload() {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [fields, setFields] = useState([]);
+
   const [form, setForm] = useState({
     categoryId: "",
     subcategoryId: "",
@@ -18,11 +19,13 @@ export default function ProductUpload() {
     price: "",
     stock: "",
     images: [],
+    previews: [],
   });
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Load categories on mount
+  // Load categories
   useEffect(() => {
     loadCategories();
   }, []);
@@ -32,30 +35,30 @@ export default function ProductUpload() {
       const data = await getCategories();
       setCategories(data);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load categories");
     }
   };
 
-  // Handle category change
+  // Category change
   const handleCategoryChange = async (categoryId) => {
     setForm((prev) => ({
       ...prev,
       categoryId,
       subcategoryId: "",
       images: [],
+      previews: [],
     }));
     setFields([]);
+
     try {
       const data = await getSubcategories(categoryId);
       setSubcategories(data);
     } catch (err) {
-      console.error(err);
       toast.error("Failed to load subcategories");
     }
   };
 
-  // Handle subcategory change and load dynamic fields
+  // Subcategory change
   const handleSubcategoryChange = (subcategoryId) => {
     setForm((prev) => ({ ...prev, subcategoryId }));
 
@@ -68,12 +71,12 @@ export default function ProductUpload() {
         type: "text",
         required: true,
       }));
+
       setFields(dynamicFields);
 
-      // Initialize dynamic field values
       setForm((prev) => {
         const updated = { ...prev };
-        dynamicFields.forEach((f) => (updated[f.name] = ""));
+        dynamicFields.forEach((df) => (updated[df.name] = ""));
         return updated;
       });
     } else {
@@ -81,16 +84,16 @@ export default function ProductUpload() {
     }
   };
 
-  // Handle input changes
+  // Input change
   const handleInputChange = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submit
+  // Submit Product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!form.images || form.images.length === 0) {
+    if (form.images.length === 0) {
       toast.error("Please upload at least one image!");
       return;
     }
@@ -98,40 +101,31 @@ export default function ProductUpload() {
     try {
       setLoading(true);
 
-      // Upload images to Cloudinary
+      // Upload images
       const uploadedUrls = await uploadMultipleToCloudinary(form.images);
 
-      // Prepare dynamic fields map
       const dynamicFieldsMap = {};
       fields.forEach((f) => {
         dynamicFieldsMap[f.name] = form[f.name];
       });
 
-      // Prepare final data matching backend DTO
-      const finalData = {
+      const dataToSend = {
         categoryId: Number(form.categoryId),
         subcategoryId: Number(form.subcategoryId),
         title: form.title,
         description: form.description,
         price: Number(form.price),
         stock: Number(form.stock),
-        imageUrls: uploadedUrls,      // rename images -> imageUrls
+        imageUrls: uploadedUrls,
         dynamicFields: dynamicFieldsMap,
       };
 
-      // Get sellerId from localStorage
       const sellerId = localStorage.getItem("sellerId");
-      if (!sellerId) {
-        toast.error("Seller ID not found! Please login again.");
-        return;
-      }
-
-      await ProductAdd(finalData, sellerId);
+      await ProductAdd(dataToSend, sellerId);
 
       toast.success("Product added successfully!");
       navigate("/sellerdashboard");
     } catch (err) {
-      console.error(err);
       toast.error("Failed to add product!");
     } finally {
       setLoading(false);
@@ -141,9 +135,10 @@ export default function ProductUpload() {
   return (
     <div className="container mt-5 mb-5">
       <div className="card shadow-lg p-5 rounded-4 form-card">
-        <h2 className="mb-4 text-center fw-bold">🛍 Add New Product</h2>
+        <h2 className="text-center fw-bold mb-4">🛍 Add New Product</h2>
 
         <form onSubmit={handleSubmit}>
+
           {/* CATEGORY */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Category</label>
@@ -155,9 +150,7 @@ export default function ProductUpload() {
             >
               <option value="">Select Category</option>
               {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
           </div>
@@ -173,14 +166,12 @@ export default function ProductUpload() {
             >
               <option value="">Select Subcategory</option>
               {subcategories.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
+                <option key={s.id} value={s.id}>{s.name}</option>
               ))}
             </select>
           </div>
 
-          {/* STATIC FIELDS */}
+          {/* TITLE */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Title</label>
             <input
@@ -192,6 +183,7 @@ export default function ProductUpload() {
             />
           </div>
 
+          {/* DESCRIPTION */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Description</label>
             <textarea
@@ -203,6 +195,7 @@ export default function ProductUpload() {
             ></textarea>
           </div>
 
+          {/* PRICE */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Price</label>
             <input
@@ -214,6 +207,7 @@ export default function ProductUpload() {
             />
           </div>
 
+          {/* STOCK */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Stock</label>
             <input
@@ -229,17 +223,15 @@ export default function ProductUpload() {
           {fields.length > 0 && (
             <div className="card p-3 mb-3">
               <h5 className="fw-bold">Product Details</h5>
-              {fields.map((field) => (
-                <div className="mb-3" key={field.name}>
-                  <label className="form-label">{field.label}</label>
+              {fields.map((f) => (
+                <div key={f.name} className="mb-3">
+                  <label className="form-label">{f.label}</label>
                   <input
-                    type={field.type || "text"}
+                    type="text"
                     className="form-control"
-                    value={form[field.name]}
-                    onChange={(e) =>
-                      handleInputChange(field.name, e.target.value)
-                    }
-                    required={field.required}
+                    value={form[f.name]}
+                    onChange={(e) => handleInputChange(f.name, e.target.value)}
+                    required
                   />
                 </div>
               ))}
@@ -249,18 +241,47 @@ export default function ProductUpload() {
           {/* IMAGE UPLOAD */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Product Images</label>
+
             <input
               type="file"
               multiple
               accept="image/*"
               className="form-control"
-              onChange={(e) => handleInputChange("images", [...e.target.files])}
+              onChange={(e) => {
+                const newFiles = Array.from(e.target.files);
+
+                if (newFiles.length > 0) {
+                  alert("Images will be automatically resized to 1024×1024 like Amazon/Flipkart!");
+                }
+
+                setForm((prev) => ({
+                  ...prev,
+                  images: [...prev.images, ...newFiles],
+                  previews: [
+                    ...prev.previews,
+                    ...newFiles.map((file) => URL.createObjectURL(file)),
+                  ],
+                }));
+              }}
               required
             />
           </div>
 
+          {/* IMAGE PREVIEW */}
+          {form.previews.length > 0 && (
+            <div className="preview-container mt-3">
+              <h6 className="fw-bold">Image Preview</h6>
+
+              <div className="d-flex gap-3 flex-wrap">
+                {form.previews.map((src, i) => (
+                  <img key={i} src={src} alt="preview" className="img-preview-box" />
+                ))}
+              </div>
+            </div>
+          )}
+
           <button
-            className="btn btn-gradient w-100 btn-lg mt-4 fw-bold"
+            className="btn btn-gradient w-100 btn-lg fw-bold mt-3"
             disabled={loading}
           >
             {loading ? "Uploading..." : "Submit Product"}
