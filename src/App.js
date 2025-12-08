@@ -26,7 +26,19 @@ import ProductDetails from "./pages/Product/ProductDetails";
 const App = () => {
   return (
     <>
-      <ToastContainer position="top-center" />
+      {/* ToastContainer updated with very high z-index */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        toastStyle={{ zIndex: 200000 }} // <-- ensure it’s above drawer
+      />
 
       <Routes>
         <Route element={<Layout />}>
@@ -44,8 +56,6 @@ const App = () => {
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/payment" element={<PaymentForm/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
-
-    
 
           <Route
             path="/profile"

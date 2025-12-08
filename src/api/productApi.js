@@ -1,15 +1,24 @@
 import axios from "axios";
 import axiosInstance from "./axiosConfig";
 
-export const ProductAdd = async (productData) => {
+export const ProductAdd = async (productData, sellerId) => {
   try {
-    const response = await axiosInstance.post("/products/add", productData);
+    const response = await axiosInstance.post(
+      "/product/add-product",
+      productData,
+      {
+        headers: {
+          sellerId: sellerId,
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("ADD PRODUCT ERROR:", error.response?.data || error.message);
     throw error;
   }
 };
+
 
 export const uploadToCloudinary = async (file) => {
   try {
