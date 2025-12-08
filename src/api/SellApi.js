@@ -61,3 +61,35 @@ export const sellerDetails = async (sellerId, formData) => {
 //     throw error.response?.data || error.message;
 //   }
 // };
+
+// Get products by seller id
+export const getSellerProducts = async (sellerId) => {
+  try {
+    const res = await axiosInstance.get(`/product/seller/${sellerId}`);
+    return res.data.data;
+  } catch (err) {
+    console.error("API error:", err);
+    return [];
+  }
+};
+export const updateProduct = async (productId, productData) => {
+  try {
+    const res = await axiosInstance.put(`/product/update/${productId}`, productData);
+    return res.data;
+  } catch (err) {
+    console.error("Update API error:", err);
+    throw err;
+  }
+};
+
+// ----------------------
+// Delete product
+export const deleteProduct = async (productId) => {
+  try {
+    const res = await axiosInstance.delete(`/product/delete/${productId}`);
+    return res.data;
+  } catch (err) {
+    console.error("Delete API error:", err);
+    throw err;
+  }
+};

@@ -22,6 +22,7 @@ import SellerAuth from "./pages/Seller/SellerAuth/Seller";
 import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
 import ProductUpload from "./components/ProductUpload/ProductUpload";
 import ProductDetails from "./pages/Product/ProductDetails";
+import SellerProducts from "./pages/Seller/ProductManagment/Sellerproduct";
 
 const App = () => {
   return (
@@ -55,6 +56,7 @@ const App = () => {
           <Route path="/sellerlogout" element={<SellerLogout />} />
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/payment" element={<PaymentForm/>}/>
+          <Route path="/sellerproduct" element={<SellerProducts/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
 
           <Route
