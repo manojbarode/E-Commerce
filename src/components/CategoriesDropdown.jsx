@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Css/CategoriesDropdown.css";
-// import { getCategories, getSubcategories } from "../api/categoriesApi";
+import { getCategories, getSubcategories } from "../api/categoriesApi";
 
 export default function CategoriesDropdown({ mobile = false, closeDrawer, onCategorySelect }) {
   const [openCategory, setOpenCategory] = useState(null);
@@ -9,21 +9,20 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer, onCate
 
   useEffect(() => {
     // Mock data for demonstration - Replace with your API calls
-    const mockCategories = {
-      "Electronics": ["Mobile Phones", "Laptops", "Earphones / Headphones", "Smart Watches", "Tablets", "Cameras"],
-      "Clothes / Fashion": ["Male", "Female", "Kids", "Accessories", "Winter Collection"],
-      "Shoes": ["Men", "Women", "Kids", "Sports Shoes", "Formal Shoes"],
-      "Beauty & Personal Care": ["Skincare", "Haircare", "Makeup", "Fragrance", "Male Skincare", "Female Skincare", "Kids Skincare", "Male Grooming"],
-      "Books & Stationery": ["Books", "Stationery", "Fiction", "Non-Fiction", "Educational / Textbooks"],
-      "Home & Kitchen": ["Kitchen Appliances", "Home Decor", "Furniture", "Bedding & Linen"],
-      "Sports & Outdoors": ["Fitness Equipment", "Outdoor Gear", "Sports Accessories"],
-      "Toys & Baby Products": ["Baby Clothing", "Toys", "Baby Care Products"]
-    };
+    // const mockCategories = {
+    //   "Electronics": ["Mobile Phones", "Laptops", "Earphones / Headphones", "Smart Watches", "Tablets", "Cameras"],
+    //   "Clothes / Fashion": ["Male", "Female", "Kids", "Accessories", "Winter Collection"],
+    //   "Shoes": ["Men", "Women", "Kids", "Sports Shoes", "Formal Shoes"],
+    //   "Beauty & Personal Care": ["Skincare", "Haircare", "Makeup", "Fragrance", "Male Skincare", "Female Skincare", "Kids Skincare", "Male Grooming"],
+    //   "Books & Stationery": ["Books", "Stationery", "Fiction", "Non-Fiction", "Educational / Textbooks"],
+    //   "Home & Kitchen": ["Kitchen Appliances", "Home Decor", "Furniture", "Bedding & Linen"],
+    //   "Sports & Outdoors": ["Fitness Equipment", "Outdoor Gear", "Sports Accessories"],
+    //   "Toys & Baby Products": ["Baby Clothing", "Toys", "Baby Care Products"]
+    // };
     
-    setCategories(mockCategories);
+    // setCategories(mockCategories);
 
     // Uncomment below code and remove mock data when using real API
-    /*
     async function loadData() {
       try {
         const res = await getCategories();
@@ -38,7 +37,6 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer, onCate
       }
     }
     loadData();
-    */
   }, []);
 
   if (!categories || Object.keys(categories).length === 0) return null;
