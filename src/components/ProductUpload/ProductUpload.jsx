@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ProductUpload.css";
 import { ProductAdd, uploadMultipleToCloudinary } from "../../api/productApi";
@@ -21,46 +21,54 @@ export default function ProductUpload() {
     previews: [],
   });
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  // Load categories
+  // Load categories once
   useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        toast.error("Failed to load categories");
+      }
+    };
     loadCategories();
   }, []);
 
-  const loadCategories = async () => {
-    try {
-      const data = await getCategories();
-      setCategories(data);
-    } catch (err) {
-      toast.error("Failed to load categories");
-    }
-  };
+  // Handle category change
+  const handleCategoryChange = useCallback(
+    async (categoryId) => {
+      if (categoryId === form.categoryId) return; // prevent duplicate API calls
 
-  // Category change
-  const handleCategoryChange = async (categoryId) => {
-    setForm((prev) => ({
-      ...prev,
-      categoryId,
-      subcategoryId: "",
-      images: [],
-      previews: [],
-    }));
-    setFields([]);
+      setForm((prev) => ({
+        ...prev,
+        categoryId,
+        subcategoryId: "",
+        images: [],
+        previews: [],
+      }));
+      setFields([]);
+      setSubcategories([]);
 
-    try {
-      const data = await getSubcategories(categoryId);
-      setSubcategories(data);
-    } catch (err) {
-      toast.error("Failed to load subcategories");
-    }
-  };
+      try {
+        const data = await getSubcategories(categoryId);
+        setSubcategories(data);
+      } catch (err) {
+        toast.error("Failed to load subcategories");
+      }
+    },
+    [form.categoryId]
+  );
 
-  // Subcategory change
+  // Handle subcategory change
   const handleSubcategoryChange = (subcategoryId) => {
     setForm((prev) => ({ ...prev, subcategoryId }));
 
-    const selected = subcategories.find((s) => s.id === Number(subcategoryId));
+    const selected = subcategories.find(
+      (s) => s.id === Number(subcategoryId)
+    );
 
     if (selected?.customFields && Array.isArray(selected.customFields)) {
       const dynamicFields = selected.customFields.map((f) => ({
@@ -69,9 +77,9 @@ export default function ProductUpload() {
         type: "text",
         required: true,
       }));
-
       setFields(dynamicFields);
 
+      // Initialize dynamic fields in form state
       setForm((prev) => {
         const updated = { ...prev };
         dynamicFields.forEach((df) => (updated[df.name] = ""));
@@ -87,7 +95,25 @@ export default function ProductUpload() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Submit Product
+  // Handle image selection
+  const handleImageChange = (files) => {
+    const newFiles = Array.from(files);
+    if (newFiles.length > 0) {
+      alert(
+        "Images will be automatically resized to 1024×1024 like Amazon/Flipkart!"
+      );
+    }
+    setForm((prev) => ({
+      ...prev,
+      images: [...prev.images, ...newFiles],
+      previews: [
+        ...prev.previews,
+        ...newFiles.map((file) => URL.createObjectURL(file)),
+      ],
+    }));
+  };
+
+  // Submit product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -99,9 +125,10 @@ export default function ProductUpload() {
     try {
       setLoading(true);
 
-      // Upload images
+      // Upload images to cloud
       const uploadedUrls = await uploadMultipleToCloudinary(form.images);
 
+      // Map dynamic fields
       const dynamicFieldsMap = {};
       fields.forEach((f) => {
         dynamicFieldsMap[f.name] = form[f.name];
@@ -135,7 +162,6 @@ export default function ProductUpload() {
       <div className="card shadow-lg p-5 rounded-4 form-card">
         <h2 className="text-center fw-bold mb-4">🛍 Add New Product</h2>
         <form onSubmit={handleSubmit}>
-
           {/* CATEGORY */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Category</label>
@@ -147,7 +173,9 @@ export default function ProductUpload() {
             >
               <option value="">Select Category</option>
               {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
               ))}
             </select>
           </div>
@@ -163,7 +191,9 @@ export default function ProductUpload() {
             >
               <option value="">Select Subcategory</option>
               {subcategories.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
               ))}
             </select>
           </div>
@@ -227,7 +257,9 @@ export default function ProductUpload() {
                     type="text"
                     className="form-control"
                     value={form[f.name]}
-                    onChange={(e) => handleInputChange(f.name, e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(f.name, e.target.value)
+                    }
                     required
                   />
                 </div>
@@ -243,22 +275,7 @@ export default function ProductUpload() {
               multiple
               accept="image/*"
               className="form-control"
-              onChange={(e) => {
-                const newFiles = Array.from(e.target.files);
-
-                if (newFiles.length > 0) {
-                  alert("Images will be automatically resized to 1024×1024 like Amazon/Flipkart!");
-                }
-
-                setForm((prev) => ({
-                  ...prev,
-                  images: [...prev.images, ...newFiles],
-                  previews: [
-                    ...prev.previews,
-                    ...newFiles.map((file) => URL.createObjectURL(file)),
-                  ],
-                }));
-              }}
+              onChange={(e) => handleImageChange(e.target.files)}
               required
             />
           </div>
@@ -269,7 +286,12 @@ export default function ProductUpload() {
               <h6 className="fw-bold">Image Preview</h6>
               <div className="d-flex gap-3 flex-wrap">
                 {form.previews.map((src, i) => (
-                  <img key={i} src={src} alt="preview" className="img-preview-box" />
+                  <img
+                    key={i}
+                    src={src}
+                    alt="preview"
+                    className="img-preview-box"
+                  />
                 ))}
               </div>
             </div>

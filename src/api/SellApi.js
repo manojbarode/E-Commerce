@@ -63,6 +63,7 @@ export const sellerDetails = async (sellerId, formData) => {
 // };
 
 // Get products by seller id
+
 export const getSellerProducts = async (sellerId) => {
   try {
     const res = await axiosInstance.get(`/product/seller/${sellerId}`);

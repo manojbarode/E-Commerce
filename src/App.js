@@ -48,7 +48,7 @@ const App = () => {
           <Route path="/sellerlogout" element={<SellerLogout />} />
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/admin/payment-method" element={<PaymentMethodAddForm />} />
-          <Route path="/sellerproduct" element={<SellerProducts/>}/>
+          <Route path="/seller/sellerproduct" element={<SellerProducts/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
           <Route path="/payment" element={<PaymentForm/>}/>
 
