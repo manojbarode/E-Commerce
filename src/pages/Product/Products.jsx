@@ -12,9 +12,6 @@ export default function Product() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
-  // =============================
-  // FETCH PRODUCTS
-  // =============================
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -28,8 +25,6 @@ export default function Product() {
         }));
 
         setProducts(cleaned);
-
-        // Set default selected image using productUid
         const defaults = {};
         cleaned.forEach((p) => {
           defaults[p.productUid] = p.imageUrls?.[0] || "/no-image.png";
@@ -45,10 +40,6 @@ export default function Product() {
 
     fetchProducts();
   }, []);
-
-  // =============================
-  // ACTION HANDLERS
-  // =============================
 
   const handleAddToCart = () => {
     if (!login) {
@@ -86,11 +77,6 @@ export default function Product() {
       [productUid]: imgUrl,
     }));
   };
-
-  // =============================
-  // RENDER
-  // =============================
-
   return (
     <div className="product-page">
       <div className="container">
