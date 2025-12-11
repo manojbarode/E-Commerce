@@ -60,6 +60,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          
 
           <Route path="/product/:id" element={<ProductDetails />} />
         </Route>

@@ -34,7 +34,7 @@ export default function ProductUpload() {
         toast.error("Failed to load categories");
       }
     };
-    loadCategories();
+    loadCategories()
   }, []);
 
   // Handle category change
