@@ -95,7 +95,6 @@ export default function ProductUpload() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle image selection
   const handleImageChange = (files) => {
     const newFiles = Array.from(files);
     if (newFiles.length > 0) {
@@ -115,47 +114,48 @@ export default function ProductUpload() {
 
   // Submit product
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (form.images.length === 0) {
-      toast.error("Please upload at least one image!");
-      return;
-    }
+  if (form.images.length === 0) {
+    toast.error("Please upload at least one image!");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      // Upload images to cloud
-      const uploadedUrls = await uploadMultipleToCloudinary(form.images);
+    // Upload images to Cloudinary
+    const uploadedUrls = await uploadMultipleToCloudinary(form.images);
 
-      // Map dynamic fields
-      const dynamicFieldsMap = {};
-      fields.forEach((f) => {
-        dynamicFieldsMap[f.name] = form[f.name];
-      });
+    // Map dynamic fields
+    const dynamicFieldsMap = {};
+    fields.forEach((f) => {
+      dynamicFieldsMap[f.name] = form[f.name];
+    });
 
-      const dataToSend = {
-        categoryId: Number(form.categoryId),
-        subcategoryId: Number(form.subcategoryId),
-        title: form.title,
-        description: form.description,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        imageUrls: uploadedUrls,
-        dynamicFields: dynamicFieldsMap,
-      };
+    // Prepare data to send (no sellerUid here, it's sent in headers)
+    const dataToSend = {
+      categoryId: Number(form.categoryId),
+      subcategoryId: Number(form.subcategoryId),
+      title: form.title,
+      description: form.description,
+      price: Number(form.price),
+      stock: Number(form.stock),
+      imageUrls: uploadedUrls,
+      dynamicFields: dynamicFieldsMap,
+    };
 
-      const sellerId = localStorage.getItem("sellerId");
-      await ProductAdd(dataToSend, sellerId);
+    await ProductAdd(dataToSend);
 
-      toast.success("Product added successfully!");
-      navigate("/sellerdashboard");
-    } catch (err) {
-      toast.error("Failed to add product!");
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Product added successfully!");
+    navigate("/sellerdashboard");
+  } catch (err) {
+    toast.error("Failed to add product!");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="container mt-5 mb-5">

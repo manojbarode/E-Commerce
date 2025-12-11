@@ -24,6 +24,7 @@ import ProductDetails from "./pages/Product/ProductDetails";
 import SellerProducts from "./pages/Seller/ProductManagment/Sellerproduct";
 import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
 import PaymentForm from "./Payment/payment";
+import UpdateProduct from "./pages/Seller/ProductManagment/SellerProductUpdate";
 
 const App = () => {
   return (
@@ -51,6 +52,7 @@ const App = () => {
           <Route path="/seller/sellerproduct" element={<SellerProducts/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
           <Route path="/payment" element={<PaymentForm/>}/>
+          <Route path="/seller/update-product/:productUid" element={<UpdateProduct />} />
 
           <Route
             path="/profile"

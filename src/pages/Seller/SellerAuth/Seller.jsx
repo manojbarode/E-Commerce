@@ -9,7 +9,7 @@ export default function SellerAuth() {
   const [tab, setTab] = useState("login");
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({email: "",mobile: "",password: "",});
+  const [form, setForm] = useState({ email: "", mobile: "", password: "" });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -38,56 +38,61 @@ export default function SellerAuth() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    if (tab === "login") {
-      const res = await loginSeller({email: form.email,password: form.password,});
+    try {
+      if (tab === "login") {
+        const res = await loginSeller({
+          email: form.email,
+          password: form.password,
+        });
 
-      if (res.status === 200 && res.data?.data?.token) {
-        toast.success(res.data.message || "Login Successful!");
-        localStorage.setItem("sellerToken", res.data.data.token);
-        localStorage.setItem("sellerName", res.data.data.fullName);
-        const sellerId = res.data.data.sellerId;
-        localStorage.setItem("sellerId", sellerId);
-        console.log("data"+sellerId);
-        navigate("/sellerdashboard");
+        if (res.status === 200 && res.data?.data?.token) {
+          toast.success(res.data.message || "Login Successful!");
+          localStorage.setItem("sellerToken", res.data.data.token);
+          localStorage.setItem("sellerName", res.data.data.fullName);
+
+          // ✅ Use sellerUid instead of sellerId
+          const sellerUid = res.data.data.sellerUid;
+          localStorage.setItem("sellerUid", sellerUid);
+
+          console.log("Seller UID: " + sellerUid);
+          navigate("/sellerdashboard");
+        } else {
+          toast.error(res.data.message || "Login failed!");
+        }
       } else {
-        toast.error(res.data.message || "Login failed!");
+        const res = await registerSeller({
+          email: form.email,
+          mobile: form.mobile,
+          password: form.password,
+        });
+
+        if (res.data.status === 201) {
+          toast.success(res.data.message || "Registration Successful!");
+
+          // After registration → switch to login tab
+          setTab("login");
+          setForm({ email: form.email, password: "", mobile: "" });
+        } else {
+          toast.error(res.data.message || "Registration failed!");
+        }
       }
-    } else {
-  const res = await registerSeller({
-    email: form.email,
-    mobile: form.mobile,
-    password: form.password,
-  });
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Something went wrong!";
+      toast.error(msg);
+    }
 
-  if (res.data.status === 201) {
-    toast.success(res.data.message || "Registration Successful!");
-
-    // After registration → switch to login tab
-    setTab("login");
-    setForm({ email: form.email, password: "", mobile: "" });
-
-  } else {
-    toast.error(res.data.message || "Registration failed!");
-  }
-}
-
-  } catch (err) {
-    const msg =err?.response?.data?.message ||err?.response?.data?.error ||"Something went wrong!";
-    toast.error(msg);
-  }
-
-  setLoading(false);
-};
-
+    setLoading(false);
+  };
 
   return (
     <div className="seller-auth-page">
       <div className="seller-auth-glass container py-4 py-lg-5">
-
         <div className="col-lg-6 seller-auth-left d-flex flex-column justify-content-between">
           <div>
             <span className="badge bg-light text-dark mb-3 px-3 py-2 rounded-pill">
@@ -104,29 +109,40 @@ export default function SellerAuth() {
 
           {tab === "register" && (
             <div className="text-center my-3">
-              <img src="SellerHome.png" alt="E-shop seller graphic"className="img-fluid rounded"/>
+              <img
+                src="SellerHome.png"
+                alt="E-shop seller graphic"
+                className="img-fluid rounded"
+              />
             </div>
           )}
 
           <div className="text-light small">
-            <div className="seller-dot-line"> <div className="seller-dot" />
+            <div className="seller-dot-line">
+              <div className="seller-dot" />
               Fast payouts
             </div>
-            <div className="seller-dot-line"> <div className="seller-dot" /> 
-              Secure protection policy
+            <div className="seller-dot-line">
+              <div className="seller-dot" /> Secure protection policy
             </div>
-            <div className="seller-dot-line"><div className="seller-dot" />
-              Premium seller dashboard
+            <div className="seller-dot-line">
+              <div className="seller-dot" /> Premium seller dashboard
             </div>
           </div>
         </div>
-        <div className="col-lg-6 bg-white p-4 p-md-5 seller-right-balanced">
 
+        <div className="col-lg-6 bg-white p-4 p-md-5 seller-right-balanced">
           <div className="d-flex justify-content-center mb-4 gap-4">
-            <button className={`seller-tab ${tab === "login" ? "active" : ""}`}onClick={() => switchTab("login")}>
+            <button
+              className={`seller-tab ${tab === "login" ? "active" : ""}`}
+              onClick={() => switchTab("login")}
+            >
               Login
             </button>
-            <button className={`seller-tab ${tab === "register" ? "active" : ""}`}onClick={() => switchTab("register")}>
+            <button
+              className={`seller-tab ${tab === "register" ? "active" : ""}`}
+              onClick={() => switchTab("register")}
+            >
               Register
             </button>
           </div>
@@ -136,21 +152,39 @@ export default function SellerAuth() {
               {tab === "register" && (
                 <div className="mb-3">
                   <label>Mobile</label>
-                  <input type="text" name="mobile" value={form.mobile} onChange={handleChange}
-                    className="form-control" required/>
+                  <input
+                    type="text"
+                    name="mobile"
+                    value={form.mobile}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                  />
                 </div>
               )}
 
               <div className="mb-3">
                 <label>Email</label>
-                <input type="email" name="email" value={form.email} onChange={handleChange} 
-                  className="form-control"required/>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="form-control"
+                  required
+                />
               </div>
 
               <div className="mb-3">
                 <label>Password</label>
-                <input type="password" name="password" value={form.password} onChange={handleChange}
-                  className="form-control" required/>
+                <input
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="form-control"
+                  required
+                />
               </div>
             </div>
 

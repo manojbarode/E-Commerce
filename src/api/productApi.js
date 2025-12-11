@@ -1,22 +1,31 @@
 import axiosInstance from "./axiosConfig";
 
-export const ProductAdd = async (productData, sellerId) => {
+export const ProductAdd = async (productData) => {
   try {
+    const sellerUid = localStorage.getItem("sellerUid");
+    if (!sellerUid) {
+      throw new Error("Seller UID not found. Please login again.");
+    }
+
     const response = await axiosInstance.post(
       "/product/add-product",
       productData,
       {
         headers: {
-          sellerId: sellerId,
+          sellerId: sellerUid,
         },
       }
     );
     return response.data;
   } catch (error) {
-    console.error("ADD PRODUCT ERROR:", error.response?.data || error.message);
+    console.error(
+      "ADD PRODUCT ERROR:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
+
 
 
 export const uploadToCloudinary = async (file) => {
@@ -56,7 +65,7 @@ export const uploadMultipleToCloudinary = async (files) => {
 
 export const ShowProduct = async () => {
   try {
-    const response = await axiosInstance.get("/product/all"); 
+    const response = await axiosInstance.get("/product/all");
     return response.data.data;
   } catch (error) {
     console.error("API ERROR:", error);
@@ -64,13 +73,10 @@ export const ShowProduct = async () => {
   }
 };
 
-
-
-
-export const getProductById = async (id) => {
+export const getProductById = async (productUid) => {
   try {
-    const response = await axiosInstance.get(`/products/${id}`);
-    return response.data;
+    const response = await axiosInstance.get(`/product/${productUid}`);
+    return response.data.data;
   } catch (error) {
     console.error("GET PRODUCT ERROR:", error.response?.data || error.message);
     throw error;

@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 export default function Product() {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [selectedImages, setSelectedImages] = useState({});
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
@@ -19,7 +20,21 @@ export default function Product() {
           setProducts([]);
           return;
         }
+
         setProducts(response);
+
+        // Initialize main images for each product
+        const initialSelected = {};
+        response.forEach((p) => {
+          if (Array.isArray(p.imageUrls) && p.imageUrls.length > 0) {
+            // Deduplicate URLs here
+            const uniqueImages = Array.from(new Set(p.imageUrls));
+            initialSelected[p.id] = uniqueImages[0];
+            p.imageUrls = uniqueImages; // Update product.images with unique list
+          }
+        });
+
+        setSelectedImages(initialSelected);
       } catch (err) {
         console.error("Error fetching products:", err);
         setProducts([]);
@@ -76,6 +91,10 @@ export default function Product() {
     });
   };
 
+  const handleThumbnailClick = (productId, imgUrl) => {
+    setSelectedImages((prev) => ({ ...prev, [productId]: imgUrl }));
+  };
+
   return (
     <div className="product-page">
       <div className="container">
@@ -95,6 +114,16 @@ export default function Product() {
 
           {products.map((product) => {
             const isWishlisted = wishlist.includes(product.id);
+            const mainImage =
+              selectedImages[product.id] ||
+              (Array.isArray(product.imageUrls) && product.imageUrls[0]) ||
+              "/no-image.png";
+
+            // Ensure unique thumbnails (exclude main image)
+            const thumbnails =
+              Array.isArray(product.imageUrls) && product.imageUrls.length > 1
+                ? product.imageUrls.filter((img) => img !== mainImage)
+                : [];
 
             return (
               <div key={product.id} className="product-card">
@@ -111,12 +140,7 @@ export default function Product() {
                   className="position-relative d-block mb-2"
                 >
                   <img
-                    src={
-                      Array.isArray(product.imageUrls) &&
-                      product.imageUrls.length > 0
-                        ? product.imageUrls[0]
-                        : "/no-image.png"
-                    }
+                    src={mainImage}
                     alt={product.title}
                     className="product-img-full"
                   />
@@ -125,39 +149,22 @@ export default function Product() {
                   </span>
                 </Link>
 
-                {Array.isArray(product.imageUrls) &&
-                  product.imageUrls.length > 1 && (
-                    <div className="thumbnail-row">
-                      {product.imageUrls.slice(0, 4).map((img, idx) => (
-                        <img
-                          key={idx}
-                          src={img}
-                          alt="thumbnail"
-                          className="thumbnail-img"
-                          onClick={(e) =>
-                            (e.target
-                              .closest(".product-card")
-                              .querySelector(".product-img-full").src = img)
-                          }
-                        />
-                      ))}
-                    </div>
-                  )}
+                {thumbnails.length > 0 && (
+                  <div className="thumbnail-row no-scrollbar">
+                    {thumbnails.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img}
+                        alt={`thumbnail-${idx}`}
+                        className="thumbnail-img"
+                        onClick={() => handleThumbnailClick(product.id, img)}
+                      />
+                    ))}
+                  </div>
+                )}
 
                 <div className="card-content">
-                  <div className="tag-row">
-                    {product.category && (
-                      <span className="tag-chip">{product.category}</span>
-                    )}
-                    {product.subcategory && (
-                      <span className="tag-chip soft">
-                        {product.subcategory}
-                      </span>
-                    )}
-                  </div>
-
                   <h5 className="card-title">{product.title}</h5>
-
                   <div className="price-row">
                     <span className="price">₹ {product.price}</span>
                   </div>

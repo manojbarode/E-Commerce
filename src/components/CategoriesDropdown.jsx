@@ -1,35 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Css/CategoriesDropdown.css";
-import axiosInstance from "../api/axiosConfig"; // Use your axios instance
 
-export default function CategoriesDropdown({ mobile = false, closeDrawer, onCategorySelect }) {
+export default function CategoriesDropdown({ mobile = false, closeDrawer, onCategorySelect, categories }) {
   const [openCategory, setOpenCategory] = useState(null);
-  const [categories, setCategories] = useState({});
   const [showMegaMenu, setShowMegaMenu] = useState(false);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const res = await axiosInstance.get("/category/with-subcategories"); 
-        
-        const catObj = {};
-        res.data.forEach(cat => {
-          catObj[cat.name] = cat.subcategories;
-        });
-
-        setCategories(catObj);
-      } catch (error) {
-        console.error("Failed to load categories:", error);
-      }
-    }
-
-    loadData();
-  }, []);
 
   if (!categories || Object.keys(categories).length === 0) return null;
 
-  const handleItemClick = (category, item) => {
-    if (onCategorySelect) onCategorySelect({ category, item });
+  const handleItemClick = (categoryName, item) => {
+    if (onCategorySelect) onCategorySelect({ category: categoryName, subcategory: item });
     if (closeDrawer) closeDrawer();
   };
 
@@ -37,23 +16,26 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer, onCate
     setOpenCategory(openCategory === index ? null : index);
   };
 
+  // ---------- MOBILE VERSION ----------
   if (mobile) {
     return (
       <div className="mobile-category-wrapper">
-        {Object.entries(categories).map(([cat, items], index) => (
+        {Object.entries(categories).map(([categoryName, items], index) => (
           <div key={index} className="mobile-category-item">
             <div
               className="mobile-category-header d-flex justify-content-between align-items-center"
               onClick={() => toggleMobileCategory(index)}
             >
-              <span className="mobile-cat-title">{cat}</span>
+              <span className="mobile-cat-title">{categoryName}</span>
               <i className={`bi bi-chevron-${openCategory === index ? "up" : "down"} mobile-cat-icon`}></i>
             </div>
             <ul className={`mobile-category-list list-unstyled ${openCategory === index ? "open" : ""}`}>
               {items.map((item, i) => (
-                <li key={i} className="mobile-cat-item" onClick={() => handleItemClick(cat, item)}>
+                <li key={i} className="mobile-cat-item" onClick={() => handleItemClick(categoryName, item)}>
                   <span className="mobile-cat-bullet">•</span>
-                  <span className="mobile-cat-text">{item}</span>
+                  <span className="mobile-cat-text">{item.name}</span>
+                  {/* Optional: show custom fields */}
+                  {/* <small className="mobile-cat-fields">{item.customFields.join(", ")}</small> */}
                 </li>
               ))}
             </ul>
@@ -63,7 +45,7 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer, onCate
     );
   }
 
-  // ---------- Desktop Mega Menu ----------
+  // ---------- DESKTOP MEGA MENU ----------
   return (
     <div 
       className="premium-dropdown-container"
@@ -77,19 +59,21 @@ export default function CategoriesDropdown({ mobile = false, closeDrawer, onCate
 
       <div className={`premium-mega-menu ${showMegaMenu ? 'show' : ''}`}>
         <div className="premium-mega-menu-content">
-          {Object.entries(categories).map(([category, items], index) => (
+          {Object.entries(categories).map(([categoryName, items], index) => (
             <div key={index} className="premium-mega-col" style={{ animationDelay: `${index * 0.05}s` }}>
               <div className="mega-col-inner">
                 <h4 className="mega-col-title mb-3">
-                  <span className="title-text">{category}</span>
+                  <span className="title-text">{categoryName}</span>
                   <span className="title-line d-block mt-2"></span>
                 </h4>
 
                 <ul className="mega-col-list list-unstyled mb-0">
                   {items.map((item, i) => (
-                    <li key={i} className="mega-col-item d-flex align-items-center" onClick={() => handleItemClick(category, item)}>
+                    <li key={i} className="mega-col-item d-flex align-items-center" onClick={() => handleItemClick(categoryName, item)}>
                       <span className="item-bullet me-2"></span>
-                      <span className="item-text">{item}</span>
+                      <span className="item-text">{item.name}</span>
+                      {/* Optional: show custom fields */}
+                      {/* <small className="item-fields">{item.customFields.join(", ")}</small> */}
                     </li>
                   ))}
                 </ul>

@@ -30,27 +30,29 @@ export default function SellerForm() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const sellerId = Number(localStorage.getItem("sellerId"));
-    const response = await sellerDetails(sellerId, form);
+    try {
+      // ✅ Use sellerUid instead of sellerId
+      const sellerUid = localStorage.getItem("sellerUid");
 
-    toast.success(response.message);
-    if (!sellerId) {
-  toast.error("Seller ID not found. Please login again.");
-  return;
-}
+      if (!sellerUid) {
+        toast.error("Seller UID not found. Please login again.");
+        return;
+      }
 
-    navigate("/sellerdashboard");
-  } catch (error) {
-    toast.error(error.message || "Something went wrong!");
-  } finally {
-    setLoading(false);
-  }
-};
+      const response = await sellerDetails(sellerUid, form);
+
+      toast.success(response.data?.message || "Details saved successfully!");
+      navigate("/sellerdashboard");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const sections = [
     {

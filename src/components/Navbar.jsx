@@ -1,16 +1,36 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { AuthContext } from "../context/AuthContext";
 import CategoriesDropdown from "./CategoriesDropdown";
-import "./Css/Navbar.css"; // Ensure this path is correct
+import { getCategories } from "../api/categoriesApi";
+import "./Css/Navbar.css";
 
 export default function Navbar() {
   const { login, logoutUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [categories, setCategories] = useState({}); // Categories state
+
+  // ---------------- Fetch categories only once ----------------
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await getCategories();
+        const catObj = {};
+        res.forEach(cat => {
+          catObj[cat.name] = cat.subcategories || [];
+        });
+        setCategories(catObj);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      }
+    }
+
+    fetchCategories();
+  }, []);
 
   const handleProfileClick = () => {
     login ? navigate("/profile") : navigate("/signup");
@@ -33,6 +53,7 @@ export default function Navbar() {
             eShop
           </span>
 
+          {/* Mobile Search */}
           <div className="premium-search-box premium-mobile-search-inline-permanent d-lg-none">
             <i className="bi bi-search"></i>
             <input 
@@ -50,8 +71,9 @@ export default function Navbar() {
                 </Link>
               </li>
 
+              {/* Desktop Categories */}
               <li className="nav-item text-warning">
-                <CategoriesDropdown />
+                <CategoriesDropdown categories={categories} />
               </li>
 
               <li className="nav-item">
@@ -79,6 +101,7 @@ export default function Navbar() {
               <input type="search" placeholder="Search products..." className="premium-search-input" />
             </div>
 
+            {/* Desktop Icons */}
             <div className="premium-nav-icons d-none d-lg-flex">
               <Link to="/wishlist" className="premium-icon-btn icon-wishlist">
                 <i className="bi bi-heart"></i>
@@ -107,8 +130,8 @@ export default function Navbar() {
             </div>
           </div>
 
+          {/* Mobile Icons */}
           <div className="d-flex d-lg-none align-items-center gap-2">
-
             {login ? (
               <div className="premium-mobile-login-btn" onClick={handleProfileClick}>
                 <i className="bi bi-person-circle"></i>
@@ -126,9 +149,9 @@ export default function Navbar() {
             </button>
           </div>
         </div>
-
       </nav>
 
+      {/* Drawer */}
       <div className={`premium-drawer ${drawerOpen ? "show" : ""}`}>
         <div className="premium-drawer-header">
           <h4>Menu</h4>
@@ -150,7 +173,8 @@ export default function Navbar() {
             <i className="bi bi-cart3"></i> Cart <span className="drawer-badge">5</span>
           </Link>
 
-          <CategoriesDropdown mobile={true} closeDrawer={closeDrawer} />
+          {/* Mobile Categories */}
+          <CategoriesDropdown mobile={true} categories={categories} closeDrawer={closeDrawer} />
 
           <Link to="/offers" onClick={closeDrawer} className="premium-drawer-link">
             <i className="bi bi-tag"></i> Offers

@@ -64,15 +64,28 @@ export const sellerDetails = async (sellerId, formData) => {
 
 // Get products by seller id
 
-export const getSellerProducts = async (sellerId) => {
+export const getSellerProducts = async () => {
   try {
-    const res = await axiosInstance.get(`/product/seller/${sellerId}`);
+    const sellerUid = localStorage.getItem("sellerUid");
+    if (!sellerUid) {
+      throw new Error("Seller ID not found.");
+    }
+
+    const res = await axiosInstance.get("/product/seller-id", {
+      headers: {
+        sellerId: sellerUid, // sellerUid is sent in the headers
+      },
+    });
+    console.log(res.data.data);
     return res.data.data;
+
   } catch (err) {
     console.error("API error:", err);
     return [];
   }
 };
+
+
 export const updateProduct = async (productId, productData) => {
   try {
     const res = await axiosInstance.put(`/product/update/${productId}`, productData);
@@ -81,16 +94,18 @@ export const updateProduct = async (productId, productData) => {
     console.error("Update API error:", err);
     throw err;
   }
-};
-
-// ----------------------
-// Delete product
+};  
 export const deleteProduct = async (productId) => {
   try {
-    const res = await axiosInstance.delete(`/product/delete/${productId}`);
+    const sellerId = localStorage.getItem("sellerUid");
+    const res = await axiosInstance.delete(`/product/delete/${productId}`, {
+      headers: {
+        sellerId,
+      },
+    });
     return res.data;
   } catch (err) {
-    console.error("Delete API error:", err);
+    console.error("Delete API error:", err.response?.data || err.message);
     throw err;
   }
 };
