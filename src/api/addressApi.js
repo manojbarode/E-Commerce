@@ -2,22 +2,26 @@ import axiosInstance from "./axiosConfig";
 
 const BASE_PATH = "address";
 
-export const getAddresses = async (userId) => {
-  const res = await axiosInstance.get(`${BASE_PATH}/${userId}`);
+// Get all addresses for a userUid
+export const getAddresses = async (userUid) => {
+  const res = await axiosInstance.get(`${BASE_PATH}/${userUid}`);
   return res.data.data;
 };
 
-export const addAddress = async (address) => {
-  const res = await axiosInstance.post(BASE_PATH, address);
+// Add new address for a userUid
+export const addAddress = async (userUid, address) => {
+  const res = await axiosInstance.post(`${BASE_PATH}/${userUid}`, address);
   return res.data.data;
 };
 
-export const updateAddress = async (id, address) => {
-  const res = await axiosInstance.put(`${BASE_PATH}/${id}`, address);
+// Update address by userUid and addressUid
+export const updateAddress = async (userUid, addressUid, address) => {
+  const res = await axiosInstance.put(`${BASE_PATH}/${userUid}/${addressUid}`, address);
   return res.data.data;
 };
 
-export const deleteAddress = async (id) => {
-  const res = await axiosInstance.delete(`${BASE_PATH}/${id}`);
+// Delete address by userUid and addressUid
+export const deleteAddress = async (userUid, addressUid) => {
+  const res = await axiosInstance.delete(`${BASE_PATH}/${userUid}/${addressUid}`);
   return res.data.data;
 };

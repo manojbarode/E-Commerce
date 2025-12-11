@@ -12,7 +12,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { loginUser } = useContext(AuthContext);
 
- const handleLoginSubmit = async (e) => {
+const handleLoginSubmit = async (e) => {
   e.preventDefault();
   setMessage("");
 
@@ -24,15 +24,15 @@ const Login = () => {
       return;
     }
 
-    // Save values
+    // Save values in localStorage
     localStorage.setItem("token", loginData.token);
-    localStorage.setItem("customerId", String(loginData.userId));
+    localStorage.setItem("userUid", loginData.userUid); // <-- changed from customerId/userId
     localStorage.setItem("name", loginData.name);
     localStorage.setItem("email", loginData.email);
 
-    // Context update
+    // Update context
     loginUser(loginData.token, {
-      id: loginData.userId,
+      userUid: loginData.userUid,  // <-- changed
       name: loginData.name,
       email: loginData.email
     });
@@ -44,6 +44,7 @@ const Login = () => {
     toast.error(err?.message || "Invalid email or password.");
   }
 };
+
 
 
 

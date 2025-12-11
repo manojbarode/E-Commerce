@@ -15,11 +15,13 @@ export default function AddressBook() {
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
-    address: "",
-    locality: "",
-    landmark: "",
+    houseNo: "",
+    street: "",
+    city: "",
     state: "",
-    pincode: "",
+    country: "",
+    zipCode: "",
+    defaultAddress: false,
   });
 
   const [errors, setErrors] = useState({});
@@ -33,39 +35,39 @@ export default function AddressBook() {
     "Uttar Pradesh","Uttarakhand","West Bengal"
   ];
 
-  useEffect(() => {
-     const userId = localStorage.getItem("customerId");
-  if (userId) {
-    fetchAddresses();
-  }
-  }, []);
+  // Fetch userUid from localStorage
+  const userUid = localStorage.getItem("userUid");
 
- const fetchAddresses = async () => {
-  try {
-    const userId = localStorage.getItem("customerId");
-    if (!userId) {
-      toast.error("User not logged in!");
-      return;
+  useEffect(() => {
+    if (userUid) fetchAddresses();
+  }, [userUid]);
+
+  const fetchAddresses = async () => {
+    try {
+      if (!userUid) {
+        toast.error("User not logged in!");
+        return;
+      }
+      const response = await getAddresses(userUid);
+      setAddresses(response || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch addresses");
     }
-    const response = await getAddresses(Number(userId));
-    setAddresses(response);
-    console.log(response);
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to fetch addresses");
-  }
-};
+  };
 
   const handleAddNew = () => {
     setEditIndex(null);
     setFormData({
       fullName: "",
       mobile: "",
-      address: "",
-      locality: "",
-      landmark: "",
+      houseNo: "",
+      street: "",
+      city: "",
       state: "",
-      pincode: "",
+      country: "",
+      zipCode: "",
+      defaultAddress: false,
     });
     setErrors({});
     setShowForm(true);
@@ -73,7 +75,18 @@ export default function AddressBook() {
 
   const handleEdit = (index) => {
     setEditIndex(index);
-    setFormData(addresses[index]);
+    const addr = addresses[index];
+    setFormData({
+      fullName: addr.fullName || "",
+      mobile: addr.mobile || "",
+      houseNo: addr.houseNo || "",
+      street: addr.street || "",
+      city: addr.city || "",
+      state: addr.state || "",
+      country: addr.country || "",
+      zipCode: addr.zipCode || "",
+      defaultAddress: addr.defaultAddress || false,
+    });
     setShowForm(true);
   };
 
@@ -81,56 +94,62 @@ export default function AddressBook() {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
 
     try {
-      const id = addresses[index].id;
-      await deleteAddress(id);
+      const addressUid = addresses[index].addressUid;
+      await deleteAddress(userUid, addressUid);
 
       setAddresses(addresses.filter((_, i) => i !== index));
       if (selectedIndex === index) setSelectedIndex(null);
 
       toast.success("Address deleted");
     } catch (err) {
-      toast.error("Failed to delete");
+      toast.error("Failed to delete address");
     }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const userId = localStorage.getItem("customerId");
-    if (!userId) {
-      toast.error("User not logged in!");
-      return;
+    try {
+      if (!userUid) {
+        toast.error("User not logged in!");
+        return;
+      }
+
+      const payload = { ...formData };
+
+      if (editIndex !== null) {
+        const addressUid = addresses[editIndex].addressUid;
+        const updatedAddress = await updateAddress(userUid, addressUid, payload);
+
+        const updatedList = [...addresses];
+        updatedList[editIndex] = updatedAddress;
+        setAddresses(updatedList);
+
+        toast.success("Address updated successfully");
+      } else {
+        const savedAddress = await addAddress(userUid, payload);
+        setAddresses([...addresses, savedAddress]);
+        toast.success("Address saved successfully");
+      }
+
+      setShowForm(false);
+      setFormData({
+        fullName: "",
+        mobile: "",
+        houseNo: "",
+        street: "",
+        city: "",
+        state: "",
+        country: "",
+        zipCode: "",
+        defaultAddress: false,
+      });
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save/update address");
     }
-
-    const payload = { ...formData, userId: Number(userId) };
-
-    if (editIndex !== null) {
-      const id = addresses[editIndex].id;
-      const updatedAddress = await updateAddress(id, payload);
-
-      const updatedList = [...addresses];
-      updatedList[editIndex] = updatedAddress;
-      setAddresses(updatedList);
-
-      toast.success("Address updated successfully");
-    } else {
-      const savedAddress = await addAddress(payload);
-      setAddresses([...addresses, savedAddress]);
-      toast.success("Address saved successfully");
-    }
-
-    setShowForm(false);
-    setFormData({
-      fullName: "", mobile: "", address: "", locality: "", landmark: "", state: "", pincode: ""
-    });
-
-  } catch (err) {
-    toast.error("Failed to save/update address");
-  }
-};
-
-
+  };
 
   const handleContinue = () => {
     if (selectedIndex === null) {
@@ -147,15 +166,16 @@ const handleSubmit = async (e) => {
 
         {addresses.map((addr, idx) => (
           <div
-            key={idx}
+            key={addr.addressUid}
             className={`card p-3 mb-3 border ${selectedIndex === idx ? "border-primary" : "border-secondary"}`}
           >
             <div className="d-flex justify-content-between align-items-center">
               <div onClick={() => setSelectedIndex(idx)} style={{ cursor: "pointer" }}>
                 <strong>{addr.fullName}</strong> — {addr.mobile}
                 <p className="text-muted mb-0">
-                  {addr.address}, {addr.locality}, {addr.state} — {addr.pincode}
+                  {addr.houseNo}, {addr.street}, {addr.city}, {addr.state}, {addr.country} — {addr.zipCode}
                 </p>
+                {addr.defaultAddress && <small className="text-success">Default Address</small>}
               </div>
 
               <div className="d-flex gap-2">
@@ -179,7 +199,6 @@ const handleSubmit = async (e) => {
         {showForm && (
           <form onSubmit={handleSubmit} className="border p-3 rounded bg-light">
             <div className="row g-2">
-              {/* Form fields same as before */}
               {/* FULL NAME */}
               <div className="col-md-6">
                 <label className="form-label">Full Name</label>
@@ -189,7 +208,6 @@ const handleSubmit = async (e) => {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 />
-                {errors.fullName && <small className="text-danger">{errors.fullName}</small>}
               </div>
 
               {/* MOBILE */}
@@ -199,43 +217,37 @@ const handleSubmit = async (e) => {
                   className="form-control"
                   value={formData.mobile}
                   maxLength={10}
-                  onChange={(e) =>
-                    setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })
-                  }
+                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })}
                 />
-                {errors.mobile && <small className="text-danger">{errors.mobile}</small>}
               </div>
 
-              {/* ADDRESS */}
-              <div className="col-md-12">
-                <label className="form-label">Address</label>
-                <textarea
-                  className="form-control"
-                  rows={2}
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                />
-                {errors.address && <small className="text-danger">{errors.address}</small>}
-              </div>
-
-              {/* LOCALITY */}
+              {/* HOUSE NO */}
               <div className="col-md-6">
-                <label className="form-label">Locality</label>
+                <label className="form-label">House No</label>
                 <input
                   className="form-control"
-                  value={formData.locality}
-                  onChange={(e) => setFormData({ ...formData, locality: e.target.value })}
+                  value={formData.houseNo}
+                  onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
                 />
-                {errors.locality && <small className="text-danger">{errors.locality}</small>}
               </div>
 
-              {/* LANDMARK */}
+              {/* STREET */}
               <div className="col-md-6">
-                <label className="form-label">Landmark</label>
+                <label className="form-label">Street</label>
                 <input
                   className="form-control"
-                  value={formData.landmark}
-                  onChange={(e) => setFormData({ ...formData, landmark: e.target.value })}
+                  value={formData.street}
+                  onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                />
+              </div>
+
+              {/* CITY */}
+              <div className="col-md-6">
+                <label className="form-label">City</label>
+                <input
+                  className="form-control"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 />
               </div>
 
@@ -252,21 +264,40 @@ const handleSubmit = async (e) => {
                     <option key={st} value={st}>{st}</option>
                   ))}
                 </select>
-                {errors.state && <small className="text-danger">{errors.state}</small>}
               </div>
 
-              {/* PINCODE */}
+              {/* COUNTRY */}
               <div className="col-md-6">
-                <label className="form-label">Pincode</label>
+                <label className="form-label">Country</label>
                 <input
                   className="form-control"
-                  maxLength={6}
-                  value={formData.pincode}
-                  onChange={(e) =>
-                    setFormData({ ...formData, pincode: e.target.value.replace(/[^0-9]/g, "") })
-                  }
+                  value={formData.country}
+                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                 />
-                {errors.pincode && <small className="text-danger">{errors.pincode}</small>}
+              </div>
+
+              {/* ZIPCODE */}
+              <div className="col-md-6">
+                <label className="form-label">Zip Code</label>
+                <input
+                  className="form-control"
+                  value={formData.zipCode}
+                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/[^0-9]/g, "") })}
+                />
+              </div>
+
+              {/* DEFAULT ADDRESS */}
+              <div className="col-md-12 form-check mt-2">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  checked={formData.defaultAddress}
+                  onChange={(e) => setFormData({ ...formData, defaultAddress: e.target.checked })}
+                  id="defaultAddress"
+                />
+                <label className="form-check-label" htmlFor="defaultAddress">
+                  Set as default address
+                </label>
               </div>
             </div>
 
