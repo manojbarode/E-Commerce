@@ -12,100 +12,96 @@ export default function Product() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
 
+  // =============================
+  // FETCH PRODUCTS
+  // =============================
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await ShowProduct();
-        if (!response || !Array.isArray(response)) {
-          setProducts([]);
-          return;
-        }
+        if (!Array.isArray(response)) return setProducts([]);
 
-        setProducts(response);
+        // Clean duplicate images
+        const cleaned = response.map((p) => ({
+          ...p,
+          imageUrls: Array.from(new Set(p.imageUrls || [])),
+        }));
 
-        // Initialize main images for each product
-        const initialSelected = {};
-        response.forEach((p) => {
-          if (Array.isArray(p.imageUrls) && p.imageUrls.length > 0) {
-            // Deduplicate URLs here
-            const uniqueImages = Array.from(new Set(p.imageUrls));
-            initialSelected[p.id] = uniqueImages[0];
-            p.imageUrls = uniqueImages; // Update product.images with unique list
-          }
+        setProducts(cleaned);
+
+        // Set default selected image using productUid
+        const defaults = {};
+        cleaned.forEach((p) => {
+          defaults[p.productUid] = p.imageUrls?.[0] || "/no-image.png";
         });
 
-        setSelectedImages(initialSelected);
+        setSelectedImages(defaults);
+
       } catch (err) {
         console.error("Error fetching products:", err);
         setProducts([]);
       }
     };
+
     fetchProducts();
   }, []);
 
+  // =============================
+  // ACTION HANDLERS
+  // =============================
+
   const handleAddToCart = () => {
     if (!login) {
-      toast.warning("Please login first to add items to cart!", {
-        position: "top-center",
-        autoClose: 1500,
-      });
-      return;
+      return toast.warning("Please login first to add items to cart!");
     }
-    toast.success("Added to cart!", { position: "top-center" });
+    toast.success("Added to cart!");
   };
 
   const handleBuyNow = () => {
     if (!login) {
-      toast.error("Login required before making a purchase!", {
-        position: "top-center",
-        autoClose: 1500,
-      });
-      return;
+      return toast.error("Login required before making a purchase!");
     }
     navigate("/Profile/buynow");
   };
 
-  const handleWishlist = (productId) => {
+  const handleWishlist = (productUid) => {
     if (!login) {
-      toast.warning("Please login first to use wishlist!", {
-        position: "top-center",
-        autoClose: 1500,
-      });
-      return;
+      return toast.warning("Please login first to use wishlist!");
     }
 
     setWishlist((prev) => {
-      if (prev.includes(productId)) {
-        toast.info("Removed from wishlist 💔", {
-          position: "top-center",
-          autoClose: 1200,
-        });
-        return prev.filter((id) => id !== productId);
+      if (prev.includes(productUid)) {
+        toast.info("Removed from wishlist");
+        return prev.filter((id) => id !== productUid);
       } else {
-        toast.success("Added to wishlist ❤️", {
-          position: "top-center",
-          autoClose: 1200,
-        });
-        return [...prev, productId];
+        toast.success("Added to wishlist");
+        return [...prev, productUid];
       }
     });
   };
 
-  const handleThumbnailClick = (productId, imgUrl) => {
-    setSelectedImages((prev) => ({ ...prev, [productId]: imgUrl }));
+  const handleThumbnailClick = (productUid, imgUrl) => {
+    setSelectedImages((prev) => ({
+      ...prev,
+      [productUid]: imgUrl,
+    }));
   };
+
+  // =============================
+  // RENDER
+  // =============================
 
   return (
     <div className="product-page">
       <div className="container">
-        <div className="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
-          <h2 className="page-heading mb-0">✨ Featured Products</h2>
-          <p className="page-subtitle mb-0">
-            Handpicked items just for you – explore, wishlist & shop in style.
-          </p>
+
+        <div className="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+          <h2 className="page-heading">Featured Products</h2>
+          <p className="page-subtitle">Explore top deals and best picks</p>
         </div>
 
         <div className="product-grid">
+
           {products.length === 0 && (
             <p className="text-center text-muted w-100">
               No products available right now.
@@ -113,30 +109,31 @@ export default function Product() {
           )}
 
           {products.map((product) => {
-            const isWishlisted = wishlist.includes(product.id);
+            const productUid = product.productUid;
+
             const mainImage =
-              selectedImages[product.id] ||
-              (Array.isArray(product.imageUrls) && product.imageUrls[0]) ||
+              selectedImages[productUid] ||
+              product.imageUrls?.[0] ||
               "/no-image.png";
 
-            // Ensure unique thumbnails (exclude main image)
             const thumbnails =
-              Array.isArray(product.imageUrls) && product.imageUrls.length > 1
-                ? product.imageUrls.filter((img) => img !== mainImage)
-                : [];
+              product.imageUrls?.filter((img) => img !== mainImage) || [];
 
             return (
-              <div key={product.id} className="product-card">
+              <div key={productUid} className="product-card">
+
                 <button
                   type="button"
-                  className={`wishlist-icon ${isWishlisted ? "active" : ""}`}
-                  onClick={() => handleWishlist(product.id)}
+                  className={`wishlist-icon ${
+                    wishlist.includes(productUid) ? "active" : ""
+                  }`}
+                  onClick={() => handleWishlist(productUid)}
                 >
-                  <span>♥</span>
+                  ♥
                 </button>
 
                 <Link
-                  to={`/product/${product.id}`}
+                  to={`/product/${productUid}`}
                   className="position-relative d-block mb-2"
                 >
                   <img
@@ -151,13 +148,12 @@ export default function Product() {
 
                 {thumbnails.length > 0 && (
                   <div className="thumbnail-row no-scrollbar">
-                    {thumbnails.map((img, idx) => (
+                    {thumbnails.map((img, index) => (
                       <img
-                        key={idx}
+                        key={index}
                         src={img}
-                        alt={`thumbnail-${idx}`}
                         className="thumbnail-img"
-                        onClick={() => handleThumbnailClick(product.id, img)}
+                        onClick={() => handleThumbnailClick(productUid, img)}
                       />
                     ))}
                   </div>
@@ -185,6 +181,7 @@ export default function Product() {
                     Buy Now
                   </button>
                 </div>
+
               </div>
             );
           })}

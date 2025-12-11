@@ -1,6 +1,3 @@
-/* ============================================================
-   GLOBAL CONTAINER & HEADER
-============================================================ */
 .seller-products-container {
   min-height: 100vh;
   padding: 3rem 0;
@@ -16,7 +13,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
 }
@@ -25,9 +22,6 @@
   color: #64748b;
 }
 
-/* ============================================================
-   SEARCH BAR
-============================================================ */
 .search-section {
   display: flex;
   justify-content: center;
@@ -65,10 +59,6 @@
   box-shadow: 0 4px 18px rgba(102, 126, 234, 0.18);
   outline: none;
 }
-
-/* ============================================================
-   LOADING STATE
-============================================================ */
 .loading-state {
   text-align: center;
   padding: 5rem 0;
@@ -88,9 +78,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ============================================================
-   EMPTY STATE
-============================================================ */
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -113,9 +100,6 @@
   color: #94a3b8;
 }
 
-/* ============================================================
-   TABLE CARD
-============================================================ */
 .premium-card {
   background: white;
   border-radius: 20px;
@@ -129,9 +113,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================================
-   TABLE BASE STYLES
-============================================================ */
 .table-responsive {
   overflow-x: auto;
 }
@@ -160,10 +141,6 @@
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
 }
-
-/* ============================================================
-   PRODUCT ROWS
-============================================================ */
 .product-row {
   transition: 0.25s ease;
 }
@@ -187,10 +164,6 @@
   border-radius: 10px;
   object-fit: cover;
 }
-
-/* ============================================================
-   PRODUCT DETAILS
-============================================================ */
 .product-details {
   max-width: 280px;
   text-align: left;
@@ -207,14 +180,10 @@
   font-size: 13px;
   line-height: 1.35;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-
-/* ============================================================
-   PRICE & STOCK BADGES
-============================================================ */
 .price-tag {
   font-size: 18px;
   font-weight: 700;
@@ -239,9 +208,6 @@
   color: white;
 }
 
-/* ============================================================
-   DYNAMIC FIELDS
-============================================================ */
 .dynamic-fields {
   max-width: 250px;
   text-align: left;
@@ -260,10 +226,6 @@
 .field-value {
   color: #1e293b;
 }
-
-/* ============================================================
-   ACTION BUTTONS
-============================================================ */
 .action-buttons {
   display: flex;
   justify-content: center;
@@ -302,10 +264,6 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
 }
-
-/* ============================================================
-   RESULTS COUNTER
-============================================================ */
 .results-counter {
   text-align: center;
   margin-top: 1rem;
@@ -314,10 +272,6 @@
 .results-counter small {
   color: #64748b;
 }
-
-/* ============================================================
-   RESPONSIVE MEDIA QUERIES
-============================================================ */
 @media (max-width: 1200px) {
   .product-details { max-width: 240px; }
   .dynamic-fields { max-width: 200px; }
@@ -336,7 +290,7 @@
 
   .product-img { width: 50px; height: 50px; }
 
-  .product-description { -webkit-line-clamp: 1; }
+  .product-description { line-clamp: 1; }
   .btn-action { padding: 8px 16px; font-size: 13px; }
   .search-input { height: 48px; font-size: 14px; }
   .page-title { font-size: 1.75rem; }
