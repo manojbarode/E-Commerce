@@ -4,15 +4,19 @@ import { toast } from "react-toastify";
 import "./SellerProductUpdate.css";
 import { getProductById, uploadMultipleToCloudinary } from "../../../api/productApi";
 import { updateProduct } from "../../../api/SellApi";
+import { useContext } from "react";
+import { SellerContext } from "../../../context/SellerProvider";
 
 export default function UpdateProduct() {
-  const { productUid } = useParams();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({});
   const [dynamicFields, setDynamicFields] = useState({});
   const [loading, setLoading] = useState(false);
-
+  // const { productUid } = useContext(SellerContext);
+  const sellerUid = localStorage.getItem("sellerUid");
+  const productUid = localStorage.getItem("productUid");
+  console.log("Seller Uid "+sellerUid);
   useEffect(() => {
     const loadProduct = async () => {
       try {
@@ -29,7 +33,7 @@ export default function UpdateProduct() {
           description: data.description,
           price: data.price,
           stock: data.stock,
-          images: data.imageUrls || [], // backend stored images
+          images: data.imageUrls || [],
         });
 
         // Dynamic fields
@@ -49,8 +53,6 @@ export default function UpdateProduct() {
   const handleDynamicFieldChange = (key, value) => {
     setDynamicFields((prev) => ({ ...prev, [key]: value }));
   };
-
-  // Remove image from the form state
   const handleRemoveImage = (index) => {
     setForm((prev) => ({
       ...prev,
@@ -64,13 +66,10 @@ export default function UpdateProduct() {
       setLoading(true);
 
       let imageUrls = form.images;
-
-      // Upload new images if any File objects exist
       if (form.images?.length && form.images.some((img) => img instanceof File)) {
         const filesToUpload = form.images.filter((img) => img instanceof File);
         const uploadedUrls = await uploadMultipleToCloudinary(filesToUpload);
 
-        // Merge existing URLs (already strings) + newly uploaded
         const existingUrls = form.images.filter((img) => typeof img === "string");
         imageUrls = [...existingUrls, ...uploadedUrls];
       }
@@ -81,8 +80,7 @@ export default function UpdateProduct() {
         imageUrls,
       };
       delete finalData.images;
-
-      await updateProduct(productUid, finalData);
+      await updateProduct(productUid,sellerUid, finalData);
       toast.success("Product Updated Successfully");
       navigate("/seller/sellerproduct");
     } catch (err) {
