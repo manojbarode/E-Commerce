@@ -1,20 +1,25 @@
-import { useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { AuthContext } from "../context/AuthContext";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutUser } from "../Redux/authSlice";
 import CategoriesDropdown from "./CategoriesDropdown";
 import { getCategories } from "../api/categoriesApi";
 import "./Css/Navbar.css";
 
 export default function Navbar() {
-  const { login, logoutUser } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [categories, setCategories] = useState({}); // Categories state
+  const dispatch = useDispatch();
 
-  // ---------------- Fetch categories only once ----------------
+  // Redux state
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const user = useSelector((state) => state.auth.user);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [categories, setCategories] = useState({});
+
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -33,11 +38,11 @@ export default function Navbar() {
   }, []);
 
   const handleProfileClick = () => {
-    login ? navigate("/profile") : navigate("/signup");
+    isLoggedIn ? navigate("/profile") : navigate("/signup");
   };
 
   const handleLogout = () => {
-    logoutUser();
+    dispatch(logoutUser());
     navigate("/");
   };
 
@@ -113,7 +118,7 @@ export default function Navbar() {
                 <span className="icon-badge">5</span>
               </Link>
 
-              {login ? (
+              {isLoggedIn ? (
                 <>
                   <div className="premium-icon-btn icon-profile" onClick={handleProfileClick}>
                     <i className="bi bi-person-circle"></i>
@@ -132,7 +137,7 @@ export default function Navbar() {
 
           {/* Mobile Icons */}
           <div className="d-flex d-lg-none align-items-center gap-2">
-            {login ? (
+            {isLoggedIn ? (
               <div className="premium-mobile-login-btn" onClick={handleProfileClick}>
                 <i className="bi bi-person-circle"></i>
               </div>
@@ -189,7 +194,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {login && (
+        {isLoggedIn && (
           <div className="premium-drawer-footer">
             <button
               onClick={() => {

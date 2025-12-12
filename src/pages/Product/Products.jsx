@@ -1,18 +1,21 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Product.css";
 import { ShowProduct } from "../../api/productApi";
-import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
-import { PaymentContext } from "../../context/PaymentProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { addProduct, setProductUid } from "../../Redux/productSlice";
+import { setAmount } from "../../Redux/orderSlice";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [selectedImages, setSelectedImages] = useState({});
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
-  const { setPaymentPrice,setproductUid } = useContext(PaymentContext);
+  const dispatch = useDispatch();
+
+  // Get login state from Redux
+  const login = useSelector((state) => state.auth.login);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -20,11 +23,17 @@ export default function Product() {
         const response = await ShowProduct();
         if (!Array.isArray(response)) return setProducts([]);
 
-        const cleaned = response.map((p) => ({...p,imageUrls: Array.from(new Set(p.imageUrls || [])),}));
+        const cleaned = response.map((p) => ({
+          ...p,
+          imageUrls: Array.from(new Set(p.imageUrls || [])),
+        }));
 
         setProducts(cleaned);
+
         const defaults = {};
-        cleaned.forEach((p) => {defaults[p.productUid] = p.imageUrls?.[0] || "/no-image.png";});
+        cleaned.forEach((p) => {
+          defaults[p.productUid] = p.imageUrls?.[0] || "/no-image.png";
+        });
         setSelectedImages(defaults);
 
       } catch (err) {
@@ -46,8 +55,8 @@ export default function Product() {
     if (!login) {
       return toast.error("Login required before making a purchase!");
     }
-    setPaymentPrice(Number(product.price));
-    setproductUid(product.productUid);
+    dispatch(setProductUid(product.productUid));
+    dispatch(setAmount(Number(product.price)));
     navigate(`/buynow`);
   };
 
@@ -56,19 +65,20 @@ export default function Product() {
       return toast.warning("Please login first to use wishlist!");
     }
     setWishlist((prev) =>
-      prev.includes(productUid)? prev.filter((id) => id !== productUid): [...prev, productUid]
+      prev.includes(productUid) ? prev.filter((id) => id !== productUid) : [...prev, productUid]
     );
   };
 
   const handleThumbnailClick = (productUid, imgUrl) => {
-    setSelectedImages((prev) => ({...prev,[productUid]: imgUrl,}));
+    setSelectedImages((prev) => ({ ...prev, [productUid]: imgUrl }));
   };
 
-  const imageClick = (product)=>{
-     setPaymentPrice(Number(product.price));
-    setproductUid(product.productUid);
-    navigate(`/buynow`);
-  }
+  const imageClick = (product) => {
+    dispatch(setProductUid(product.productUid));
+    dispatch(setAmount(Number(product.price)));
+    dispatch(addProduct(product));
+  };
+
   return (
     <div className="product-page">
       <div className="container">
@@ -84,19 +94,22 @@ export default function Product() {
 
           {products.map((product) => {
             const productUid = product.productUid;
-            const mainImage = selectedImages[productUid] || product.imageUrls?.[0] ||"/no-image.png";
-
+            const mainImage = selectedImages[productUid] || product.imageUrls?.[0] || "/no-image.png";
             const thumbnails = product.imageUrls?.filter((img) => img !== mainImage) || [];
 
             return (
               <div key={productUid} className="product-card">
-                <button type="button" className={`wishlist-icon ${ wishlist.includes(productUid) ? "active" : ""}`}
-                  onClick={() => handleWishlist(productUid)}>♥
+                <button
+                  type="button"
+                  className={`wishlist-icon ${wishlist.includes(productUid) ? "active" : ""}`}
+                  onClick={() => handleWishlist(productUid)}
+                >
+                  ♥
                 </button>
 
                 <Link to={`/productDetails`} className="position-relative d-block mb-2">
-                  <img src={mainImage} alt={product.title} className="product-img-full"
-                    onClick={()=>imageClick(product)}
+                  <img src={mainImage} alt={product.title} className="product-img-full" 
+                    onClick={() => imageClick(product)}
                   />
                   <span className="badge new-badge position-absolute top-0 start-0 m-2">New</span>
                 </Link>
@@ -104,8 +117,12 @@ export default function Product() {
                 {thumbnails.length > 0 && (
                   <div className="thumbnail-row no-scrollbar">
                     {thumbnails.map((img, index) => (
-                      <img key={index} src={img} className="thumbnail-img"
-                        onClick={() => handleThumbnailClick(productUid, img)}/>
+                      <img
+                        key={index}
+                        src={img}
+                        className="thumbnail-img"
+                        onClick={() => handleThumbnailClick(productUid, img)}
+                      />
                     ))}
                   </div>
                 )}
@@ -121,7 +138,6 @@ export default function Product() {
                   <button className="btn glass-btn w-100 mb-2" onClick={handleAddToCart}>
                     Add to Cart
                   </button>
-
                   <button className="btn glass-btn-secondary w-100" onClick={() => handleBuyNow(product)}>
                     Buy Now
                   </button>

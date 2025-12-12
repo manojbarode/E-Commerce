@@ -1,13 +1,20 @@
-/* IMAGE */
+/* Sticky left column */
+.sticky-left {
+  position: sticky;
+  top: 90px;
+  z-index: 1;
+}
+
+/* Product Image */
 .product-main-img {
-  max-height: 450px;
+  max-height: 350px;
   object-fit: contain;
   background: #f8f9fa;
   padding: 10px;
   border-radius: 10px;
 }
 
-/* RIGHT SIDE SCROLLABLE BOX */
+/* Right side scrollable box */
 .details-box {
   max-height: 80vh;
   overflow-y: auto;
@@ -39,6 +46,11 @@
   }
 
   .btn {
-    width: 100%; /* Full width on mobile */
+    width: 100%;
+  }
+
+  .sticky-left {
+    position: relative;
+    top: auto;
   }
 }

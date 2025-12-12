@@ -2,9 +2,9 @@ import React, { useContext, useEffect, useState } from "react";
 import "./Payment.css";
 import { getPaymentMethods, getPaymentFields, submitPayment } from "../api/paymentApi";
 import { FaCreditCard, FaPaypal, FaMobileAlt } from "react-icons/fa";
-import { PaymentContext } from "../context/PaymentProvider";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function PaymentForm() {
   const [paymentMethods, setPaymentMethods] = useState([]);
@@ -13,10 +13,10 @@ export default function PaymentForm() {
   const [formData, setFormData] = useState({});
   const [currency, setCurrency] = useState("INR");
   const [amount, setAmount] = useState();
-  const { price, productUid } = useContext(PaymentContext);
   const navigate = useNavigate();
   const [paymentInProgress, setPaymentInProgress] = useState(false);
-
+ const productUid = useSelector((state) => state.product?.productUid) || localStorage.getItem("productUid");
+const price = useSelector((state) => state.order?.totalAmount) || 0;
   useEffect(() => {
     const fetchMethods = async () => {
       try {
@@ -76,7 +76,6 @@ export default function PaymentForm() {
 
     try {
       const response = await submitPayment(payload);
-
       if (response && response.status === 202) {
         // toast.success(`Payment successful!`);
         navigate("/payment-success", {
@@ -102,9 +101,7 @@ export default function PaymentForm() {
 
       <div className="payment-cards-container">
         {paymentMethods.map((method) => (
-          <div
-            key={method.id}
-            className={`payment-card ${selectedMethodId === method.id ? "selected" : ""}`}
+          <div key={method.id} className={`payment-card ${selectedMethodId === method.id ? "selected" : ""}`}
             onClick={() => handleMethodClick(method.id)}
           >
             <div className="payment-icon">{method.icon}</div>

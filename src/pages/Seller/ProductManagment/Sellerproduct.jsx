@@ -1,20 +1,24 @@
-import React, { useEffect, useState, useMemo, useContext } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux"; 
 import { deleteProduct, getSellerProducts } from "../../../api/SellApi";
 import "./SellerProducts.css";
-import { SellerContext } from "../../../context/SellerProvider";
+import { setProductUid } from "../../../Redux/orderSlice";
 
 export default function SellerProducts() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const {sellerUid,setProductUid}  = useContext(SellerContext);
-  // sellerUid = localStorage.getItem("sellerUid");
-  console.log("Seller Uid "+sellerUid);
+  const dispatch = useDispatch();
+
+  const sellerUid = useSelector((state) => state.seller.sellerUid);
+
+  console.log("Seller Uid " + sellerUid);
 
   const loadProducts = async () => {
+    if (!sellerUid) return;
     try {
       setLoading(true);
       const data = await getSellerProducts(sellerUid);
@@ -29,26 +33,24 @@ export default function SellerProducts() {
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [sellerUid]);
 
   const handleDelete = async (productUid) => {
-  if (window.confirm("Are you sure you want to delete this product?")) {
-    try {
-      await deleteProduct(productUid);
-      toast.success("Product deleted successfully");
-      navigate("/sellerdashboard")
-    } catch (err) {
-      toast.error(err.response?.error || "Delete failed");
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(productUid);
+        toast.success("Product deleted successfully");
+        loadProducts();
+      } catch (err) {
+        toast.error(err.response?.error || "Delete failed");
+      }
     }
-  }
-};
+  };
 
   const filteredProducts = useMemo(() => {
     const term = searchTerm.toLowerCase();
     return products.filter((p) => {
-      const base =
-        p.title?.toLowerCase().includes(term) ||
-        p.description?.toLowerCase().includes(term);
+      const base = p.title?.toLowerCase().includes(term) || p.description?.toLowerCase().includes(term);
 
       const dynamic = Object.values(p.dynamicFields || {}).some((v) =>
         String(v).toLowerCase().includes(term)
@@ -90,15 +92,17 @@ export default function SellerProducts() {
               <path d="m21 21-4.35-4.35" />
             </svg>
 
-            <input type="text" className="search-input" placeholder="Search products..."value={searchTerm}
+            <input type="text" className="search-input" placeholder="Search products..." value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}/>
           </div>
         </div>
+
         {loading && (
           <div className="loading-state">
             <div className="spinner"></div>
           </div>
         )}
+
         {!loading && filteredProducts.length === 0 && (
           <div className="empty-state">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -132,8 +136,7 @@ export default function SellerProducts() {
                   {filteredProducts.map((p) => (
                     <tr key={p.productUid}>
                       <td>
-                        <img src={p.imageUrls?.[0] || "https://via.placeholder.com/80"}alt={p.title}
-                          className="product-img" />
+                        <img src={p.imageUrls?.[0] || "https://via.placeholder.com/80"} alt={p.title} className="product-img" />
                       </td>
 
                       <td>
@@ -166,12 +169,12 @@ export default function SellerProducts() {
 
                       <td>
                         <div className="action-buttons">
-                          <button className="btn-action btn-edit" onClick={() => 
-                            {
-                              setProductUid(p.productUid);
-                              localStorage.setItem("productUid",p.productUid);
-                              navigate(`/seller/update-product`)
-                              }}>
+                          <button className="btn-action btn-edit" onClick={() => {
+                              dispatch(setProductUid(p.productUid));
+                              localStorage.setItem("productUid", p.productUid);
+                              navigate(`/seller/update-product`);
+                            }}
+                          >
                             <EditIcon /> Edit
                           </button>
 

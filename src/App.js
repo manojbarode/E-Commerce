@@ -47,6 +47,7 @@ const App = () => {
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
           <Route path="/buynow" element={<BuyNow />} />
+          <Route path="/productDetails" element={<ProductDetails />} />
           <Route path="/sellerlogout" element={<SellerLogout />} />
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/admin/payment-method" element={<PaymentMethodAddForm />} />
@@ -61,10 +62,6 @@ const App = () => {
                 <Profile />
               </ProtectedRoute>
             }/>
-    
-          
-
-          <Route path="/productDetails" element={<ProductDetails />} />
         </Route>
       </Routes>
     </>
