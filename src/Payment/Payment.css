@@ -77,6 +77,7 @@
   color: #374151;
 }
 
+/* Input styles (text, number, password, email, etc.) */
 .form-group input {
   padding: 10px 12px;
   border-radius: 10px;
@@ -90,6 +91,34 @@
   box-shadow: 0 0 5px rgba(79,70,229,0.3);
 }
 
+/* Number input (Amount) */
+.form-group input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.form-group input[type="number"]::-webkit-outer-spin-button,
+.form-group input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Currency select dropdown */
+.form-group select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  background-color: #ffffff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 5px rgba(79,70,229,0.3);
+}
+
+/* Submit button */
 .submit-btn {
   width: 100%;
   padding: 12px;

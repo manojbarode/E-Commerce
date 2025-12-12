@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./buynow.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addAddress, deleteAddress, getAddresses, updateAddress } from "../../api/addressApi";
+import {
+  addAddress,
+  deleteAddress,
+  getAddresses,
+  updateAddress,
+} from "../../api/addressApi";
 
 export default function AddressBook() {
   const [addresses, setAddresses] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-
   const [formData, setFormData] = useState({
     fullName: "",
     mobile: "",
@@ -24,9 +28,10 @@ export default function AddressBook() {
     defaultAddress: false,
   });
 
-  const [errors, setErrors] = useState({});
+  
   const navigate = useNavigate();
-
+  const userUid = localStorage.getItem("userUid");
+  const { productUid, price } = useParams();
   const indianStates = [
     "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Delhi","Goa",
     "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala",
@@ -35,19 +40,13 @@ export default function AddressBook() {
     "Uttar Pradesh","Uttarakhand","West Bengal"
   ];
 
-  // Fetch userUid from localStorage
-  const userUid = localStorage.getItem("userUid");
-
   useEffect(() => {
     if (userUid) fetchAddresses();
   }, [userUid]);
 
   const fetchAddresses = async () => {
     try {
-      if (!userUid) {
-        toast.error("User not logged in!");
-        return;
-      }
+      if (!userUid) return toast.error("User not logged in!");
       const response = await getAddresses(userUid);
       setAddresses(response || []);
     } catch (err) {
@@ -56,8 +55,7 @@ export default function AddressBook() {
     }
   };
 
-  const handleAddNew = () => {
-    setEditIndex(null);
+  const resetForm = () => {
     setFormData({
       fullName: "",
       mobile: "",
@@ -69,7 +67,12 @@ export default function AddressBook() {
       zipCode: "",
       defaultAddress: false,
     });
-    setErrors({});
+    setEditIndex(null);
+    setShowForm(false);
+  };
+
+  const handleAddNew = () => {
+    resetForm();
     setShowForm(true);
   };
 
@@ -92,59 +95,42 @@ export default function AddressBook() {
 
   const handleDelete = async (index) => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
-
     try {
       const addressUid = addresses[index].addressUid;
       await deleteAddress(userUid, addressUid);
-
       setAddresses(addresses.filter((_, i) => i !== index));
       if (selectedIndex === index) setSelectedIndex(null);
-
-      toast.success("Address deleted");
+      toast.success("Address deleted successfully");
     } catch (err) {
+      console.error(err);
       toast.error("Failed to delete address");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.fullName || !formData.mobile) {
+      toast.error("Full Name and Mobile are required");
+      return;
+    }
 
     try {
-      if (!userUid) {
-        toast.error("User not logged in!");
-        return;
-      }
-
       const payload = { ...formData };
 
       if (editIndex !== null) {
         const addressUid = addresses[editIndex].addressUid;
         const updatedAddress = await updateAddress(userUid, addressUid, payload);
-
         const updatedList = [...addresses];
         updatedList[editIndex] = updatedAddress;
         setAddresses(updatedList);
-
         toast.success("Address updated successfully");
       } else {
         const savedAddress = await addAddress(userUid, payload);
         setAddresses([...addresses, savedAddress]);
-        toast.success("Address saved successfully");
+        toast.success("Address added successfully");
       }
 
-      setShowForm(false);
-      setFormData({
-        fullName: "",
-        mobile: "",
-        houseNo: "",
-        street: "",
-        city: "",
-        state: "",
-        country: "",
-        zipCode: "",
-        defaultAddress: false,
-      });
-
+      resetForm();
     } catch (err) {
       console.error(err);
       toast.error("Failed to save/update address");
@@ -156,6 +142,8 @@ export default function AddressBook() {
       toast.error("Please select an address!");
       return;
     }
+    const selectedAddress = addresses[selectedIndex];
+    
     navigate("/payment");
   };
 
@@ -168,21 +156,31 @@ export default function AddressBook() {
           <div
             key={addr.addressUid}
             className={`card p-3 mb-3 border ${selectedIndex === idx ? "border-primary" : "border-secondary"}`}
+            style={{ cursor: "pointer" }}
+            onClick={() => setSelectedIndex(idx)}
           >
             <div className="d-flex justify-content-between align-items-center">
-              <div onClick={() => setSelectedIndex(idx)} style={{ cursor: "pointer" }}>
+              <div>
                 <strong>{addr.fullName}</strong> — {addr.mobile}
                 <p className="text-muted mb-0">
                   {addr.houseNo}, {addr.street}, {addr.city}, {addr.state}, {addr.country} — {addr.zipCode}
                 </p>
-                {addr.defaultAddress && <small className="text-success">Default Address</small>}
+                {addr.defaultAddress && (
+                  <small className="text-success">Default Address</small>
+                )}
               </div>
 
               <div className="d-flex gap-2">
-                <button className="btn btn-sm btn-outline-primary" onClick={() => handleEdit(idx)}>
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={(e) => { e.stopPropagation(); handleEdit(idx); }}
+                >
                   <Pencil size={16} /> Edit
                 </button>
-                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(idx)}>
+                <button
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={(e) => { e.stopPropagation(); handleDelete(idx); }}
+                >
                   <Trash2 size={16} /> Delete
                 </button>
               </div>
@@ -199,7 +197,7 @@ export default function AddressBook() {
         {showForm && (
           <form onSubmit={handleSubmit} className="border p-3 rounded bg-light">
             <div className="row g-2">
-              {/* FULL NAME */}
+              {/* Full Name */}
               <div className="col-md-6">
                 <label className="form-label">Full Name</label>
                 <input
@@ -207,21 +205,24 @@ export default function AddressBook() {
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  required
                 />
               </div>
 
-              {/* MOBILE */}
+              {/* Mobile */}
               <div className="col-md-6">
                 <label className="form-label">Mobile</label>
                 <input
                   className="form-control"
+                  type="tel"
                   value={formData.mobile}
                   maxLength={10}
                   onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })}
+                  required
                 />
               </div>
 
-              {/* HOUSE NO */}
+              {/* House No */}
               <div className="col-md-6">
                 <label className="form-label">House No</label>
                 <input
@@ -231,7 +232,7 @@ export default function AddressBook() {
                 />
               </div>
 
-              {/* STREET */}
+              {/* Street */}
               <div className="col-md-6">
                 <label className="form-label">Street</label>
                 <input
@@ -241,7 +242,7 @@ export default function AddressBook() {
                 />
               </div>
 
-              {/* CITY */}
+              {/* City */}
               <div className="col-md-6">
                 <label className="form-label">City</label>
                 <input
@@ -251,7 +252,7 @@ export default function AddressBook() {
                 />
               </div>
 
-              {/* STATE */}
+              {/* State */}
               <div className="col-md-6">
                 <label className="form-label">State</label>
                 <select
@@ -266,7 +267,7 @@ export default function AddressBook() {
                 </select>
               </div>
 
-              {/* COUNTRY */}
+              {/* Country */}
               <div className="col-md-6">
                 <label className="form-label">Country</label>
                 <input
@@ -276,7 +277,7 @@ export default function AddressBook() {
                 />
               </div>
 
-              {/* ZIPCODE */}
+              {/* Zip Code */}
               <div className="col-md-6">
                 <label className="form-label">Zip Code</label>
                 <input
@@ -286,7 +287,7 @@ export default function AddressBook() {
                 />
               </div>
 
-              {/* DEFAULT ADDRESS */}
+              {/* Default Address */}
               <div className="col-md-12 form-check mt-2">
                 <input
                   className="form-check-input"
@@ -305,7 +306,7 @@ export default function AddressBook() {
               <button type="submit" className="btn btn-primary w-50">
                 {editIndex !== null ? "Update" : "Save"}
               </button>
-              <button type="button" className="btn btn-secondary w-50" onClick={() => setShowForm(false)}>
+              <button type="button" className="btn btn-secondary w-50" onClick={resetForm}>
                 Cancel
               </button>
             </div>

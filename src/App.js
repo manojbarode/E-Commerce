@@ -25,6 +25,7 @@ import SellerProducts from "./pages/Seller/ProductManagment/Sellerproduct";
 import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
 import PaymentForm from "./Payment/payment";
 import UpdateProduct from "./pages/Seller/ProductManagment/SellerProductUpdate";
+import PaymentSuccess from "./Payment/PaymentSuccess";
 
 const App = () => {
   return (
@@ -45,26 +46,25 @@ const App = () => {
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/sellerdashboard" element={<SellerDashboard />} />
           <Route path="/sellerpage/product-upload" element={<ProductUpload />} />
-          <Route path="/Profile/buynow" element={<BuyNow/>}/>
+          <Route path="/buynow" element={<BuyNow />} />
           <Route path="/sellerlogout" element={<SellerLogout />} />
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/admin/payment-method" element={<PaymentMethodAddForm />} />
           <Route path="/seller/sellerproduct" element={<SellerProducts/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
           <Route path="/payment" element={<PaymentForm/>}/>
+          <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/seller/update-product/:productUid" element={<UpdateProduct />} />
 
-          <Route
-            path="/profile"
-            element={
+          <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
-            }
-          />
+            }/>
+    
           
 
-          <Route path="/product/:productUid" element={<ProductDetails />} />
+          <Route path="/productDetails" element={<ProductDetails />} />
         </Route>
       </Routes>
     </>

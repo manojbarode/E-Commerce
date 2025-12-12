@@ -31,13 +31,12 @@ export const addPaymentMethod = async (methodData) => {
   }
 };
 
-// Optional: submit payment if needed
-// export const submitPayment = async (paymentData) => {
-//   try {
-//     const response = await axiosInstance.post(`/payment/add`, paymentData);
-//     return response.data;
-//   } catch (error) {
-//     console.error("Payment submission failed", error);
-//     throw error;
-//   }
-// };
+export const submitPayment = async (paymentData) => {
+  try {
+    const response = await axiosInstance.post(`/payment/transaction`, paymentData);
+    return response.data;
+  } catch (error) {
+    console.error("Payment submission failed", error);
+    throw error;
+  }
+};
