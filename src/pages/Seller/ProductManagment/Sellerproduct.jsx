@@ -1,15 +1,18 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useContext } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { deleteProduct, getSellerProducts } from "../../../api/SellApi";
 import "./SellerProducts.css";
+import { SellerContext } from "../../../context/SellerProvider";
 
 export default function SellerProducts() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const sellerUid = localStorage.getItem("sellerUid");
+  const {sellerUid,setProductUid}  = useContext(SellerContext);
+  // sellerUid = localStorage.getItem("sellerUid");
+  console.log("Seller Uid "+sellerUid);
 
   const loadProducts = async () => {
     try {
@@ -28,10 +31,10 @@ export default function SellerProducts() {
     loadProducts();
   }, []);
 
-  const handleDelete = async (productId) => {
+  const handleDelete = async (productUid) => {
   if (window.confirm("Are you sure you want to delete this product?")) {
     try {
-      await deleteProduct(productId);
+      await deleteProduct(productUid);
       toast.success("Product deleted successfully");
       navigate("/sellerdashboard")
     } catch (err) {
@@ -163,7 +166,12 @@ export default function SellerProducts() {
 
                       <td>
                         <div className="action-buttons">
-                          <button className="btn-action btn-edit" onClick={() => navigate(`/seller/update-product/${p.productUid}`)}>
+                          <button className="btn-action btn-edit" onClick={() => 
+                            {
+                              setProductUid(p.productUid);
+                              localStorage.setItem("productUid",p.productUid);
+                              navigate(`/seller/update-product`)
+                              }}>
                             <EditIcon /> Edit
                           </button>
 

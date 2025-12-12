@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import SellerSidebar from "./SellerSidebar";
 import SellerStatsCard from "./SellerStatsCard";
@@ -17,6 +17,7 @@ import {
 } from "chart.js";
 
 import "../Css/SellerDashboard.css";
+import { SellerContext } from "../../../context/SellerProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -34,6 +35,7 @@ export default function SellerDashboard() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const {sellerUid} = useContext(SellerContext);
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalOrders: 0,

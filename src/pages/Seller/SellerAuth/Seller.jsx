@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./Seller.css";
 import { registerSeller, loginSeller } from "../../../api/SellApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { SellerContext } from "../../../context/SellerProvider";
 
 export default function SellerAuth() {
   const navigate = useNavigate();
   const [tab, setTab] = useState("login");
   const [loading, setLoading] = useState(false);
+  const { setSellerUid } = useContext(SellerContext);
 
   const [form, setForm] = useState({ email: "", mobile: "", password: "" });
 
@@ -56,6 +58,7 @@ export default function SellerAuth() {
           // ✅ Use sellerUid instead of sellerId
           const sellerUid = res.data.data.sellerUid;
           localStorage.setItem("sellerUid", sellerUid);
+          setSellerUid(sellerUid);
 
           console.log("Seller UID: " + sellerUid);
           navigate("/sellerdashboard");
@@ -71,8 +74,6 @@ export default function SellerAuth() {
 
         if (res.data.status === 201) {
           toast.success(res.data.message || "Registration Successful!");
-
-          // After registration → switch to login tab
           setTab("login");
           setForm({ email: form.email, password: "", mobile: "" });
         } else {

@@ -86,15 +86,28 @@ export const getSellerProducts = async () => {
 };
 
 
-export const updateProduct = async (productId, productData) => {
+export const updateProduct = async (productUid, sellerUid, productData) => {
   try {
-    const res = await axiosInstance.put(`/product/update/${productId}`, productData);
+    const res = await axiosInstance.put(
+      "/product/update",
+      productData,
+      {
+        headers: {
+          "Product-Uid": productUid,
+          "Seller-Uid": sellerUid,
+        },
+      }
+    );
     return res.data;
   } catch (err) {
     console.error("Update API error:", err);
     throw err;
   }
-};  
+};
+
+
+
+
 export const deleteProduct = async (productId) => {
   try {
     const sellerId = localStorage.getItem("sellerUid");
