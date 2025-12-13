@@ -1,7 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {sellerUid: "",productUid: "",buyerUid: "",quantity: 1,amount: 0,
-    totalAmount: 0,paymentMethod: "",paymentStatus: "PENDING",currency: "INR",
+const initialState = {
+  sellerUid: "",
+  productUid: "",
+  buyerUid: "",
+  quantity: 1,
+  amount: 0,
+  totalAmount: 0,
+  paymentMethod: "",
+  paymentStatus: "PENDING",
+  currency: "INR",
 };
 
 const orderSlice = createSlice({
@@ -35,8 +43,15 @@ const orderSlice = createSlice({
   },
 });
 
-export const {setSellerUid,setProductUid,setBuyerUid,setQuantity,setAmount,setPaymentMethod,
-    setPaymentStatus,resetOrder,
+export const {
+  setSellerUid,
+  setProductUid,
+  setBuyerUid,
+  setQuantity,
+  setAmount,
+  setPaymentMethod,
+  setPaymentStatus,
+  resetOrder,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

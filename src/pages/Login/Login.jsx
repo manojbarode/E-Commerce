@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { loginUser as loginUserAction } from "../../Redux/authSlice";
+import { setBuyerUid } from "../../Redux/orderSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,8 @@ const Login = () => {
           },
         })
       );
+
+      dispatch(setBuyerUid(loginData.userUid));
 
       toast.success("Login successful!");
       setTimeout(() => navigate("/"), 500);

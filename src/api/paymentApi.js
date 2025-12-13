@@ -31,9 +31,9 @@ export const addPaymentMethod = async (methodData) => {
   }
 };
 
-export const submitPayment = async (paymentData) => {
+export const submitPayment = async (order) => {
   try {
-    const response = await axiosInstance.post(`/payment/transaction`, paymentData);
+    const response = await axiosInstance.post(`/payment/transaction`, order);
     return response.data;
   } catch (error) {
     console.error("Payment submission failed", error);

@@ -5,7 +5,7 @@ import { ShowProduct } from "../../api/productApi";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct, setProductUid } from "../../Redux/productSlice";
-import { setAmount } from "../../Redux/orderSlice";
+import { setAmount, setQuantity, setSellerUid } from "../../Redux/orderSlice";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
@@ -14,8 +14,8 @@ export default function Product() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Get login state from Redux
-  const login = useSelector((state) => state.auth.login);
+  // ✅ Fix: use correct property from Redux authSlice
+  const login = useSelector((state) => state.auth.isLoggedIn);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -38,6 +38,7 @@ export default function Product() {
 
       } catch (err) {
         console.error("Error fetching products:", err);
+        toast.error("Failed to fetch products");
         setProducts([]);
       }
     };
@@ -56,8 +57,13 @@ export default function Product() {
       return toast.error("Login required before making a purchase!");
     }
     dispatch(setProductUid(product.productUid));
+    console.log("product uid "+product.productUid);
+    dispatch(setSellerUid(product.sellerUid));
     dispatch(setAmount(Number(product.price)));
-    navigate(`/buynow`);
+    dispatch(setQuantity(1));
+    dispatch(addProduct(product));
+
+    navigate("/buynow");
   };
 
   const handleWishlist = (productUid) => {
@@ -73,11 +79,11 @@ export default function Product() {
     setSelectedImages((prev) => ({ ...prev, [productUid]: imgUrl }));
   };
 
-  const imageClick = (product) => {
-    dispatch(setProductUid(product.productUid));
-    dispatch(setAmount(Number(product.price)));
-    dispatch(addProduct(product));
-  };
+  // const imageClick = (product) => {
+  //   dispatch(setProductUid(product.productUid));
+  //   dispatch(setAmount(Number(product.price)));
+  //   dispatch(addProduct(product));
+  // };
 
   return (
     <div className="product-page">
@@ -109,7 +115,7 @@ export default function Product() {
 
                 <Link to={`/productDetails`} className="position-relative d-block mb-2">
                   <img src={mainImage} alt={product.title} className="product-img-full" 
-                    onClick={() => imageClick(product)}
+                    // onClick={() => imageClick(product)}
                   />
                   <span className="badge new-badge position-absolute top-0 start-0 m-2">New</span>
                 </Link>
