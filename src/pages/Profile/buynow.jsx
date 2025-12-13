@@ -2,36 +2,24 @@ import React, { useState, useEffect, useContext } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./buynow.css";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  addAddress,
-  deleteAddress,
-  getAddresses,
-  updateAddress,
-} from "../../api/addressApi";
+import {addAddress,deleteAddress,getAddresses,  updateAddress,} from "../../api/addressApi";
+import { useSelector } from "react-redux";
 
 export default function AddressBook() {
   const [addresses, setAddresses] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    mobile: "",
-    houseNo: "",
-    street: "",
-    city: "",
-    state: "",
-    country: "",
-    zipCode: "",
-    defaultAddress: false,
-  });
+  const [formData, setFormData] = useState({fullName: "",mobile: "",houseNo: "",street: "",city: "",
+    state: "",country: "",zipCode: "",defaultAddress: false,});
 
   
   const navigate = useNavigate();
   const userUid = localStorage.getItem("userUid");
-  const { productUid, price } = useParams();
+  const price = useSelector((state)=>state.order.totalAmount);
+  console.log("price "+price);
   const indianStates = [
     "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Delhi","Goa",
     "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala",

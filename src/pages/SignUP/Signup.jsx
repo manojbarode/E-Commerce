@@ -29,11 +29,6 @@ const handleSignupSubmit = async (e) => {
     toast.error(error?.message || "Signup failed!");
   }
 };
-
-
-
-
-
   return (
     <div className="container py-5" style={{ background: "#f8f9fa" }}>
       <link

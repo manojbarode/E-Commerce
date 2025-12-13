@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./SellerProductUpdate.css";
 import { getProductById, uploadMultipleToCloudinary } from "../../../api/productApi";
 import { updateProduct } from "../../../api/SellApi";
-import { useContext } from "react";
-import { SellerContext } from "../../../context/SellerProvider";
+import { useSelector } from "react-redux";
 
 export default function UpdateProduct() {
   const navigate = useNavigate();
@@ -13,10 +12,10 @@ export default function UpdateProduct() {
   const [form, setForm] = useState({});
   const [dynamicFields, setDynamicFields] = useState({});
   const [loading, setLoading] = useState(false);
-  // const { productUid } = useContext(SellerContext);
-  const sellerUid = localStorage.getItem("sellerUid");
-  const productUid = localStorage.getItem("productUid");
-  console.log("Seller Uid "+sellerUid);
+
+  const productUid = useSelector((state) => state.product.productUid);
+  const sellerUid = useSelector((state)=>state.seller.sellerUid)
+
   useEffect(() => {
     const loadProduct = async () => {
       try {
@@ -26,8 +25,6 @@ export default function UpdateProduct() {
           toast.error("Product not found");
           return;
         }
-
-        // Only editable fields
         setForm({
           title: data.title,
           description: data.description,
@@ -36,15 +33,19 @@ export default function UpdateProduct() {
           images: data.imageUrls || [],
         });
 
-        // Dynamic fields
         setDynamicFields(data.dynamicFields || {});
       } catch (err) {
         toast.error("Failed to load product");
       }
     };
 
-    loadProduct();
-  }, [productUid]);
+    if (productUid) {
+      loadProduct();
+    } else {
+      toast.error("No product selected for update");
+      navigate("/seller/sellerproduct");
+    }
+  }, [productUid, navigate]);
 
   const handleInputChange = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -53,10 +54,9 @@ export default function UpdateProduct() {
   const handleDynamicFieldChange = (key, value) => {
     setDynamicFields((prev) => ({ ...prev, [key]: value }));
   };
+
   const handleRemoveImage = (index) => {
-    setForm((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+    setForm((prev) => ({...prev,images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -74,13 +74,10 @@ export default function UpdateProduct() {
         imageUrls = [...existingUrls, ...uploadedUrls];
       }
 
-      const finalData = {
-        ...form,
-        dynamicFields,
-        imageUrls,
-      };
+      const finalData = {...form,dynamicFields,imageUrls,};
       delete finalData.images;
-      await updateProduct(productUid,sellerUid, finalData);
+
+      await updateProduct(productUid, sellerUid, finalData);
       toast.success("Product Updated Successfully");
       navigate("/seller/sellerproduct");
     } catch (err) {
@@ -94,56 +91,34 @@ export default function UpdateProduct() {
     <div className="update-wrapper">
       <div className="update-card">
         <h1 className="update-heading">Update Product</h1>
-
         <form onSubmit={handleSubmit}>
-          {/* Editable basic fields */}
           {Object.entries(form)
-            .filter(([key]) => key !== "images") // images handled separately
+            .filter(([key]) => key !== "images")
             .map(([key, value]) => (
               <div className="form-group" key={key}>
                 <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
                 {typeof value === "string" && value.length > 50 ? (
-                  <textarea
-                    rows="3"
-                    value={value}
+                  <textarea rows="3" value={value}
                     onChange={(e) => handleInputChange(key, e.target.value)}
                   />
                 ) : typeof value === "number" ? (
-                  <input
-                    type="number"
-                    value={value}
-                    onChange={(e) => handleInputChange(key, Number(e.target.value))}
-                  />
+                  <input type="number" value={value} onChange={(e) => handleInputChange(key, Number(e.target.value))}/>
                 ) : (
-                  <input
-                    type="text"
-                    value={value}
-                    onChange={(e) => handleInputChange(key, e.target.value)}
-                  />
+                  <input type="text" value={value} onChange={(e) => handleInputChange(key, e.target.value)}/>
                 )}
               </div>
             ))}
 
-          {/* Dynamic Fields */}
           {Object.entries(dynamicFields).map(([key, value]) => (
             <div className="form-group" key={key}>
               <label>{key}</label>
-              <input
-                type="text"
-                value={value}
-                onChange={(e) => handleDynamicFieldChange(key, e.target.value)}
-              />
+              <input type="text" value={value} onChange={(e) => handleDynamicFieldChange(key, e.target.value)}/>
             </div>
           ))}
 
-          {/* Images */}
           <div className="form-group">
             <label>Images</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={(e) =>
+            <input type="file" multiple accept="image/*" onChange={(e) =>
                 handleInputChange("images", [...form.images, ...[...e.target.files]])
               }
             />
@@ -151,15 +126,8 @@ export default function UpdateProduct() {
               {form.images &&
                 form.images.map((img, i) => (
                   <div key={i} className="preview-item">
-                    <img
-                      src={img instanceof File ? URL.createObjectURL(img) : img}
-                      alt="preview"
-                    />
-                    <button
-                      type="button"
-                      className="remove-btn"
-                      onClick={() => handleRemoveImage(i)}
-                    >
+                    <img src={img instanceof File ? URL.createObjectURL(img) : img} alt="preview" />
+                    <button type="button" className="remove-btn" onClick={() => handleRemoveImage(i)} >
                       Remove
                     </button>
                   </div>

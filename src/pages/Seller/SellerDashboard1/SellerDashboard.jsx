@@ -1,59 +1,44 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import SellerSidebar from "./SellerSidebar";
 import SellerStatsCard from "./SellerStatsCard";
 import { Line, Pie } from "react-chartjs-2";
 
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title,Tooltip,Legend,
+  ArcElement,} from "chart.js";
 
 import "../Css/SellerDashboard.css";
-import { SellerContext } from "../../../context/SellerProvider";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement
-);
+ChartJS.register( CategoryScale, LinearScale, PointElement,LineElement,Title,Tooltip,Legend,ArcElement);
 
 export default function SellerDashboard() {
   const navigate = useNavigate();
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const {sellerUid} = useContext(SellerContext);
-  const [stats, setStats] = useState({
-    totalProducts: 0,
-    totalOrders: 0,
-    totalRevenue: 0,
-  });
+  const sellerData = useSelector((state) => state.seller);
+  const sellerUid = sellerData?.sellerUid;
+  const sellerName = sellerData?.sellerName;
+
+  const [stats, setStats] = useState({totalProducts: 0,totalOrders: 0,totalRevenue: 0,});
 
   const [sales, setSales] = useState([]);
   const [categoryStats, setCategoryStats] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const sellerId = localStorage.getItem("sellerId");
+    if (!sellerUid) {
+      navigate("/seller-auth");
+      return;
+    }
 
-    // API calls disabled for now
+    const sellerId = sellerUid;
+
+    // API calls (mocked/commented)
     // getSellerStats(sellerId).then(setStats);
     // getMonthlySales(sellerId).then(setSales);
     // getCategoryStats(sellerId).then(setCategoryStats);
-  }, []);
+  }, [sellerUid, navigate]);
 
   const filteredCategories = categoryStats.filter((c) =>
     (c.category || c.name)?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -82,14 +67,7 @@ export default function SellerDashboard() {
     datasets: [
       {
         data: filteredCategories.map((c) => c.count || c.total),
-        backgroundColor: [
-          "#6a11cb",
-          "#2575fc",
-          "#ff6a00",
-          "#ff3cac",
-          "#1de9b6",
-          "#f9d423",
-        ],
+        backgroundColor: ["#6a11cb","#2575fc","#ff6a00","#ff3cac","#1de9b6","#f9d423",],
       },
     ],
   };
@@ -114,25 +92,16 @@ export default function SellerDashboard() {
         {/* HEADER */}
         <header className="dashboard-header row align-items-center">
           <div className="col-12 col-md-6">
-            <h2 className="dashboard-title">Welcome Back 👋</h2>
-            <p className="dashboard-subtitle">
-              Here’s your store performance
-            </p>
+            <h2 className="dashboard-title">Welcome Back {sellerName}</h2>
+            <p className="dashboard-subtitle">Here’s your store performance</p>
           </div>
 
-          {/* BUTTONS - Add Product & Start New Business */}
           <div className="col-12 col-md-6 text-md-end mt-2 mt-md-0 d-flex flex-wrap gap-2 justify-content-md-end">
-            <button
-              className="btn-action"
-              onClick={() => navigate("/sellerpage/product-upload")}
-            >
+            <button className="btn-action" onClick={() => navigate("/sellerpage/product-upload")}>
               <i className="bi bi-plus-circle me-2" /> Add Product
             </button>
 
-            <button
-              className="btn-action"
-              onClick={() => navigate("/SellerDetailsForm")}
-            >
+            <button className="btn-action" onClick={() => navigate("/SellerDetailsForm")}>
               <i className="bi bi-building-add me-2" /> Start New Business
             </button>
           </div>
@@ -141,41 +110,27 @@ export default function SellerDashboard() {
         {/* SEARCH */}
         <div className="row mt-3 mb-4">
           <div className="col-12 col-sm-8 col-md-4">
-            <input
-              type="text"
-              className="form-control search-bar"
-              placeholder="Search category or month..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <input type="text" className="form-control search-bar" placeholder="Search category or month..."
+              value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
           </div>
         </div>
 
         {/* STATS */}
         <div className="row g-3">
           <div className="col-12 col-sm-6 col-lg-4">
-            <SellerStatsCard
-              title="Total Products"
-              value={stats.totalProducts}
-              icon="bi-box-seam"
+            <SellerStatsCard title="Total Products" value={stats.totalProducts} icon="bi-box-seam"
               color="primary"
             />
           </div>
 
           <div className="col-12 col-sm-6 col-lg-4">
-            <SellerStatsCard
-              title="Total Orders"
-              value={stats.totalOrders}
-              icon="bi-cart-check"
+            <SellerStatsCard title="Total Orders" value={stats.totalOrders} icon="bi-cart-check" 
               color="warning"
             />
           </div>
 
           <div className="col-12 col-sm-6 col-lg-4">
-            <SellerStatsCard
-              title="Revenue"
-              value={`₹${stats.totalRevenue}`}
-              icon="bi-currency-rupee"
+            <SellerStatsCard title="Revenue" value={`₹${stats.totalRevenue}`} icon="bi-currency-rupee"
               color="success"
             />
           </div>

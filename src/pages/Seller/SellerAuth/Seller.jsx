@@ -1,15 +1,16 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import "./Seller.css";
 import { registerSeller, loginSeller } from "../../../api/SellApi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { SellerContext } from "../../../context/SellerProvider";
+import { useDispatch } from "react-redux";
+import { setSeller } from "../../../Redux/sellerSlice";
 
 export default function SellerAuth() {
   const navigate = useNavigate();
   const [tab, setTab] = useState("login");
   const [loading, setLoading] = useState(false);
-  const { setSellerUid } = useContext(SellerContext);
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({ email: "", mobile: "", password: "" });
 
@@ -45,32 +46,27 @@ export default function SellerAuth() {
 
     try {
       if (tab === "login") {
-        const res = await loginSeller({
-          email: form.email,
-          password: form.password,
-        });
+        const res = await loginSeller({ email: form.email,password: form.password,});
 
         if (res.status === 200 && res.data?.data?.token) {
           toast.success(res.data.message || "Login Successful!");
-          localStorage.setItem("sellerToken", res.data.data.token);
-          localStorage.setItem("sellerName", res.data.data.fullName);
 
-          // ✅ Use sellerUid instead of sellerId
-          const sellerUid = res.data.data.sellerUid;
-          localStorage.setItem("sellerUid", sellerUid);
-          setSellerUid(sellerUid);
+          const sellerData = {
+            sellerUid: res.data.data.sellerUid,
+            sellerName: res.data.data.fullName,
+            token: res.data.data.token,
+          };
 
-          console.log("Seller UID: " + sellerUid);
+          // Redux dispatch
+          dispatch(setSeller(sellerData));
+          localStorage.setItem("sellerData", JSON.stringify(sellerData));
+
           navigate("/sellerdashboard");
         } else {
           toast.error(res.data.message || "Login failed!");
         }
       } else {
-        const res = await registerSeller({
-          email: form.email,
-          mobile: form.mobile,
-          password: form.password,
-        });
+        const res = await registerSeller({email: form.email,mobile: form.mobile,password: form.password,});
 
         if (res.data.status === 201) {
           toast.success(res.data.message || "Registration Successful!");
@@ -81,10 +77,7 @@ export default function SellerAuth() {
         }
       }
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        "Something went wrong!";
+      const msg = err?.response?.data?.message || err?.response?.data?.error || "Something went wrong!";
       toast.error(msg);
     }
 
@@ -110,11 +103,7 @@ export default function SellerAuth() {
 
           {tab === "register" && (
             <div className="text-center my-3">
-              <img
-                src="SellerHome.png"
-                alt="E-shop seller graphic"
-                className="img-fluid rounded"
-              />
+              <img src="SellerHome.png" alt="E-shop seller graphic" className="img-fluid rounded" />
             </div>
           )}
 
@@ -134,16 +123,11 @@ export default function SellerAuth() {
 
         <div className="col-lg-6 bg-white p-4 p-md-5 seller-right-balanced">
           <div className="d-flex justify-content-center mb-4 gap-4">
-            <button
-              className={`seller-tab ${tab === "login" ? "active" : ""}`}
-              onClick={() => switchTab("login")}
-            >
+            <button className={`seller-tab ${tab === "login" ? "active" : ""}`} onClick={() => switchTab("login")}>
               Login
             </button>
-            <button
-              className={`seller-tab ${tab === "register" ? "active" : ""}`}
-              onClick={() => switchTab("register")}
-            >
+            <button className={`seller-tab ${tab === "register" ? "active" : ""}`}
+              onClick={() => switchTab("register")}>
               Register
             </button>
           </div>
@@ -153,36 +137,20 @@ export default function SellerAuth() {
               {tab === "register" && (
                 <div className="mb-3">
                   <label>Mobile</label>
-                  <input
-                    type="text"
-                    name="mobile"
-                    value={form.mobile}
-                    onChange={handleChange}
-                    className="form-control"
-                    required
-                  />
+                  <input type="text" name="mobile" value={form.mobile} onChange={handleChange} 
+                      className="form-control" required/>
                 </div>
               )}
 
               <div className="mb-3">
                 <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  className="form-control"
-                  required
-                />
+                <input type="email" name="email" value={form.email} onChange={handleChange} className="form-control"
+                  required />
               </div>
 
               <div className="mb-3">
                 <label>Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
+                <input type="password" name="password" value={form.password} onChange={handleChange}
                   className="form-control"
                   required
                 />
