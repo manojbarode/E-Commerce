@@ -38,7 +38,7 @@ const Profile = () => {
 
         setLoading(false);
       } catch (err) {
-        console.error(err);
+        // console.error(err);
         toast.error("Failed to fetch user data");
         setLoading(false);
       }
