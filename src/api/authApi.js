@@ -17,3 +17,13 @@ export const loginUser = async (credentials) => {
     throw error.response?.data || error.message;
   }
 };
+
+export const productFetchedByUser = async(UserUid)=>{
+  try{
+      const response = await axiosInstance.get(`/user/userUid/${UserUid}`);
+      return response.data;
+  }
+  catch(error){
+    throw error.response?.data || error.message;
+  }
+};

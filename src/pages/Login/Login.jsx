@@ -23,8 +23,6 @@ const Login = () => {
         toast.error("Login failed. Please try again.");
         return;
       }
-
-      // Save user data to Redux (and sessionStorage inside the slice)
       dispatch(
         loginUserAction({
           token: loginData.token,

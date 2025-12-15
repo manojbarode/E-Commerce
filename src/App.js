@@ -11,7 +11,6 @@ import OffersPage from "./pages/Extra/Offers";
 import Home from "./pages/Home/Home";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/SignUP/Signup";
-import Profile from "./pages/Profile/Profile";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -27,6 +26,8 @@ import PaymentForm from "./Payment/payment";
 import UpdateProduct from "./pages/Seller/ProductManagment/SellerProductUpdate";
 import PaymentSuccess from "./Payment/PaymentSuccess";
 import SellerOrdersPage from "./pages/Seller/ProductManagment/SellerOrdersPage";
+import Profile from "./pages/Profile/Profile";
+import UserOrderedProducts from "./pages/Profile/UserOrderedProducts";
 
 const App = () => {
   return (
@@ -59,11 +60,8 @@ const App = () => {
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/seller/update-product" element={<UpdateProduct />} />
 
-          <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }/>
+          <Route path="/profile" element={<Profile/>}/>
+          <Route path="/profile/userOrders" element={<UserOrderedProducts/>}/>
         </Route>
       </Routes>
     </>
