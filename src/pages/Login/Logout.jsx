@@ -1,9 +1,21 @@
-const { login, logoutUser } = useContext(AuthContext);
+import { useDispatch } from "react-redux";
+import { logoutUser } from "../../Redux/authSlice";
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
+const LogoutButton = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-function handleLogout() {
-  logoutUser();
-  navigate("/");
-}
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    navigate("/login");
+  };
+
+  return (
+    <button className="btn btn-outline-danger" onClick={handleLogout}>
+      Logout
+    </button>
+  );
+};
+
+export default LogoutButton;
