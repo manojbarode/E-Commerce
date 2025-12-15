@@ -1,112 +1,91 @@
 import React, { useState } from "react";
-import { loginUser as apiLoginUser } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
-import { loginUser as loginUserAction } from "../../Redux/authSlice";
+import { toast } from "react-toastify";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import { loginUser as apiLoginUser } from "../../api/authApi";
+import { loginUser } from "../../Redux/authSlice";
 import { setBuyerUid } from "../../Redux/orderSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const loginData = await apiLoginUser({ email, password });
+      const res = await apiLoginUser({ email, password });
 
-      if (!loginData || !loginData.token) {
-        toast.error("Login failed. Please try again.");
+      if (!res?.token) {
+        toast.error("Login failed");
         return;
       }
+
       dispatch(
-        loginUserAction({
-          token: loginData.token,
+        loginUser({
+          token: res.token,
           user: {
-            userUid: loginData.userUid,
-            name: loginData.name,
-            email: loginData.email,
+            userUid: res.userUid,
+            name: res.name,
+            email: res.email,
           },
         })
       );
 
-      dispatch(setBuyerUid(loginData.userUid));
+      dispatch(setBuyerUid(res.userUid));
 
-      toast.success("Login successful!");
-      setTimeout(() => navigate("/"), 500);
-
+      toast.success("Login successful");
+      navigate("/");
     } catch (err) {
-      toast.error(err?.message || "Invalid email or password.");
+      toast.error(err?.message || "Invalid email or password");
     }
   };
 
   return (
     <div style={{ background: "#f8f9fa", padding: "60px 0" }}>
       <div className="container d-flex justify-content-center">
-        <div className="col-md-7 col-lg-5">
-          <div className="card shadow-lg border-0 rounded-4 p-4" style={{ background: "white" }}>
-            <h2 className="text-center mb-4 fw-bold" style={{ color: "#dc3545" }}>
-              Sign in
-            </h2>
-
-            <div className="d-flex justify-content-center mb-3">
-              <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
-                <i className="fa fa-facebook" />
-              </a>
-              <a href="#" className="btn btn-outline-danger btn-sm mx-1 rounded-circle shadow-sm">
-                <i className="fa fa-google-plus" />
-              </a>
-              <a href="#" className="btn btn-outline-primary btn-sm mx-1 rounded-circle shadow-sm">
-                <i className="fa fa-linkedin" />
-              </a>
-            </div>
-
-            <p className="text-center text-muted mb-4" style={{ fontSize: "0.9rem" }}>
-              or use your account
-            </p>
+        <div className="col-md-6 col-lg-4">
+          <div className="card shadow-lg border-0 rounded-4 p-4">
+            <h3 className="text-center fw-bold mb-4 text-danger">
+              Sign In
+            </h3>
 
             <form onSubmit={handleLoginSubmit}>
-              <div className="mb-3">
-                <input
-                  type="email"
-                  className="form-control form-control-sm rounded-pill shadow-sm"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                type="email"
+                className="form-control mb-3 rounded-pill"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
 
-              <div className="mb-3">
-                <input
-                  type="password"
-                  className="form-control form-control-sm rounded-pill shadow-sm"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                type="password"
+                className="form-control mb-3 rounded-pill"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
 
-              <div className="d-grid mb-3">
-                <button
-                  type="submit"
-                  className="btn btn-danger shadow-sm rounded-pill fw-bold"
-                  style={{ padding: "0.5rem", fontSize: "1rem" }}
-                >
-                  Sign in
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="btn btn-danger w-100 rounded-pill fw-bold"
+              >
+                Sign In
+              </button>
             </form>
 
             <p className="text-center mt-3">
               Don't have an account?{" "}
               <button
-                className="btn btn-link p-0 fw-semibold"
+                className="btn btn-link p-0"
                 onClick={() => navigate("/signup")}
               >
                 Sign Up
