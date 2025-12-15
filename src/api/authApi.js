@@ -18,12 +18,13 @@ export const loginUser = async (credentials) => {
   }
 };
 
-export const productFetchedByUser = async(UserUid)=>{
-  try{
-      const response = await axiosInstance.get(`/user/userUid/${UserUid}`);
-      return response.data;
-  }
-  catch(error){
+export const productFetchedByUser = async (buyerUid) => {
+  try {
+    const response = await axiosInstance.get(`/orders/user/${buyerUid}`);
+    return response.data.data.content; // ✅ ONLY ARRAY
+  } catch (error) {
     throw error.response?.data || error.message;
   }
 };
+
+
