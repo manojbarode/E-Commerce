@@ -9,7 +9,7 @@ export default function SellerSidebar({ isOpen, closeDrawer }) {
   const menuItems = [
     { name: "Dashboard", icon: "bi-speedometer2", path: "/seller/dashboard" },
     { name: "Products", icon: "bi-box-seam", path: "/seller/sellerproduct" },
-    { name: "Orders", icon: "bi-cart-check", path: "/seller/orders" },
+    { name: "Orders", icon: "bi-cart-check", path: "/seller/sellerOrderPage" },
   ];
 
   const handleLogout = () => {

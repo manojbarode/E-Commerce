@@ -26,6 +26,7 @@ import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
 import PaymentForm from "./Payment/payment";
 import UpdateProduct from "./pages/Seller/ProductManagment/SellerProductUpdate";
 import PaymentSuccess from "./Payment/PaymentSuccess";
+import SellerOrdersPage from "./pages/Seller/ProductManagment/SellerOrdersPage";
 
 const App = () => {
   return (
@@ -52,6 +53,7 @@ const App = () => {
           <Route path="/SellerDetailsForm" element={<SellerForm />} />
           <Route path="/admin/payment-method" element={<PaymentMethodAddForm />} />
           <Route path="/seller/sellerproduct" element={<SellerProducts/>}/>
+          <Route path="/seller/sellerOrderPage" element={<SellerOrdersPage/>}/>
           <Route path="/admin" element={<AdminDashboard/>}/>
           <Route path="/payment" element={<PaymentForm/>}/>
           <Route path="/payment-success" element={<PaymentSuccess />} />
