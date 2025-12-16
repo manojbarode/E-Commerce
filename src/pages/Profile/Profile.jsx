@@ -1,56 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 import axios from "axios";
+import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
+import {FaUser,FaMapMarkerAlt,FaShieldAlt,FaShoppingCart,FaBoxOpen,FaHeart,FaPlus} from "react-icons/fa";
+import {addAddress,deleteAddress,getAddresses,updateAddress} from "../../api/addressApi";
+const API_BASE = "http://localhost:8081/api";
+
+const emptyProfile = {name: "",email: "",phone: "",image: ""};
+const emptyAddress = {label: "Home",fullName: "",mobile: "",houseNo: "",street: "",city: "",
+  state: "",country: "",zipCode: "",defaultAddress: false};
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState({ name: "", email: "", phone: "", image: null, bio: "" });
+  const user = useSelector((state) => state.auth?.user || JSON.parse(localStorage.getItem("user")));
+  const userUid = user?.userUid;
+  const [profile, setProfile] = useState(emptyProfile);
   const [addresses, setAddresses] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
-  const [addressForm, setAddressForm] = useState({ label: "Home", fullAddress: "", city: "", state: "", pincode: "", isDefault: false });
-  const [userStats, setUserStats] = useState({ totalOrders: 0, cartItems: 0, wishlistItems: 0, addresses: 0 });
-
-  const API_BASE = "http://localhost:8081/api"; // Replace with your backend URL
-
-  // Fetch profile, addresses, cart, wishlist, total orders
+  const [addressForm, setAddressForm] = useState(emptyAddress);
+  const [userStats] = useState({cartItems: 0,totalOrders: 0,wishlistItems: 0});
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+    if (!userUid) return;
+    fetchProfile();
+    fetchAddresses();
+  }, [userUid]);
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/users/profile/${userUid}`);
+      setProfile(res.data);
+    } catch {
+      toast.error("Failed to load profile");
+    }
+  };
 
-        // 1. Fetch Profile
-        const profileRes = await axios.get(`${API_BASE}/users/profile`);
-        setProfile(profileRes.data);
+  const fetchAddresses = async () => {
+    try {
+      const data = await getAddresses(userUid);
+      setAddresses(data || []);
+    } catch {
+      toast.error("Failed to load addresses");
+    }
+  };
 
-        // 2. Fetch Addresses
-        const addressRes = await axios.get(`${API_BASE}/users/addresses`);
-        setAddresses(addressRes.data);
-
-        // 3. Fetch Cart & Wishlist & Orders counts
-        const statsRes = await axios.get(`${API_BASE}/users/stats`);
-        setUserStats(statsRes.data);
-
-        setLoading(false);
-      } catch (err) {
-        // console.error(err);
-        toast.error("Failed to fetch user data");
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Update profile
   const handleProfileSubmit = async () => {
-    const { name, email, phone } = profile;
-    if (!name || !email || phone.length !== 10) {
+    if (!profile.name || !profile.email || profile.phone.length !== 10) {
       toast.error("Invalid profile details");
       return;
     }
@@ -58,344 +57,254 @@ const Profile = () => {
     try {
       setLoading(true);
       await axios.put(`${API_BASE}/users/profile`, profile);
-      toast.success("Profile updated successfully");
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update profile");
+      toast.success("Profile updated");
+    } catch {
+      toast.error("Profile update failed");
+    } finally {
       setLoading(false);
     }
   };
 
-  // Image update
-  const handleImageChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5_000_000) {
-      toast.error("Image size must be under 5MB");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const res = await axios.post(`${API_BASE}/users/profile/image`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-      setProfile(prev => ({ ...prev, image: res.data.image }));
-      toast.success("Profile picture updated");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to upload image");
-    }
-  };
-
-  // Address modal handlers
-  const handleAddAddress = () => {
+  const openAddAddress = () => {
     setEditingAddress(null);
-    setAddressForm({ label: "Home", fullAddress: "", city: "", state: "", pincode: "", isDefault: false });
+    setAddressForm(emptyAddress);
     setShowAddressModal(true);
   };
+  const openEditAddress = (addr) => {
+  setEditingAddress(addr);
+  setAddressForm({ ...addr });
+  setShowAddressModal(true);
+};
 
-  const handleEditAddress = (address) => {
-    setEditingAddress(address);
-    setAddressForm(address);
-    setShowAddressModal(true);
-  };
 
-  const handleSaveAddress = async () => {
-    const { fullAddress, city, pincode } = addressForm;
-    if (!fullAddress || !city || pincode.length !== 6) {
-      toast.error("Invalid address details");
-      return;
+  const saveAddress = async () => {
+  try {
+    if (editingAddress) {
+      const res = await updateAddress(
+        userUid,
+        editingAddress.addressUid,
+        addressForm
+      );
+
+      const updated = res?.addressUid ? res : res?.data || res;
+
+      setAddresses(prev =>
+        prev.map(a =>
+          a.addressUid === updated.addressUid ? updated : a
+        )
+      );
+
+      toast.success("Address updated");
+    } else {
+      const res = await addAddress(userUid, addressForm);
+      const created = res?.addressUid ? res : res?.data || res;
+
+      setAddresses(prev => [...prev, created]);
+      toast.success("Address added");
     }
 
-    try {
-      if (editingAddress) {
-        // Update address
-        const res = await axios.put(`${API_BASE}/users/addresses/${editingAddress.id}`, addressForm);
-        setAddresses(prev => prev.map(a => (a.id === editingAddress.id ? res.data : a)));
-        toast.success("Address updated");
-      } else {
-        // Add new address
-        const res = await axios.post(`${API_BASE}/users/addresses`, addressForm);
-        setAddresses(prev => [...prev, res.data]);
-        toast.success("Address added");
-      }
-      setShowAddressModal(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to save address");
-    }
-  };
+    setShowAddressModal(false);
+  } catch (err) {
+    console.error(err.response?.data || err);
+    toast.error("Address save failed");
+  }
+};
 
-  const handleDeleteAddress = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this address?")) return;
-    try {
-      await axios.delete(`${API_BASE}/users/addresses/${id}`);
-      setAddresses(prev => prev.filter(a => a.id !== id));
-      toast.success("Address deleted");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to delete address");
-    }
-  };
 
-  const handleSetDefaultAddress = async (id) => {
-    try {
-      await axios.put(`${API_BASE}/users/addresses/${id}/default`);
-      setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
-      toast.success("Default address updated");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to set default address");
-    }
-  };
+const removeAddress = async (uid) => {
+  if (!window.confirm("Delete this address?")) return;
+  try {
+    await deleteAddress(userUid, uid);
+    setAddresses(prev => prev.filter(a => a.addressUid !== uid));
+    toast.success("Address deleted");
+  } catch (err) {
+    console.error(err.response?.data || err);
+    toast.error("Delete failed");
+  }
+};
 
   const quickLinks = [
-    { icon: "🛒", title: "My Cart", count: userStats.cartItems, path: "/cart" },
-    { icon: "📦", title: "My Orders", count: userStats.totalOrders, path: "/profile/userOrders" },
-    { icon: "❤️", title: "Wishlist", count: userStats.wishlistItems, path: "/wishlist" },
-    { icon: "📍", title: "Addresses", count: addresses.length, action: () => setActiveTab("addresses") }
+    { title: "Cart", icon: <FaShoppingCart />, count: userStats.cartItems, path: "/profile/cart" },
+    { title: "Orders", icon: <FaBoxOpen />, count: userStats.totalOrders, path: "/profile/userOrders" },
+    { title: "Wishlist", icon: <FaHeart />, count: userStats.wishlistItems, path: "/profile/wishcart" },
+    { title: "Addresses", icon: <FaMapMarkerAlt />, count: addresses.length, action: () => setActiveTab("addresses") }
   ];
 
   return (
     <div className="profile-container">
       <div className="container py-5">
-        {/* Header */}
-        <div className="profile-header text-center mb-5">
-          <h1 className="profile-main-title">
-            <span className="title-icon">👤</span> My Profile
-          </h1>
-          <p className="profile-subtitle">Manage your account and preferences</p>
+
+        {/* HEADER */}
+        <div className="text-center mb-4">
+          <h1 className="profile-main-title">My Profile</h1>
+          <p className="profile-subtitle">Manage your account</p>
         </div>
 
-        {/* Quick Links */}
+        {/* QUICK LINKS */}
         <div className="row g-3 mb-4">
-          {quickLinks.map((link, index) => (
-            <div key={index} className="col-6 col-md-3">
-              <div 
-                className="quick-link-card"
-                style={{ animationDelay: `${index * 0.1}s` }}
-                onClick={() => link.action ? link.action() : navigate(link.path)}
-              >
-                <div className="quick-link-icon">{link.icon}</div>
-                <h3 className="quick-link-count">{link.count}</h3>
-                <p className="quick-link-title">{link.title}</p>
+          {quickLinks.map((item, i) => (
+            <div key={i} className="col-6 col-md-3">
+              <div className="quick-link-card"onClick={() =>item.action ? item.action() : navigate(item.path)}>
+                <div className="fs-4 mb-1">{item.icon}</div>
+                <h3>{item.count}</h3>
+                <p>{item.title}</p>
               </div>
             </div>
           ))}
         </div>
 
         <div className="row">
-          {/* Sidebar */}
-          <div className="col-lg-3 mb-4">
+
+          {/* SIDEBAR */}
+          <div className="col-lg-3 mb-3">
             <div className="profile-sidebar">
-              <div className="sidebar-nav">
-                <button className={`nav-item ${activeTab === "profile" ? "active" : ""}`} onClick={() => setActiveTab("profile")}>
-                  <span className="nav-icon">👤</span> Profile Info
-                </button>
-                <button className={`nav-item ${activeTab === "addresses" ? "active" : ""}`} onClick={() => setActiveTab("addresses")}>
-                  <span className="nav-icon">📍</span> Addresses
-                </button>
-                <button className={`nav-item ${activeTab === "security" ? "active" : ""}`} onClick={() => setActiveTab("security")}>
-                  <span className="nav-icon">🔒</span> Security
-                </button>
-                <button className="nav-item" onClick={() => navigate("/profile/userOrders")}>
-                  <span className="nav-icon">📦</span> My Orders
-                </button>
-                <button className="nav-item" onClick={() => navigate("/cart")}>
-                  <span className="nav-icon">🛒</span> Shopping Cart
-                </button>
-              </div>
+              <button className={`nav-item ${activeTab === "profile" ? "active" : ""}`} onClick={() => setActiveTab("profile")}>
+                <FaUser /> Profile
+              </button>
+
+              <button className={`nav-item ${activeTab === "addresses" ? "active" : ""}`} onClick={() => setActiveTab("addresses")}>
+                <FaMapMarkerAlt /> Addresses
+              </button>
+
+              <button className={`nav-item ${activeTab === "security" ? "active" : ""}`} onClick={() => setActiveTab("security")}>
+                <FaShieldAlt /> Security
+              </button>
+
+              <button className="nav-item" onClick={() => navigate("/profile/cart")}>
+                <FaShoppingCart /> Cart
+              </button>
+
+              <button className="nav-item" onClick={() => navigate("/profile/userOrders")}>
+                <FaBoxOpen /> Orders
+              </button>
+
+              <button className="nav-item" onClick={() => navigate("/profile/wishcart")}>
+                <FaHeart /> Wishlist
+              </button>
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* MAIN CONTENT */}
           <div className="col-lg-9">
-            {/* Profile Tab */}
+
+            {/* PROFILE TAB */}
             {activeTab === "profile" && (
               <div className="content-card">
                 <div className="card-header-custom">
-                  <div>
-                    <h3 className="card-title-custom">Personal Information</h3>
-                    <p className="card-subtitle-custom">Update your profile details</p>
-                  </div>
+                  <h4>Personal Information</h4>
                 </div>
                 <div className="card-body-custom">
-                  {/* Profile Image */}
-                  <div className="profile-image-section">
-                    <label htmlFor="imageUpload" className="image-upload-label">
-                      <div className="profile-image-wrapper">
-                        {profile.image ? (
-                          <img src={profile.image} alt="Profile" className="profile-image" />
-                        ) : (
-                          <div className="profile-image-placeholder">
-                            <span className="placeholder-icon">📷</span>
-                            <span className="placeholder-text">Upload Photo</span>
-                          </div>
-                        )}
-                        <div className="image-overlay"><span>Change</span></div>
-                      </div>
-                      <input id="imageUpload" type="file" accept="image/*" onChange={handleImageChange} className="d-none"/>
-                    </label>
-                  </div>
-
-                  {/* Form Fields */}
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <label className="form-label-custom">Full Name *</label>
-                      <div className="input-group-custom">
-                        <span className="input-icon">👤</span>
-                        <input type="text" className="form-control-custom" value={profile.name} onChange={e => setProfile(prev => ({ ...prev, name: e.target.value }))}/>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label-custom">Phone Number *</label>
-                      <div className="input-group-custom">
-                        <span className="input-icon">📱</span>
-                        <input type="text" className="form-control-custom" value={profile.phone} maxLength={10} onChange={e => setProfile(prev => ({ ...prev, phone: e.target.value.replace(/\D/g,'') }))}/>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <label className="form-label-custom">Email Address *</label>
-                      <div className="input-group-custom">
-                        <span className="input-icon">📧</span>
-                        <input type="email" className="form-control-custom" value={profile.email} onChange={e => setProfile(prev => ({ ...prev, email: e.target.value }))}/>
-                      </div>
-                    </div>
-                    <div className="col-12">
-                      <label className="form-label-custom">Bio (Optional)</label>
-                      <textarea className="form-control-custom" value={profile.bio} onChange={e => setProfile(prev => ({ ...prev, bio: e.target.value }))} rows={3} style={{ resize:'none', paddingLeft:'1rem' }}/>
-                    </div>
-                  </div>
-
-                  <button onClick={handleProfileSubmit} className="btn-save-profile" disabled={loading}>
-                    {loading ? <>Saving...</> : <>💾 Save Changes</>}
+                  <input className="form-control-custom mb-3" placeholder="Full Name"value={profile.name}
+                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                  />
+                  <input className="form-control-custom mb-3" placeholder="Email" value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                  />
+                  <input className="form-control-custom" placeholder="Phone" maxLength={10} value={profile.phone}
+                    onChange={(e) =>
+                      setProfile({ ...profile, phone: e.target.value.replace(/\D/g, "") })
+                    }
+                  />
+                  <button className="btn-save-profile w-100 mt-4" disabled={loading}
+                    onClick={handleProfileSubmit}
+                  >
+                    {loading ? "Saving..." : "Save Changes"}
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Addresses Tab */}
+            {/* ADDRESSES TAB */}
             {activeTab === "addresses" && (
               <div className="content-card">
-                <div className="card-header-custom">
-                  <div>
-                    <h3 className="card-title-custom">Saved Addresses</h3>
-                    <p className="card-subtitle-custom">Manage your delivery addresses</p>
-                  </div>
-                  <button className="btn-add-address" onClick={handleAddAddress}>+ Add New Address</button>
+                <div className="card-header-custom d-flex justify-content-between align-items-center">
+                  <h4 className="mb-0">Saved Addresses</h4>
+                  <button className="btn-add-address" onClick={openAddAddress}>
+                    <FaPlus /> Add Address
+                  </button>
                 </div>
+
                 <div className="card-body-custom">
-                  {addresses.length === 0 ? (
-                    <div className="empty-addresses">
-                      <div className="empty-icon">📍</div>
-                      <h4>No addresses saved</h4>
-                      <p>Add your first delivery address</p>
-                      <button className="btn-add-first" onClick={handleAddAddress}>Add Address</button>
-                    </div>
-                  ) : (
-                    <div className="row g-3">
-                      {addresses.map((addr, index) => (
-                        <div key={addr.id} className="col-md-6">
-                          <div className="address-card">
-                            <div className="address-header">
-                              <span className="address-label">{addr.label}</span>
-                              {addr.isDefault && <span className="default-badge">Default</span>}
-                            </div>
-                            <p className="address-text">{addr.fullAddress}</p>
-                            <p className="address-text">{addr.city}, {addr.state} - {addr.pincode}</p>
-                            <div className="address-actions">
-                              <button className="btn-address-action edit" onClick={() => handleEditAddress(addr)}>✏️ Edit</button>
-                              <button className="btn-address-action delete" onClick={() => handleDeleteAddress(addr.id)}>🗑️ Delete</button>
-                              {!addr.isDefault && <button className="btn-address-action default" onClick={() => handleSetDefaultAddress(addr.id)}>⭐ Set Default</button>}
-                            </div>
+                  <div className="row g-3">
+                    {addresses.map((addr) => (
+                      <div key={addr.addressUid} className="col-md-6">
+                        <div className="address-card">
+                          <strong>{addr.label}</strong>
+                          <p>{addr.fullName}</p>
+                          <p>{addr.mobile}</p>
+                          <p>{addr.houseNo}, {addr.city}</p>
+                          <div className="d-flex gap-2">
+                            <button className="btn-address-action edit" onClick={() => openEditAddress(addr)}>Edit</button>
+                            <button className="btn-address-action delete" onClick={() => removeAddress(addr.addressUid)}>Delete</button>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Security Tab */}
+            {/* SECURITY TAB */}
             {activeTab === "security" && (
               <div className="content-card">
                 <div className="card-header-custom">
-                  <div>
-                    <h3 className="card-title-custom">Security Settings</h3>
-                    <p className="card-subtitle-custom">Manage your password and security</p>
-                  </div>
+                  <h4>Security Settings</h4>
                 </div>
                 <div className="card-body-custom">
-                  <div className="security-section">
-                    <div className="security-item">
-                      <div><h5>Change Password</h5><p>Update your password regularly for better security</p></div>
-                      <button className="btn-security">Change</button>
+                  <div className="security-item d-flex justify-content-between mb-3">
+                    <div>
+                      <h6>Change Password</h6>
+                      <small className="text-muted">Update your password</small>
                     </div>
-                    <div className="security-item">
-                      <div><h5>Two-Factor Authentication</h5><p>Add an extra layer of security to your account</p></div>
-                      <button className="btn-security">Enable</button>
+                    <button className="btn-security">Change</button>
+                  </div>
+
+                  <div className="security-item d-flex justify-content-between">
+                    <div>
+                      <h6>Two Factor Authentication</h6>
+                      <small className="text-muted">Extra security layer</small>
                     </div>
-                    <div className="security-item">
-                      <div><h5>Login Activity</h5><p>View your recent login history</p></div>
-                      <button className="btn-security">View</button>
-                    </div>
+                    <button className="btn-security">Enable</button>
                   </div>
                 </div>
               </div>
             )}
+
           </div>
         </div>
       </div>
 
-      {/* Address Modal */}
+      {/* ================= ADDRESS MODAL ================= */}
       {showAddressModal && (
-        <div className="modal-overlay" onClick={() => setShowAddressModal(false)}>
-          <div className="modal-content-custom" onClick={e => e.stopPropagation()}>
-            <div className="modal-header-custom">
+        <div className="modal-overlay d-flex align-items-center justify-content-center" 
+          onClick={() => setShowAddressModal(false)}
+        >
+          <div className="modal-content-custom" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-custom d-flex justify-content-between">
               <h4>{editingAddress ? "Edit Address" : "Add New Address"}</h4>
               <button className="btn-close-modal" onClick={() => setShowAddressModal(false)}>✕</button>
             </div>
+
             <div className="modal-body-custom">
-              <div className="mb-3">
-                <label className="form-label-custom">Address Label</label>
-                <select className="form-control-custom" value={addressForm.label} onChange={e => setAddressForm(prev => ({ ...prev, label: e.target.value }))}>
-                  <option value="Home">Home</option>
-                  <option value="Office">Office</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div className="mb-3">
-                <label className="form-label-custom">Full Address *</label>
-                <textarea className="form-control-custom" value={addressForm.fullAddress} onChange={e => setAddressForm(prev => ({ ...prev, fullAddress: e.target.value }))} rows={2}/>
-              </div>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="form-label-custom">City *</label>
-                  <input className="form-control-custom" value={addressForm.city} onChange={e => setAddressForm(prev => ({ ...prev, city: e.target.value }))}/>
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label-custom">State *</label>
-                  <input className="form-control-custom" value={addressForm.state} onChange={e => setAddressForm(prev => ({ ...prev, state: e.target.value }))}/>
-                </div>
-                <div className="col-12">
-                  <label className="form-label-custom">Pincode *</label>
-                  <input className="form-control-custom" value={addressForm.pincode} maxLength={6} onChange={e => setAddressForm(prev => ({ ...prev, pincode: e.target.value.replace(/\D/g,'') }))}/>
-                </div>
-              </div>
-              <div className="form-check mt-3">
-                <input type="checkbox" className="form-check-input" checked={addressForm.isDefault} onChange={e => setAddressForm(prev => ({ ...prev, isDefault: e.target.checked }))}/>
-                <label className="form-check-label">Set as default address</label>
-              </div>
+              {Object.keys(emptyAddress).map((key) =>
+                key !== "defaultAddress" ? (
+                  <input key={key} className="form-control-custom mb-2" placeholder={key} value={addressForm[key]}
+                    onChange={(e) =>
+                      setAddressForm({ ...addressForm, [key]: e.target.value })
+                    }
+                  />
+                ) : null
+              )}
             </div>
-            <div className="modal-footer-custom">
-              <button className="btn-modal-cancel" onClick={() => setShowAddressModal(false)}>Cancel</button>
-              <button className="btn-modal-save" onClick={handleSaveAddress}>{editingAddress ? "Update" : "Save"} Address</button>
+
+            <div className="modal-footer-custom d-flex justify-content-end gap-2">
+              <button className="btn-modal-cancel" onClick={() => setShowAddressModal(false)}>
+                Cancel
+              </button>
+              <button className="btn-modal-save" onClick={saveAddress}>
+                Save Address
+              </button>
             </div>
           </div>
         </div>
