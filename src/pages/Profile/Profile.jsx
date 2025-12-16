@@ -28,7 +28,6 @@ const Profile = () => {
   useEffect(() => {
     if (!userUid) return;
     fetchProfile();
-    fetchAddresses();
   }, [userUid]);
   const fetchProfile = async () => {
     try {
@@ -76,6 +75,14 @@ const Profile = () => {
   setShowAddressModal(true);
 };
 
+const handleOpenAddresses = () => {
+  setActiveTab("addresses");
+
+  // Lazy load: fetch only once
+  if (addresses.length === 0) {
+    fetchAddresses();
+  }
+};
 
   const saveAddress = async () => {
   try {
@@ -127,7 +134,7 @@ const removeAddress = async (uid) => {
     { title: "Cart", icon: <FaShoppingCart />, count: userStats.cartItems, path: "/profile/cart" },
     { title: "Orders", icon: <FaBoxOpen />, count: userStats.totalOrders, path: "/profile/userOrders" },
     { title: "Wishlist", icon: <FaHeart />, count: userStats.wishlistItems, path: "/profile/wishcart" },
-    { title: "Addresses", icon: <FaMapMarkerAlt />, count: addresses.length, action: () => setActiveTab("addresses") }
+    { title: "Addresses", icon: <FaMapMarkerAlt />, count: addresses.length, action:handleOpenAddresses }
   ];
 
   return (
@@ -161,10 +168,13 @@ const removeAddress = async (uid) => {
               <button className={`nav-item ${activeTab === "profile" ? "active" : ""}`} onClick={() => setActiveTab("profile")}>
                 <FaUser /> Profile
               </button>
+                <button
+                  className={`nav-item ${activeTab === "addresses" ? "active" : ""}`}
+                  onClick={handleOpenAddresses}
+                >
+                  <FaMapMarkerAlt /> Addresses
+                </button>
 
-              <button className={`nav-item ${activeTab === "addresses" ? "active" : ""}`} onClick={() => setActiveTab("addresses")}>
-                <FaMapMarkerAlt /> Addresses
-              </button>
 
               <button className={`nav-item ${activeTab === "security" ? "active" : ""}`} onClick={() => setActiveTab("security")}>
                 <FaShieldAlt /> Security
