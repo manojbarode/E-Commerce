@@ -28,6 +28,8 @@ import PaymentSuccess from "./Payment/PaymentSuccess";
 import SellerOrdersPage from "./pages/Seller/ProductManagment/SellerOrdersPage";
 import Profile from "./pages/Profile/Profile";
 import UserOrderedProducts from "./pages/Profile/UserOrderedProducts";
+import Cart from "./pages/Profile/Cart";
+import WishCart from "./pages/Profile/WishCart";
 
 const App = () => {
   return (
@@ -62,6 +64,8 @@ const App = () => {
 
           <Route path="/profile" element={<Profile/>}/>
           <Route path="/profile/userOrders" element={<UserOrderedProducts/>}/>
+          <Route path="/profile/cart" element={<Cart/>}/>
+          <Route path="/profile/wishcart" element={<WishCart/>}/>
         </Route>
       </Routes>
     </>
