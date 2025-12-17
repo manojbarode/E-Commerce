@@ -3,7 +3,7 @@ import { FaTrashAlt, FaPlus, FaMinus, FaHeart, FaArrowLeft } from "react-icons/f
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Cart.css";
-import { fetchCartdata } from "../../api/cartApi";
+import { deleteCartItem, fetchCartdata } from "../../api/cartApi";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem, updateQuantity, setCartItems, clearCart } from "../../Redux/cartSlice";
 import { toast } from "react-toastify";
@@ -12,18 +12,19 @@ import { logoutUser } from "../../Redux/authSlice";
 const Cart = () => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  // Get cart items from Redux
-  const cartItems = useSelector((state) => state.cart.items || []);
-  
-  // Get user from Redux or localStorage
+  const cartItems = useSelector((state) => state.cart.items || []);  
   const user = useSelector((state) => state.auth?.user || JSON.parse(localStorage.getItem("user")));
   const userUid = user?.userUid;
+  
 
   useEffect(() => {
+    if (!userUid) {
+    toast.error("You must be logged in to view the cart");
+    navigate("/");
+    return;
+  }
     const fetchCart = async () => {
       try {
         if (!userUid) {
@@ -53,14 +54,25 @@ const Cart = () => {
       ? item.quantity + 1 
       : Math.max(item.quantity - 1, 1);
 
-    // Dispatch to Redux with productUid as id
     dispatch(updateQuantity({ id: productUid, quantity: newQty }));
   };
 
-  const handleRemove = (productUid) => {
+  const handleRemove = async (productUid) => {
+  try {
+    if (!userUid) {
+      toast.error("Please login first");
+      navigate("/");
+      return;
+    }
+
+    await deleteCartItem(userUid, productUid);
     dispatch(removeItem(productUid));
     toast.success("Item removed from cart");
-  };
+  } catch (error) {
+    console.error("Failed to remove item:", error);
+    toast.error("Failed to remove item");
+  }
+};
 
   const toggleWishlist = (productUid) => {
     setWishlist((prev) =>

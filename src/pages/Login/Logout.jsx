@@ -1,6 +1,7 @@
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../../Redux/authSlice";
 import { useNavigate } from "react-router-dom";
+import { resetWishlist } from "../../Redux/wishlistSlice";
 
 const LogoutButton = () => {
   const dispatch = useDispatch();
@@ -9,6 +10,7 @@ const LogoutButton = () => {
   const handleLogout = () => {
     dispatch(logoutUser());
     dispatch(clearCart());
+    dispatch(resetWishlist());
     navigate("/login");
   };
 

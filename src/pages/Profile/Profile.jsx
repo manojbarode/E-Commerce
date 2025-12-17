@@ -43,7 +43,6 @@ const Profile = () => {
   }
 };
 
-
   const fetchAddresses = async () => {
     try {
       const data = await getAddresses(userUid);
@@ -109,7 +108,6 @@ const handleImageUpload = async (e) => {
   }
 };
 
-
   const openAddAddress = () => {
     setEditingAddress(null);
     setAddressForm(emptyAddress);
@@ -173,6 +171,7 @@ const handleImageUpload = async (e) => {
       toast.error("Delete failed");
     }
   };
+  
 
   const quickLinks = [
     { title: "Cart", icon: <FaShoppingCart />, count: userStats.cartItems, path: "/profile/cart" },
@@ -277,7 +276,7 @@ const handleImageUpload = async (e) => {
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                   />
                   <input className="form-control-custom mb-3" placeholder="Email" value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })} readOnly
                   />
                   <input className="form-control-custom" placeholder="Phone" maxLength={10} value={profile.phone || ""}
                     onChange={(e) =>setProfile({ ...profile, phone: e.target.value.replace(/\D/g, "") })}

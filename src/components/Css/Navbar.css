@@ -8,8 +8,6 @@
   /* --primary-bg: #0f172a; */
   --text-light: #fff;
 }
-
-/* NAVBAR */
 .premium-navbar {
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
@@ -38,7 +36,7 @@
   cursor: pointer;
   letter-spacing: 2px;
   transition: transform 0.3s ease, color 0.3s ease;
-  flex-shrink: 0; /* Added to ensure logo doesn't shrink on mobile */
+  flex-shrink: 0; 
 }
 
 .premium-logo:hover {
@@ -109,8 +107,6 @@
 }
 
 .premium-search-box input:focus { border-color: var(--primary-purple); }
-
-/* ICONS */
 .premium-nav-icons {
   display: flex;
   align-items: center;
@@ -149,11 +145,7 @@
   align-items: center;
   justify-content: center;
 }
-
-/* BUTTONS */
-.premium-signup-btn,
-.premium-logout-btn,
-.premium-mobile-login {
+.premium-signup-btn,.premium-logout-btn,.premium-mobile-login {
   border-radius: 25px;
   padding: 8px 18px;
   font-weight: 600;
@@ -166,8 +158,7 @@
   transition: all 0.4s ease;
 }
 
-.premium-signup-btn,
-.premium-mobile-login {  
+.premium-signup-btn,.premium-mobile-login {  
   background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)) !important;  
   color: #fff;  
 }
@@ -177,11 +168,9 @@
   color: #fff;  
 }
 
-.premium-signup-btn:hover,
-.premium-logout-btn:hover,
-.premium-mobile-login:hover { transform: scale(1.05); }
+.premium-signup-btn:hover,.premium-logout-btn:hover,.premium-mobile-login:hover 
+{ transform: scale(1.05); }
 
-/* MOBILE TOGGLE */
 .premium-mobile-toggle {
   background: var(--primary-blue);
   border: none;
@@ -192,7 +181,7 @@
   gap: 4px;
   border-radius: 8px;
   margin-left: 5px;
-  flex-shrink: 0; /* Added to prevent shrinking */
+  flex-shrink: 0;
 }
 
 .premium-mobile-toggle span {
@@ -209,21 +198,20 @@
   transform: scaleY(1.2);
 }
 
-/* MOBILE LOGIN ICON */
 .premium-mobile-login {
   margin-left: 6px;
   background: linear-gradient(135deg, var(--primary-orange), var(--primary-pink));
   border-radius: 10px;
   padding: 8px 11px;
   color: #fff;
-  flex-shrink: 0; /* Added to prevent shrinking */
+  flex-shrink: 0;
 }
 .premium-mobile-search-inline-permanent {
-  flex-grow: 1; /* Allows the search bar to take up available space */
+  flex-grow: 1;
   display: flex;
   align-items: center;
   position: relative;
-  margin-right: 0; /* Reset margin from premium-search-box */
+  margin-right: 0;
   max-width: 400px; 
 }
 
@@ -244,6 +232,8 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .premium-drawer.show { right: 0; }
@@ -264,6 +254,8 @@
 }
 
 .premium-drawer-content {
+  flex: 1;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -319,11 +311,10 @@
 
 @media (max-width: 991px) {
   .premium-navbar .container-fluid {
-    flex-wrap: nowrap; /* Forces content onto a single line */
+    flex-wrap: nowrap;
     justify-content: space-between;
   }
   
-  /* Hide desktop-only elements */
   .collapse.navbar-collapse {
     display: none !important;
   }
@@ -332,7 +323,6 @@
     display: none !important;
   }
   
-  /* Ensure mobile toggle is visible */
   .premium-mobile-toggle {
     display: flex !important;
   }
@@ -348,7 +338,7 @@
   }
   
   .premium-mobile-search-inline-permanent .premium-search-input {
-      padding: 8px 10px 8px 30px; /* Reduced padding */
+      padding: 8px 10px 8px 30px;
   }
   .premium-search-box i {
       left: 10px;

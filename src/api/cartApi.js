@@ -1,9 +1,7 @@
 import axiosInstance from "./axiosConfig";
 
 export const addToCartApi = async (productUid, quantity, userUid) => {
-  const response = await axiosInstance.post(
-    `/cart/add`,
-    {
+  const response = await axiosInstance.post(`/cart/add`,{
       productUid,
       quantity,
     },
@@ -28,4 +26,59 @@ export const fetchCartdata = async (userUid) => {
     console.error("Fetch cart error:", err);
     throw err;
   }
+};
+
+export const deleteCartItem = async (userUid, productUid) => {
+  try{
+    return axiosInstance.delete(`/cart/remove/${productUid}`, {
+      headers: { userUid }
+    });
+  }
+  catch(err) {
+    console.error("Fetch cart error:", err);
+    throw err;
+  }
+};
+
+export const fetchWishlistApi = async (userUid)=>{
+  try
+  {
+    const response = await axiosInstance.get(`/wishlist`, {
+        headers: { userUid },
+      });
+      return response.data.data;
+  }
+  catch(err){
+    throw err;
+  }
+};
+
+export const addwishlist = async (userUid, productUid) => {
+  try {
+    return await axiosInstance.post(
+      `/wishlist`,
+      null,
+      {
+        headers: {
+          userUid: userUid,
+          productUid: productUid
+        }
+      }
+    );
+  } catch (err) {
+    console.error("Add wishlist error:", err);
+    throw err;
+  }
+};
+
+export const deleteWishlistProduct =async (userUid,productUid)=>{
+  try {
+      return await axiosInstance.delete(`/wishlist`, {
+        headers: { userUid, productUid },
+      });
+  } catch (err) {
+    console.error("no delete:", err);
+    throw err;
+  }
+
 };

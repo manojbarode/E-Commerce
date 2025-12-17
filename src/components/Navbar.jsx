@@ -14,15 +14,13 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Redux state
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.user);
- const cartItems = useSelector((state) => state.cart.items || []);
-const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-
-
+  const cartItems = useSelector((state) => state.cart.items || []);
+  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [categories, setCategories] = useState({});
+  const wishlistCount = useSelector((state) => state.wishlist?.count || 0);
 
   useEffect(() => {
     async function fetchCategories() {
@@ -75,11 +73,7 @@ const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
           {/* Mobile Search */}
           <div className="premium-search-box premium-mobile-search-inline-permanent d-lg-none">
             <i className="bi bi-search"></i>
-            <input 
-              type="search" 
-              placeholder="Search products..." 
-              className="premium-search-input" 
-            />
+            <input type="search" placeholder="Search products..." className="premium-search-input" />
           </div>
 
           <div className="collapse navbar-collapse" id="navbarContent">
@@ -122,9 +116,10 @@ const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
             {/* Desktop Icons */}
             <div className="premium-nav-icons d-none d-lg-flex">
-              <Link to="/wishlist" className="premium-icon-btn icon-wishlist">
-                <i className="bi bi-heart"></i>
-                <span className="icon-badge">3</span>
+              <Link to="/profile/wishcart" className="premium-icon-btn icon-wishlist">
+                <i className="bi bi-heart"></i>{wishlistCount > 0 && (
+                  <span className="icon-badge">{wishlistCount}</span>
+                )}
               </Link>
 
               <Link to="/profile/cart" className="premium-icon-btn icon-cart">
@@ -184,15 +179,17 @@ const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
             <i className="bi bi-house-door"></i> Home
           </Link>
 
-          <Link to="/wishlist" onClick={closeDrawer} className="premium-drawer-link">
-            <i className="bi bi-heart"></i> Wishlist <span className="drawer-badge">3</span>
+           <Link to="/profile/wishcart" className="premium-icon-btn icon-wishlist">
+                <i className="bi bi-heart"></i>{wishlistCount > 0 && (
+                  <span className="icon-badge">{wishlistCount}</span>
+                )}
           </Link>
 
-          <Link to="/cart" onClick={closeDrawer} className="premium-drawer-link">
-            <i className="bi bi-cart3"></i> Cart <span className="icon-badge">{cartCount}</span>
+         <Link to="/profile/cart" className="premium-icon-btn icon-cart">
+            <i className="bi bi-cart3" onClick={cartClick}></i>
+            <span className="icon-badge">{cartCount}</span>
           </Link>
 
-          {/* Mobile Categories */}
           <CategoriesDropdown mobile={true} categories={categories} closeDrawer={closeDrawer} />
 
           <Link to="/offers" onClick={closeDrawer} className="premium-drawer-link">
