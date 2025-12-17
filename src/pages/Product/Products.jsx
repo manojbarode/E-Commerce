@@ -47,9 +47,9 @@ export default function Product() {
 
   const handleAddToCart = async (product) => {
   if (!isLoggedIn) {
-  toast.warning("Please login first");
-  return;
-}
+    toast.warning("Please login first");
+    return;
+  }
 
   try {
     const res = await addToCartApi(
@@ -57,17 +57,19 @@ export default function Product() {
       1,
       userUid
     );
-
-    if (res.success) {
-      toast.success("Product added to cart");
+    if (res.status === 201 || res.status === 200) {
+      toast.success(res.message || "Product added to cart");
     } else {
       toast.error(res.message || "Failed to add to cart");
     }
+
   } catch (err) {
     console.error("Add to cart failed:", err);
     toast.error("Something went wrong");
   }
 };
+
+
   const handleBuyNow = (product) => {
   if (!isLoggedIn) {
   toast.warning("Please login first");

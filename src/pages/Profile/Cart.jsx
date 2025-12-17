@@ -32,11 +32,7 @@ const Cart = () => {
         }
 
         const response = await fetchCartdata(userUid);
-
-        // Handle different response structures
         const items = response?.data?.items || response?.items || [];
-        
-        // Sync with Redux store
         dispatch(setCartItems(items));
       } catch (error) {
         console.error("Error fetching cart:", error);
