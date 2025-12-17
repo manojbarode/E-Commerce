@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
-import {FaUser,FaMapMarkerAlt,FaShieldAlt,FaShoppingCart,FaBoxOpen,FaHeart,FaPlus} from "react-icons/fa";
+import {FaUser,FaMapMarkerAlt,FaShieldAlt,FaShoppingCart,FaBoxOpen,FaHeart,FaPlus,FaCamera} from "react-icons/fa";
 import {addAddress,deleteAddress,getAddresses,updateAddress} from "../../api/addressApi";
 const API_BASE = "http://localhost:8081/api";
 
@@ -17,18 +17,23 @@ const Profile = () => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth?.user || JSON.parse(localStorage.getItem("user")));
   const userUid = user?.userUid;
+  const fileInputRef = useRef(null);
+  
   const [profile, setProfile] = useState(emptyProfile);
   const [addresses, setAddresses] = useState([]);
   const [activeTab, setActiveTab] = useState("profile");
   const [loading, setLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [addressForm, setAddressForm] = useState(emptyAddress);
   const [userStats] = useState({cartItems: 0,totalOrders: 0,wishlistItems: 0});
+  
   useEffect(() => {
     if (!userUid) return;
     fetchProfile();
   }, [userUid]);
+  
   const fetchProfile = async () => {
     try {
       const res = await axios.get(`${API_BASE}/users/profile/${userUid}`);
@@ -44,6 +49,48 @@ const Profile = () => {
       setAddresses(data || []);
     } catch {
       toast.error("Failed to load addresses");
+    }
+  };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('userUid', userUid);
+
+    try {
+      setImageLoading(true);
+      const res = await axios.post(`${API_BASE}/users/profile/image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      setProfile({ ...profile, image: res.data.imageUrl || res.data.image });
+      toast.success("Profile image updated successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to upload image");
+    } finally {
+      setImageLoading(false);
     }
   };
 
@@ -69,66 +116,64 @@ const Profile = () => {
     setAddressForm(emptyAddress);
     setShowAddressModal(true);
   };
+  
   const openEditAddress = (addr) => {
-  setEditingAddress(addr);
-  setAddressForm({ ...addr });
-  setShowAddressModal(true);
-};
+    setEditingAddress(addr);
+    setAddressForm({ ...addr });
+    setShowAddressModal(true);
+  };
 
-const handleOpenAddresses = () => {
-  setActiveTab("addresses");
-
-  // Lazy load: fetch only once
-  if (addresses.length === 0) {
-    fetchAddresses();
-  }
-};
+  const handleOpenAddresses = () => {
+    setActiveTab("addresses");
+    if (addresses.length === 0) {
+      fetchAddresses();
+    }
+  };
 
   const saveAddress = async () => {
-  try {
-    if (editingAddress) {
-      const res = await updateAddress(
-        userUid,
-        editingAddress.addressUid,
-        addressForm
-      );
+    try {
+      if (editingAddress) {
+        const res = await updateAddress(
+          userUid,
+          editingAddress.addressUid,
+          addressForm
+        );
 
-      const updated = res?.addressUid ? res : res?.data || res;
+        const updated = res?.addressUid ? res : res?.data || res;
 
-      setAddresses(prev =>
-        prev.map(a =>
-          a.addressUid === updated.addressUid ? updated : a
-        )
-      );
+        setAddresses(prev =>
+          prev.map(a =>
+            a.addressUid === updated.addressUid ? updated : a
+          )
+        );
 
-      toast.success("Address updated");
-    } else {
-      const res = await addAddress(userUid, addressForm);
-      const created = res?.addressUid ? res : res?.data || res;
+        toast.success("Address updated");
+      } else {
+        const res = await addAddress(userUid, addressForm);
+        const created = res?.addressUid ? res : res?.data || res;
 
-      setAddresses(prev => [...prev, created]);
-      toast.success("Address added");
+        setAddresses(prev => [...prev, created]);
+        toast.success("Address added");
+      }
+
+      setShowAddressModal(false);
+    } catch (err) {
+      console.error(err.response?.data || err);
+      toast.error("Address save failed");
     }
+  };
 
-    setShowAddressModal(false);
-  } catch (err) {
-    console.error(err.response?.data || err);
-    toast.error("Address save failed");
-  }
-};
-
-
-const removeAddress = async (uid) => {
-  if (!window.confirm("Delete this address?")) return;
-  try {
-    await deleteAddress(userUid, uid);
-    setAddresses(prev => prev.filter(a => a.addressUid !== uid));
-    toast.success("Address deleted");
-  } catch (err) {
-    console.error(err.response?.data || err);
-    toast.error("Delete failed");
-  }
-};
+  const removeAddress = async (uid) => {
+    if (!window.confirm("Delete this address?")) return;
+    try {
+      await deleteAddress(userUid, uid);
+      setAddresses(prev => prev.filter(a => a.addressUid !== uid));
+      toast.success("Address deleted");
+    } catch (err) {
+      console.error(err.response?.data || err);
+      toast.error("Delete failed");
+    }
+  };
 
   const quickLinks = [
     { title: "Cart", icon: <FaShoppingCart />, count: userStats.cartItems, path: "/profile/cart" },
@@ -168,13 +213,12 @@ const removeAddress = async (uid) => {
               <button className={`nav-item ${activeTab === "profile" ? "active" : ""}`} onClick={() => setActiveTab("profile")}>
                 <FaUser /> Profile
               </button>
-                <button
-                  className={`nav-item ${activeTab === "addresses" ? "active" : ""}`}
-                  onClick={handleOpenAddresses}
-                >
-                  <FaMapMarkerAlt /> Addresses
-                </button>
-
+              <button
+                className={`nav-item ${activeTab === "addresses" ? "active" : ""}`}
+                onClick={handleOpenAddresses}
+              >
+                <FaMapMarkerAlt /> Addresses
+              </button>
 
               <button className={`nav-item ${activeTab === "security" ? "active" : ""}`} onClick={() => setActiveTab("security")}>
                 <FaShieldAlt /> Security
@@ -204,6 +248,36 @@ const removeAddress = async (uid) => {
                   <h4>Personal Information</h4>
                 </div>
                 <div className="card-body-custom">
+                  {/* Profile Image Upload */}
+                  <div className="text-center mb-4">
+                    <div className="profile-image-wrapper mx-auto position-relative" onClick={handleImageClick}>
+                      {imageLoading ? (
+                        <div className="profile-image-placeholder">
+                          <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      ) : profile.image ? (
+                        <img src={profile.image} alt="Profile" />
+                      ) : (
+                        <div className="profile-image-placeholder">
+                          <FaUser size={40} />
+                        </div>
+                      )}
+                      <div className="profile-image-overlay">
+                        <FaCamera size={24} />
+                      </div>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <p className="text-muted mt-2 small">Click to upload profile picture</p>
+                  </div>
+
                   <input className="form-control-custom mb-3" placeholder="Full Name"value={profile.name}
                     onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                   />

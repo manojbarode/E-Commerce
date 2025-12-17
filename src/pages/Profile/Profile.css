@@ -1,4 +1,3 @@
-```css
 /* ================= ROOT ================= */
 .profile-container {
   min-height: 100vh;
@@ -103,10 +102,15 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: transform 0.3s ease;
+  position: relative;
 }
 
 .profile-image-wrapper:hover {
   transform: scale(1.05);
+}
+
+.profile-image-wrapper:hover .profile-image-overlay {
+  opacity: 1;
 }
 
 .profile-image-wrapper img {
@@ -120,9 +124,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   color: #64748b;
   font-weight: 600;
+}
+
+.profile-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(102, 126, 234, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 /* ================= FORMS ================= */
@@ -183,8 +199,6 @@
 .btn-modal-cancel:hover {
   background: #cbd5e1;
 }
-
-/* ================= ADDRESS ================= */
 .address-card {
   padding: 1.5rem;
   background: linear-gradient(135deg, #f8fafc, #f1f5f9);
@@ -205,22 +219,31 @@
   color: #ffffff;
   font-size: 0.85rem;
   font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .btn-address-action.edit {
   background: #3b82f6;
 }
 
+.btn-address-action.edit:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+}
+
 .btn-address-action.delete {
   background: #ef4444;
 }
 
-/* ================= SECURITY ================= */
+.btn-address-action.delete:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
 .security-item h6 {
   font-weight: 700;
 }
 
-/* ================= MODAL ================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -237,6 +260,18 @@
   max-width: 600px;
   width: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.25s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .modal-footer-custom {
@@ -247,7 +282,6 @@
   gap: 1rem;
 }
 
-/* ================= RESPONSIVE ================= */
 @media (max-width: 992px) {
   .profile-sidebar {
     position: static;
@@ -264,7 +298,17 @@
   .modal-body-custom {
     padding: 1.5rem;
   }
+
+  .profile-image-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .modal-body-custom {
+    grid-template-columns: 1fr;
+  }
 }
+
 .nav-item svg,
 .quick-link-card svg {
   font-size: 1.1rem;
@@ -272,24 +316,20 @@
   color: #64748b;
 }
 
-/* Sidebar hover */
 .profile-sidebar .nav-item:hover svg {
   color: #667eea;
   transform: scale(1.15) rotate(-3deg);
 }
 
-/* Sidebar active */
 .profile-sidebar .nav-item.active svg {
   color: #ffffff;
 }
 
-/* Quick links hover */
 .quick-link-card:hover svg {
   color: #667eea;
   transform: scale(1.2);
 }
 
-/* Add address button icon */
 .btn-add-address svg {
   margin-right: 6px;
   transition: transform 0.3s ease;
@@ -298,7 +338,7 @@
 .btn-add-address:hover svg {
   transform: rotate(90deg);
 }
-/* ================= ADD ADDRESS BUTTON ================= */
+
 .btn-add-address {
   display: inline-flex;
   align-items: center;
@@ -308,7 +348,6 @@
   cursor: pointer;
 }
 
-/* ================= MODAL HEADER FIX ================= */
 .modal-header-custom h4 {
   font-weight: 800;
   font-size: 1.2rem;
@@ -326,15 +365,12 @@
 .btn-close-modal:hover {
   transform: scale(1.2);
 }
-
-/* ================= ADDRESS FORM GRID ================= */
 .modal-body-custom {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
 }
 
-/* Full width fields */
 .modal-body-custom input:nth-child(1),
 .modal-body-custom input:nth-child(2),
 .modal-body-custom input:nth-child(3),
@@ -348,24 +384,3 @@
   font-weight: 600;
   color: #94a3b8;
 }
-
-.modal-content-custom {
-  animation: scaleIn 0.25s ease;
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-@media (max-width: 576px) {
-  .modal-body-custom {
-    grid-template-columns: 1fr;
-  }
-}
-  

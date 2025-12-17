@@ -11,13 +11,14 @@ export default function ProductDetails() {
   const productUid = useSelector((state) => state.product.productUid);
 
   const [product, setProduct] = useState(null);
-  const [quantity, setLocalQuantity] = useState("1"); // store as string for smooth typing
+  const [quantity, setLocalQuantity] = useState("1");
 
   /* ---------- Load Product ---------- */
   useEffect(() => {
     const loadProduct = async () => {
       try {
         const res = await getProductById(productUid);
+        console.log(" productUid " +productUid);
         setProduct(res);
       } catch (err) {
         console.error("Product load failed", err);

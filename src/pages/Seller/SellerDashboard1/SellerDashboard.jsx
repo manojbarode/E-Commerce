@@ -9,6 +9,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
   ArcElement,} from "chart.js";
 
 import "../Css/SellerDashboard.css";
+import { getCategoryStats, getMonthlySales, getSellerStats } from "../../../api/SellApi";
 
 ChartJS.register( CategoryScale, LinearScale, PointElement,LineElement,Title,Tooltip,Legend,ArcElement);
 
@@ -26,51 +27,72 @@ export default function SellerDashboard() {
   const [categoryStats, setCategoryStats] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    if (!sellerUid) {
-      navigate("/seller-auth");
-      return;
+ useEffect(() => {
+  if (!sellerUid) {
+    navigate("/seller-auth");
+    return;
+  }
+
+  const loadDashboard = async () => {
+    try {
+      const statsRes = await getSellerStats(sellerUid);
+      const salesRes = await getMonthlySales(sellerUid);
+      const categoryRes = await getCategoryStats(sellerUid);
+
+      setStats(statsRes);
+      setSales(salesRes);
+      setCategoryStats(categoryRes);
+
+    } catch (err) {
+      console.error("Dashboard API error:", err);
     }
+  };
 
-    const sellerId = sellerUid;
+  loadDashboard();
+}, [sellerUid, navigate]);
 
-    // API calls (mocked/commented)
-    // getSellerStats(sellerId).then(setStats);
-    // getMonthlySales(sellerId).then(setSales);
-    // getCategoryStats(sellerId).then(setCategoryStats);
-  }, [sellerUid, navigate]);
 
-  const filteredCategories = categoryStats.filter((c) =>
-    (c.category || c.name)?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ const filteredCategories = categoryStats.filter(c =>
+  (c.category || "").toString().toLowerCase().includes(searchTerm.toLowerCase())
+);
 
-  const filteredSales = sales.filter((s) =>
-    s.month?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+const filteredSales = sales.filter(s =>
+  (s.month || "").toString().toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+
 
   const salesData = {
-    labels: filteredSales.map((s) => s.month),
-    datasets: [
-      {
-        label: "Monthly Sales",
-        data: filteredSales.map((s) => s.amount || s.totalAmount),
-        borderColor: "#6a11cb",
-        backgroundColor: "rgba(106,17,203,0.15)",
-        tension: 0.4,
-        fill: true,
-      },
-    ],
-  };
+  labels: filteredSales.map((s) => (s.month || "").toString()),
+  datasets: [
+    {
+      label: "Monthly Sales",
+      data: filteredSales.map((s) => s.amount || s.totalAmount || 0),
+      borderColor: "#6a11cb",
+      backgroundColor: "rgba(106,17,203,0.15)",
+      tension: 0.4,
+      fill: true,
+    },
+  ],
+};
 
-  const pieData = {
-    labels: filteredCategories.map((c) => c.category || c.name),
-    datasets: [
-      {
-        data: filteredCategories.map((c) => c.count || c.total),
-        backgroundColor: ["#6a11cb","#2575fc","#ff6a00","#ff3cac","#1de9b6","#f9d423",],
-      },
-    ],
-  };
+const pieData = {
+  labels: filteredCategories.map((c) => (c.category || c.name || "").toString()),
+  datasets: [
+    {
+      data: filteredCategories.map((c) => c.count || c.total || 0),
+      backgroundColor: [
+        "#6a11cb",
+        "#2575fc",
+        "#ff6a00",
+        "#ff3cac",
+        "#1de9b6",
+        "#f9d423",
+      ],
+    },
+  ],
+};
+
 
   return (
     <div className="dashboard-container">

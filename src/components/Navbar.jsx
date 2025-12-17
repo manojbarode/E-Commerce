@@ -8,6 +8,7 @@ import { logoutUser } from "../Redux/authSlice";
 import CategoriesDropdown from "./CategoriesDropdown";
 import { getCategories } from "../api/categoriesApi";
 import "./Css/Navbar.css";
+import { toast } from "react-toastify";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -16,6 +17,9 @@ export default function Navbar() {
   // Redux state
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.user);
+ const cartItems = useSelector((state) => state.cart.items || []);
+const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [categories, setCategories] = useState({});
@@ -47,7 +51,17 @@ export default function Navbar() {
   };
 
   const closeDrawer = () => setDrawerOpen(false);
-
+  
+  const cartClick = ()=>{
+    if (!isLoggedIn) {
+      toast.warning("Please login first");
+      return;
+    }
+    else
+    {
+      navigate("/login")
+    }
+}
   return (
     <>
       {/* MAIN NAV */}
@@ -113,9 +127,9 @@ export default function Navbar() {
                 <span className="icon-badge">3</span>
               </Link>
 
-              <Link to="/cart" className="premium-icon-btn icon-cart">
-                <i className="bi bi-cart3"></i>
-                <span className="icon-badge">5</span>
+              <Link to="/profile/cart" className="premium-icon-btn icon-cart">
+                <i className="bi bi-cart3" onClick={cartClick}></i>
+                <span className="icon-badge">{cartCount}</span>
               </Link>
 
               {isLoggedIn ? (
@@ -175,7 +189,7 @@ export default function Navbar() {
           </Link>
 
           <Link to="/cart" onClick={closeDrawer} className="premium-drawer-link">
-            <i className="bi bi-cart3"></i> Cart <span className="drawer-badge">5</span>
+            <i className="bi bi-cart3"></i> Cart <span className="icon-badge">{cartCount}</span>
           </Link>
 
           {/* Mobile Categories */}

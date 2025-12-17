@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct, setProductUid } from "../../Redux/productSlice";
 import { setAmount, setQuantity, setSellerUid } from "../../Redux/orderSlice";
+import { addToCartApi } from "../../api/cartApi";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
@@ -14,8 +15,7 @@ export default function Product() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ✅ Fix: use correct property from Redux authSlice
-  const login = useSelector((state) => state.auth.isLoggedIn);
+ const { isLoggedIn, userUid } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -45,17 +45,34 @@ export default function Product() {
     fetchProducts();
   }, []);
 
-  const handleAddToCart = () => {
-    if (!login) {
-      return toast.warning("Please login first to add items to cart!");
-    }
-    toast.success("Added to cart!");
-  };
+  const handleAddToCart = async (product) => {
+  if (!isLoggedIn) {
+  toast.warning("Please login first");
+  return;
+}
 
-  const handleBuyNow = (product) => {
-    if (!login) {
-      return toast.error("Login required before making a purchase!");
+  try {
+    const res = await addToCartApi(
+      product.productUid,
+      1,
+      userUid
+    );
+
+    if (res.success) {
+      toast.success("Product added to cart");
+    } else {
+      toast.error(res.message || "Failed to add to cart");
     }
+  } catch (err) {
+    console.error("Add to cart failed:", err);
+    toast.error("Something went wrong");
+  }
+};
+  const handleBuyNow = (product) => {
+  if (!isLoggedIn) {
+  toast.warning("Please login first");
+  return;
+}
     dispatch(setProductUid(product.productUid));
     console.log("product uid "+product.productUid);
     dispatch(setSellerUid(product.sellerUid));
@@ -67,8 +84,8 @@ export default function Product() {
   };
 
   const handleWishlist = (productUid) => {
-    if (!login) {
-      return toast.warning("Please login first to use wishlist!");
+    if (!isLoggedIn) {
+        toast.warning("Please login first");
     }
     setWishlist((prev) =>
       prev.includes(productUid) ? prev.filter((id) => id !== productUid) : [...prev, productUid]
@@ -79,11 +96,11 @@ export default function Product() {
     setSelectedImages((prev) => ({ ...prev, [productUid]: imgUrl }));
   };
 
-  // const imageClick = (product) => {
-  //   dispatch(setProductUid(product.productUid));
-  //   dispatch(setAmount(Number(product.price)));
-  //   dispatch(addProduct(product));
-  // };
+  const imageClick = (product) => {
+    dispatch(setProductUid(product.productUid));
+    // dispatch(setAmount(Number(product.price)));
+    dispatch(addProduct(product));
+  };
 
   return (
     <div className="product-page">
@@ -115,7 +132,7 @@ export default function Product() {
 
                 <Link to={`/productDetails`} className="position-relative d-block mb-2">
                   <img src={mainImage} alt={product.title} className="product-img-full" 
-                    // onClick={() => imageClick(product)}
+                    onClick={() => imageClick(product)}
                   />
                   <span className="badge new-badge position-absolute top-0 start-0 m-2">New</span>
                 </Link>
@@ -141,9 +158,10 @@ export default function Product() {
                 </div>
 
                 <div className="card-actions">
-                  <button className="btn glass-btn w-100 mb-2" onClick={handleAddToCart}>
-                    Add to Cart
+                  <button className="btn glass-btn w-100 mb-2" onClick={() => handleAddToCart(product)}>
+                      Add to Cart
                   </button>
+
                   <button className="btn glass-btn-secondary w-100" onClick={() => handleBuyNow(product)}>
                     Buy Now
                   </button>

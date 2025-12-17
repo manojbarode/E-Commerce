@@ -1,67 +1,118 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTrashAlt, FaPlus, FaMinus, FaHeart, FaArrowLeft } from "react-icons/fa";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./Cart.css";
+import { fetchCartdata } from "../../api/cartApi";
+import { useDispatch, useSelector } from "react-redux";
+import { removeItem, updateQuantity, setCartItems, clearCart } from "../../Redux/cartSlice";
+import { toast } from "react-toastify";
+import { logoutUser } from "../../Redux/authSlice";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Sony WH-1000XM5 Wireless",
-      category: "Electronics",
-      price: 299.99,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-      id: 2,
-      name: "Apple Watch Series 9",
-      category: "Wearables",
-      price: 399.99,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    },
-    {
-      id: 3,
-      name: "Nike Air Max 270",
-      category: "Fashion",
-      price: 150.00,
-      quantity: 1,
-      image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
-    }
-  ]);
-
   const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleQuantity = (id, type) => {
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === id
-          ? { ...item, quantity: type === "inc" ? item.quantity + 1 : Math.max(item.quantity - 1, 1) }
-          : item
-      )
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  // Get cart items from Redux
+  const cartItems = useSelector((state) => state.cart.items || []);
+  
+  // Get user from Redux or localStorage
+  const user = useSelector((state) => state.auth?.user || JSON.parse(localStorage.getItem("user")));
+  const userUid = user?.userUid;
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        if (!userUid) {
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetchCartdata(userUid);
+
+        // Handle different response structures
+        const items = response?.data?.items || response?.items || [];
+        
+        // Sync with Redux store
+        dispatch(setCartItems(items));
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+        toast.error("Failed to load cart");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [userUid, dispatch]);
+
+  const handleQuantity = (productUid, type) => {
+    const item = cartItems.find((item) => item.productUid === productUid);
+    if (!item) return;
+
+    const newQty = type === "inc" 
+      ? item.quantity + 1 
+      : Math.max(item.quantity - 1, 1);
+
+    // Dispatch to Redux with productUid as id
+    dispatch(updateQuantity({ id: productUid, quantity: newQty }));
+  };
+
+  const handleRemove = (productUid) => {
+    dispatch(removeItem(productUid));
+    toast.success("Item removed from cart");
+  };
+
+  const toggleWishlist = (productUid) => {
+    setWishlist((prev) =>
+      prev.includes(productUid)
+        ? prev.filter((i) => i !== productUid)
+        : [...prev, productUid]
     );
+    
+    const isAdded = !wishlist.includes(productUid);
+    toast.success(isAdded ? "Added to wishlist" : "Removed from wishlist");
   };
 
-  const handleRemove = (id) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
+  const handleContinueShopping = () => {
+    navigate("/products");
   };
 
-  const toggleWishlist = (id) => {
-    setWishlist(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    );
+  const handleCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+    navigate("/checkout");
   };
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const shipping = 15.00;
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + (item.priceAtTime || item.price || 0) * item.quantity,
+    0
+  );
+
+  const shipping = subtotal > 0 ? 15 : 0;
   const total = subtotal + shipping;
+
+  if (loading) {
+    return (
+      <div className="cart-wrapper">
+        <div className="text-center mt-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p className="mt-3">Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="cart-wrapper">
       <div className="cart-container">
-        
-        {/* Header */}
         <div className="cart-header">
           <h1 className="cart-title">Shopping Cart</h1>
           <span className="cart-count">{cartItems.length} items</span>
@@ -70,88 +121,123 @@ const Cart = () => {
         {cartItems.length === 0 ? (
           <div className="empty-state">
             <h3>Your cart is empty</h3>
-            <p>Looks like you haven't added anything to your cart yet.</p>
-            <button className="btn-continue">Start Shopping</button>
+            <p>Looks like you haven't added anything yet.</p>
+            <button 
+              className="btn-continue-shopping"
+              onClick={handleContinueShopping}
+            >
+              Start Shopping
+            </button>
           </div>
         ) : (
           <div className="cart-content">
-            
-            {/* Left Side: Items */}
+            {/* LEFT - Cart Items */}
             <div className="cart-items-section">
-              {cartItems.map(item => (
-                <div key={item.id} className="cart-item-card">
+              {cartItems.map((item) => (
+                <div key={item.productUid} className="cart-item-card">
                   <div className="item-img-container">
-                    <img src={item.image} alt={item.name} />
+                    <img
+                      src={item.imageUrls?.[0] || item.imageUrl || "/no-image.png"}
+                      alt={item.productName || "Product"}
+                      onError={(e) => {
+                        e.target.src = "/no-image.png";
+                      }}
+                    />
                   </div>
-                  
+
                   <div className="item-details">
-                    <div className="item-info">
-                      <span className="item-category">{item.category}</span>
-                      <h4 className="item-name">{item.name}</h4>
-                    </div>
+                    <h4 className="item-name">{item.productName || "Unknown Product"}</h4>
+                    <p className="item-price-single">
+                      ₹{(item.priceAtTime || item.price || 0).toFixed(2)} each
+                    </p>
 
                     <div className="item-controls">
                       <div className="quantity-wrapper">
-                        <button onClick={() => handleQuantity(item.id, "dec")}><FaMinus size={10} /></button>
-                        <span>{item.quantity}</span>
-                        <button onClick={() => handleQuantity(item.id, "inc")}><FaPlus size={10} /></button>
+                        <button
+                          className="qty-btn"
+                          onClick={() => handleQuantity(item.productUid, "dec")}
+                          disabled={item.quantity <= 1}
+                        >
+                          <FaMinus size={10} />
+                        </button>
+
+                        <span className="qty-display">{item.quantity}</span>
+
+                        <button
+                          className="qty-btn"
+                          onClick={() => handleQuantity(item.productUid, "inc")}
+                        >
+                          <FaPlus size={10} />
+                        </button>
                       </div>
-                      <div className="price-tag">${(item.price * item.quantity).toFixed(2)}</div>
+
+                      <div className="price-tag">
+                        ₹{((item.priceAtTime || item.price || 0) * item.quantity).toFixed(2)}
+                      </div>
                     </div>
                   </div>
 
                   <div className="item-actions">
-                    <button 
-                      className={`action-btn wishlist-btn ${wishlist.includes(item.id) ? 'active' : ''}`}
-                      onClick={() => toggleWishlist(item.id)}
+                    <button
+                      className={`action-btn wishlist-btn ${
+                        wishlist.includes(item.productUid) ? "active" : ""
+                      }`}
+                      onClick={() => toggleWishlist(item.productUid)}
+                      title="Add to wishlist"
                     >
                       <FaHeart />
                     </button>
-                    <button className="action-btn remove-btn" onClick={() => handleRemove(item.id)}>
+
+                    <button
+                      className="action-btn remove-btn"
+                      onClick={() => handleRemove(item.productUid)}
+                      title="Remove from cart"
+                    >
                       <FaTrashAlt />
                     </button>
                   </div>
                 </div>
               ))}
-              
-              <div className="continue-shopping">
+
+              <div className="continue-shopping" onClick={handleContinueShopping}>
                 <FaArrowLeft /> <span>Continue Shopping</span>
               </div>
             </div>
 
-            {/* Right Side: Summary */}
+            {/* RIGHT - Order Summary */}
             <div className="cart-summary-section">
               <div className="summary-card">
                 <h3>Order Summary</h3>
-                
+
                 <div className="summary-row">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
-                </div>
-                <div className="summary-row">
-                  <span>Shipping Estimate</span>
-                  <span>${shipping.toFixed(2)}</span>
-                </div>
-                <div className="summary-row">
-                  <span>Tax Estimate</span>
-                  <span>$0.00</span>
-                </div>
-                
-                <div className="divider"></div>
-                
-                <div className="summary-row total-row">
-                  <span>Order Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>Subtotal ({cartItems.length} items)</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
                 </div>
 
-                <button className="btn-checkout">Checkout Now</button>
-                
-                <div className="secure-badge">
-                  <small>🔒 Secure Checkout</small>
+                <div className="summary-row">
+                  <span>Shipping</span>
+                  <span>{shipping > 0 ? `₹${shipping.toFixed(2)}` : "FREE"}</span>
                 </div>
+
+                <div className="divider"></div>
+
+                <div className="summary-row total-row">
+                  <span>Total</span>
+                  <span>₹{total.toFixed(2)}</span>
+                </div>
+
+                <button 
+                  className="btn-checkout"
+                  onClick={handleCheckout}
+                >
+                  Checkout Now
+                </button>
+
+                <p className="secure-checkout-text">
+                  🔒 Secure Checkout
+                </p>
               </div>
             </div>
-            
           </div>
         )}
       </div>

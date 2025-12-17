@@ -8,6 +8,7 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
+    dispatch(clearCart());
     navigate("/login");
   };
 
