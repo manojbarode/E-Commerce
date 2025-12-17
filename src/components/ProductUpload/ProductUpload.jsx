@@ -132,8 +132,6 @@ export default function ProductUpload() {
     fields.forEach((f) => {
       dynamicFieldsMap[f.name] = form[f.name];
     });
-
-    // Prepare data to send (no sellerUid here, it's sent in headers)
     const dataToSend = {
       categoryId: Number(form.categoryId),
       subcategoryId: Number(form.subcategoryId),

@@ -31,8 +31,8 @@ export const ProductAdd = async (productData) => {
 export const uploadToCloudinary = async (file) => {
   try {
     const formData = new FormData();
-    formData.append("file", file); // must be "file"
-    formData.append("upload_preset", "Ecommerce"); // unsigned preset
+    formData.append("file", file);
+    formData.append("upload_preset", "Ecommerce");
 
     const cloudName = "djbgoanwn";
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;

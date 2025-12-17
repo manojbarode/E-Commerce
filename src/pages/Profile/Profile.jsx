@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Profile.css";
 import {FaUser,FaMapMarkerAlt,FaShieldAlt,FaShoppingCart,FaBoxOpen,FaHeart,FaPlus,FaCamera} from "react-icons/fa";
 import {addAddress,deleteAddress,getAddresses,updateAddress} from "../../api/addressApi";
-const API_BASE = "http://localhost:8081/api";
+import { uploadToCloudinary } from "../../api/productApi";
+import { fetchProfileFromApi, profileImageUpload, updateProfile } from "../../api/authApi";
 
-const emptyProfile = {name: "",email: "",phone: "",image: ""};
+const emptyProfile = { name: "", email: "", phone: "", image: "" };
 const emptyAddress = {label: "Home",fullName: "",mobile: "",houseNo: "",street: "",city: "",
   state: "",country: "",zipCode: "",defaultAddress: false};
 
@@ -34,14 +34,15 @@ const Profile = () => {
     fetchProfile();
   }, [userUid]);
   
-  const fetchProfile = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/users/profile/${userUid}`);
-      setProfile(res.data);
-    } catch {
-      toast.error("Failed to load profile");
-    }
-  };
+ const fetchProfile = async () => {
+  try {
+    const res = await fetchProfileFromApi(userUid);
+    setProfile(res.data.data);
+  } catch {
+    toast.error("Failed to load profile");
+  }
+};
+
 
   const fetchAddresses = async () => {
     try {
@@ -56,60 +57,58 @@ const Profile = () => {
     fileInputRef.current?.click();
   };
 
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+const handleImageUpload = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error("Please select an image file");
-      return;
-    }
+  if (!file.type.startsWith("image/")) {
+    toast.error("Please select an image file");
+    return;
+  }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error("Image size should be less than 5MB");
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append('image', file);
-    formData.append('userUid', userUid);
+  try {
+    setImageLoading(true);
 
-    try {
-      setImageLoading(true);
-      const res = await axios.post(`${API_BASE}/users/profile/image`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
-      setProfile({ ...profile, image: res.data.imageUrl || res.data.image });
-      toast.success("Profile image updated successfully");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to upload image");
-    } finally {
-      setImageLoading(false);
-    }
-  };
+    // Single file upload
+    const imageUrl = await uploadToCloudinary(file);
+
+    const res = await profileImageUpload(imageUrl, userUid);
+    setProfile((prev) => ({ ...prev, image: res.data.data.image }));
+    toast.success("Profile image updated successfully");
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to upload image");
+  } finally {
+    setImageLoading(false);
+  }
+};
 
   const handleProfileSubmit = async () => {
-    if (!profile.name || !profile.email || profile.phone.length !== 10) {
-      toast.error("Invalid profile details");
-      return;
-    }
+    console.log(profile.name);
+    console.log(profile.email);
+    console.log(profile.phone);
+  if (!profile.name || !profile.email || (profile.phone?.length || 0) !== 10) {
+  toast.error("Invalid profile details");
+  return;
+}
+  try {
+    setLoading(true);
+    const res = await updateProfile(userUid, profile);
+    setProfile(res.data.data);
+    toast.success("Profile updated successfully");
+  } catch (error) {
+    console.error(error);
+    toast.error("Profile update failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      setLoading(true);
-      await axios.put(`${API_BASE}/users/profile`, profile);
-      toast.success("Profile updated");
-    } catch {
-      toast.error("Profile update failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const openAddAddress = () => {
     setEditingAddress(null);
@@ -268,11 +267,7 @@ const Profile = () => {
                         <FaCamera size={24} />
                       </div>
                     </div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
+                    <input ref={fileInputRef} type="file" accept="image/*"onChange={handleImageUpload}
                       style={{ display: 'none' }}
                     />
                     <p className="text-muted mt-2 small">Click to upload profile picture</p>
@@ -284,10 +279,8 @@ const Profile = () => {
                   <input className="form-control-custom mb-3" placeholder="Email" value={profile.email}
                     onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                   />
-                  <input className="form-control-custom" placeholder="Phone" maxLength={10} value={profile.phone}
-                    onChange={(e) =>
-                      setProfile({ ...profile, phone: e.target.value.replace(/\D/g, "") })
-                    }
+                  <input className="form-control-custom" placeholder="Phone" maxLength={10} value={profile.phone || ""}
+                    onChange={(e) =>setProfile({ ...profile, phone: e.target.value.replace(/\D/g, "") })}
                   />
                   <button className="btn-save-profile w-100 mt-4" disabled={loading}
                     onClick={handleProfileSubmit}
