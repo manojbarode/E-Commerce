@@ -298,3 +298,11 @@
 .premium-mega-menu::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
 .premium-mega-menu::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 .premium-mega-menu::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+.premium-mega-menu.show .premium-mega-col {
+  opacity: 1 !important;
+  animation: none !important;
+  transform: none !important;
+}
+.premium-mega-menu {
+  left: 0;
+}

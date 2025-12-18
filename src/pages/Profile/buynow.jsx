@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./buynow.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {addAddress,deleteAddress,getAddresses,  updateAddress,} from "../../api/addressApi";
+import { addAddress, deleteAddress, getAddresses, updateAddress } from "../../api/addressApi";
 import { useSelector } from "react-redux";
 
 export default function AddressBook() {
@@ -12,14 +12,22 @@ export default function AddressBook() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [formData, setFormData] = useState({fullName: "",mobile: "",houseNo: "",street: "",city: "",
-    state: "",country: "",zipCode: "",defaultAddress: false,});
+  const [formData, setFormData] = useState({
+    fullName: "",
+    mobile: "",
+    houseNo: "",
+    street: "",
+    city: "",
+    state: "",
+    country: "",
+    zipCode: "",
+    defaultAddress: false,
+  });
 
-  
   const navigate = useNavigate();
-  const userUid = localStorage.getItem("userUid");
-  const price = useSelector((state)=>state.order.totalAmount);
-  console.log("price "+price);
+  const { userUid } = useSelector((state) => state.auth);
+  const price = useSelector((state) => state.order.totalAmount);
+
   const indianStates = [
     "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Delhi","Goa",
     "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala",
@@ -35,8 +43,9 @@ export default function AddressBook() {
   const fetchAddresses = async () => {
     try {
       if (!userUid) return toast.error("User not logged in!");
-      const response = await getAddresses(userUid);
-      setAddresses(response || []);
+      const res = await getAddresses(userUid);
+      const data = res?.addressUid ? [res] : res?.data || res || [];
+      setAddresses(data);
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch addresses");
@@ -67,17 +76,7 @@ export default function AddressBook() {
   const handleEdit = (index) => {
     setEditIndex(index);
     const addr = addresses[index];
-    setFormData({
-      fullName: addr.fullName || "",
-      mobile: addr.mobile || "",
-      houseNo: addr.houseNo || "",
-      street: addr.street || "",
-      city: addr.city || "",
-      state: addr.state || "",
-      country: addr.country || "",
-      zipCode: addr.zipCode || "",
-      defaultAddress: addr.defaultAddress || false,
-    });
+    setFormData({ ...addr });
     setShowForm(true);
   };
 
@@ -86,7 +85,7 @@ export default function AddressBook() {
     try {
       const addressUid = addresses[index].addressUid;
       await deleteAddress(userUid, addressUid);
-      setAddresses(addresses.filter((_, i) => i !== index));
+      setAddresses(prev => prev.filter((_, i) => i !== index));
       if (selectedIndex === index) setSelectedIndex(null);
       toast.success("Address deleted successfully");
     } catch (err) {
@@ -107,14 +106,18 @@ export default function AddressBook() {
 
       if (editIndex !== null) {
         const addressUid = addresses[editIndex].addressUid;
-        const updatedAddress = await updateAddress(userUid, addressUid, payload);
+        const res = await updateAddress(userUid, addressUid, payload);
+        const updated = res?.addressUid ? res : res?.data || res;
+
         const updatedList = [...addresses];
-        updatedList[editIndex] = updatedAddress;
+        updatedList[editIndex] = updated;
         setAddresses(updatedList);
         toast.success("Address updated successfully");
       } else {
-        const savedAddress = await addAddress(userUid, payload);
-        setAddresses([...addresses, savedAddress]);
+        const res = await addAddress(userUid, payload);
+        const created = res?.addressUid ? res : res?.data || res;
+
+        setAddresses([...addresses, created]);
         toast.success("Address added successfully");
       }
 
@@ -130,8 +133,6 @@ export default function AddressBook() {
       toast.error("Please select an address!");
       return;
     }
-    const selectedAddress = addresses[selectedIndex];
-    
     navigate("/payment");
   };
 
@@ -153,9 +154,7 @@ export default function AddressBook() {
                 <p className="text-muted mb-0">
                   {addr.houseNo}, {addr.street}, {addr.city}, {addr.state}, {addr.country} — {addr.zipCode}
                 </p>
-                {addr.defaultAddress && (
-                  <small className="text-success">Default Address</small>
-                )}
+                {addr.defaultAddress && <small className="text-success">Default Address</small>}
               </div>
 
               <div className="d-flex gap-2">
@@ -185,97 +184,33 @@ export default function AddressBook() {
         {showForm && (
           <form onSubmit={handleSubmit} className="border p-3 rounded bg-light">
             <div className="row g-2">
-              {/* Full Name */}
-              <div className="col-md-6">
-                <label className="form-label">Full Name</label>
-                <input
-                  className="form-control"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  required
-                />
-              </div>
+              {["fullName", "mobile", "houseNo", "street", "city", "state", "country", "zipCode"].map((field) => (
+                <div className="col-md-6" key={field}>
+                  <label className="form-label">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                  {field === "state" ? (
+                    <select
+                      className="form-select"
+                      value={formData.state}
+                      onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    >
+                      <option value="">Select State</option>
+                      {indianStates.map((st) => <option key={st} value={st}>{st}</option>)}
+                    </select>
+                  ) : (
+                    <input
+                      className="form-control"
+                      type={field === "mobile" ? "tel" : "text"}
+                      value={formData[field]}
+                      maxLength={field === "mobile" ? 10 : undefined}
+                      onChange={(e) =>
+                        setFormData({ ...formData, [field]: field === "mobile" ? e.target.value.replace(/[^0-9]/g, "") : e.target.value })
+                      }
+                      required={field === "fullName" || field === "mobile"}
+                    />
+                  )}
+                </div>
+              ))}
 
-              {/* Mobile */}
-              <div className="col-md-6">
-                <label className="form-label">Mobile</label>
-                <input
-                  className="form-control"
-                  type="tel"
-                  value={formData.mobile}
-                  maxLength={10}
-                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/[^0-9]/g, "") })}
-                  required
-                />
-              </div>
-
-              {/* House No */}
-              <div className="col-md-6">
-                <label className="form-label">House No</label>
-                <input
-                  className="form-control"
-                  value={formData.houseNo}
-                  onChange={(e) => setFormData({ ...formData, houseNo: e.target.value })}
-                />
-              </div>
-
-              {/* Street */}
-              <div className="col-md-6">
-                <label className="form-label">Street</label>
-                <input
-                  className="form-control"
-                  value={formData.street}
-                  onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                />
-              </div>
-
-              {/* City */}
-              <div className="col-md-6">
-                <label className="form-label">City</label>
-                <input
-                  className="form-control"
-                  value={formData.city}
-                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                />
-              </div>
-
-              {/* State */}
-              <div className="col-md-6">
-                <label className="form-label">State</label>
-                <select
-                  className="form-select"
-                  value={formData.state}
-                  onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                >
-                  <option value="">Select State</option>
-                  {indianStates.map((st) => (
-                    <option key={st} value={st}>{st}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Country */}
-              <div className="col-md-6">
-                <label className="form-label">Country</label>
-                <input
-                  className="form-control"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                />
-              </div>
-
-              {/* Zip Code */}
-              <div className="col-md-6">
-                <label className="form-label">Zip Code</label>
-                <input
-                  className="form-control"
-                  value={formData.zipCode}
-                  onChange={(e) => setFormData({ ...formData, zipCode: e.target.value.replace(/[^0-9]/g, "") })}
-                />
-              </div>
-
-              {/* Default Address */}
               <div className="col-md-12 form-check mt-2">
                 <input
                   className="form-check-input"
