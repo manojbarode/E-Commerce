@@ -1,3 +1,4 @@
+// src/components/SubcategoryManagement.jsx
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
@@ -7,6 +8,8 @@ import {
   getSubcategories,
   updateSubcategory,
 } from "../../api/categoriesApi";
+import { useDispatch } from "react-redux";
+import { fetchCategories1 } from "../../Redux/categoriesSlice";
 
 export default function SubcategoryManagement() {
   const [categories, setCategories] = useState([]);
@@ -22,6 +25,8 @@ export default function SubcategoryManagement() {
     customFields: [""],
   });
 
+  const dispatch = useDispatch();
+
   // ---------------- Fetch Categories ----------------
   const fetchCategories = async () => {
     try {
@@ -29,7 +34,8 @@ export default function SubcategoryManagement() {
       const cats = await getCategories();
       setCategories(cats || []);
     } catch (err) {
-      toast.error("Failed to load categories");
+      console.error("Fetch categories error:", err);
+      toast.error(err.response?.data?.message || "Failed to load categories");
     } finally {
       setLoadingCats(false);
     }
@@ -41,12 +47,14 @@ export default function SubcategoryManagement() {
 
   // ---------------- Fetch Subcategories ----------------
   const fetchSubcategories = async (categoryId) => {
+    if (!categoryId) return setSubcategories([]);
     try {
       setLoadingSubs(true);
       const subs = await getSubcategories(categoryId);
       setSubcategories(subs || []);
     } catch (err) {
-      toast.error("Failed to load subcategories");
+      console.error("Fetch subcategories error:", err);
+      toast.error(err.response?.data?.message || "Failed to load subcategories");
     } finally {
       setLoadingSubs(false);
     }
@@ -59,13 +67,13 @@ export default function SubcategoryManagement() {
 
   // ---------------- Add Subcategory ----------------
   const handleAddSubcategory = async () => {
-    const cleanedFields = newSubcategory.customFields
-      .map((f) => f.trim())
-      .filter((f) => f);
+    const cleanedFields = newSubcategory.customFields.map(f => f.trim()).filter(f => f);
 
     if (!newSubcategory.name.trim()) return toast.error("Subcategory name required!");
+    if (!selectedCategory) return toast.error("Select a category first!");
 
     try {
+      setLoadingSubs(true);
       await addSubcategory(selectedCategory, {
         name: newSubcategory.name.trim(),
         customFields: cleanedFields,
@@ -73,9 +81,15 @@ export default function SubcategoryManagement() {
 
       toast.success("Subcategory added!");
       setNewSubcategory({ name: "", customFields: [""] });
+
+      // Update Redux store & local list
+      dispatch(fetchCategories1());
       fetchSubcategories(selectedCategory);
     } catch (err) {
-      toast.error("Failed to add subcategory");
+      console.error("Add subcategory error:", err);
+      toast.error(err.response?.data?.message || "Failed to add subcategory");
+    } finally {
+      setLoadingSubs(false);
     }
   };
 
@@ -84,10 +98,7 @@ export default function SubcategoryManagement() {
     setEditingSubcategory({
       id: sub.id,
       name: sub.name || "",
-      customFields:
-        Array.isArray(sub.customFields) && sub.customFields.length > 0
-          ? sub.customFields
-          : [""],
+      customFields: Array.isArray(sub.customFields) && sub.customFields.length > 0 ? sub.customFields : [""],
     });
   };
 
@@ -96,72 +107,58 @@ export default function SubcategoryManagement() {
   };
 
   const saveEdit = async () => {
-  const cleanedFields = editingSubcategory.customFields
-    .map((f) => f.trim())
-    .filter((f) => f);
+    const cleanedFields = editingSubcategory.customFields.map(f => f.trim()).filter(f => f);
+    const trimmedName = editingSubcategory.name.trim();
+    if (!trimmedName) return toast.error("Subcategory name required!");
 
-  const trimmedName = editingSubcategory.name.trim();
-  if (!trimmedName) return toast.error("Subcategory name required!");
-
-  console.log("Saving subcategory:", {
-    id: editingSubcategory.id,
-    name: trimmedName,
-    customFields: cleanedFields,
-  });
-
-  try {
-    await updateSubcategory(editingSubcategory.id, {
-      name: trimmedName,
-      customFields: cleanedFields,
-    });
-    toast.success("Subcategory updated!");
-    cancelEditing();
-    fetchSubcategories(selectedCategory);
-  } catch (err) {
-    console.error("Update subcategory error:", err);
-    toast.error("Failed to update subcategory");
-  }
-};
-
-
-  // ---------------- Delete ----------------
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this subcategory?")) return;
     try {
-      await deleteSubcategory(id);
-      toast.info("Deleted!");
+      setLoadingSubs(true);
+      await updateSubcategory(editingSubcategory.id, { name: trimmedName, customFields: cleanedFields });
+      toast.success("Subcategory updated!");
+      cancelEditing();
+
+      dispatch(fetchCategories1());
       fetchSubcategories(selectedCategory);
     } catch (err) {
-      toast.error("Failed to delete subcategory");
+      console.error("Update subcategory error:", err);
+      toast.error(err.response?.data?.message || "Failed to update subcategory");
+    } finally {
+      setLoadingSubs(false);
     }
   };
 
-  // ---------------- Dynamic Field Handlers ----------------
+  // ---------------- Delete Subcategory ----------------
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this subcategory?")) return;
+    try {
+      setLoadingSubs(true);
+      await deleteSubcategory(id);
+      toast.info("Deleted!");
+
+      dispatch(fetchCategories1());
+      fetchSubcategories(selectedCategory);
+    } catch (err) {
+      console.error("Delete subcategory error:", err);
+      toast.error(err.response?.data?.message || "Failed to delete subcategory");
+    } finally {
+      setLoadingSubs(false);
+    }
+  };
+
+  // ---------------- Dynamic Fields ----------------
   const addField = (isEditing = false) => {
     if (isEditing) {
-      setEditingSubcategory((prev) => ({
-        ...prev,
-        customFields: [...prev.customFields, ""],
-      }));
+      setEditingSubcategory(prev => ({ ...prev, customFields: [...prev.customFields, ""] }));
     } else {
-      setNewSubcategory((prev) => ({
-        ...prev,
-        customFields: [...prev.customFields, ""],
-      }));
+      setNewSubcategory(prev => ({ ...prev, customFields: [...prev.customFields, ""] }));
     }
   };
 
   const removeField = (index, isEditing = false) => {
     if (isEditing) {
-      setEditingSubcategory((prev) => ({
-        ...prev,
-        customFields: prev.customFields.filter((_, i) => i !== index),
-      }));
+      setEditingSubcategory(prev => ({ ...prev, customFields: prev.customFields.filter((_, i) => i !== index) }));
     } else {
-      setNewSubcategory((prev) => ({
-        ...prev,
-        customFields: prev.customFields.filter((_, i) => i !== index),
-      }));
+      setNewSubcategory(prev => ({ ...prev, customFields: prev.customFields.filter((_, i) => i !== index) }));
     }
   };
 
@@ -169,11 +166,11 @@ export default function SubcategoryManagement() {
     if (isEditing) {
       const updated = [...editingSubcategory.customFields];
       updated[index] = value;
-      setEditingSubcategory((prev) => ({ ...prev, customFields: updated }));
+      setEditingSubcategory(prev => ({ ...prev, customFields: updated }));
     } else {
       const updated = [...newSubcategory.customFields];
       updated[index] = value;
-      setNewSubcategory((prev) => ({ ...prev, customFields: updated }));
+      setNewSubcategory(prev => ({ ...prev, customFields: updated }));
     }
   };
 
@@ -191,10 +188,8 @@ export default function SubcategoryManagement() {
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="">-- Choose category --</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
         {loadingCats && <span className="text-muted small">Loading categories...</span>}
@@ -208,9 +203,7 @@ export default function SubcategoryManagement() {
             className="form-control admin-input mb-2"
             placeholder="New Subcategory"
             value={newSubcategory.name}
-            onChange={(e) =>
-              setNewSubcategory({ ...newSubcategory, name: e.target.value })
-            }
+            onChange={(e) => setNewSubcategory({ ...newSubcategory, name: e.target.value })}
           />
 
           {newSubcategory.customFields.map((field, idx) => (
@@ -228,17 +221,10 @@ export default function SubcategoryManagement() {
             </div>
           ))}
 
-          <button
-            className="btn btn-secondary btn-sm mt-1 admin-btn-outline"
-            onClick={() => addField()}
-          >
+          <button className="btn btn-secondary btn-sm mt-1 admin-btn-outline" onClick={() => addField()}>
             + Add Field
           </button>
-
-          <button
-            className="btn btn-primary w-100 admin-btn mt-2"
-            onClick={handleAddSubcategory}
-          >
+          <button className="btn btn-primary w-100 admin-btn mt-2" onClick={handleAddSubcategory}>
             Add Subcategory
           </button>
         </div>
@@ -247,87 +233,73 @@ export default function SubcategoryManagement() {
       {/* Subcategory List */}
       {loadingSubs && <p className="text-muted small mb-2">Loading subcategories...</p>}
 
-      {subcategories.length === 0 ? (
+      {subcategories.length === 0 && selectedCategory && !loadingSubs && (
         <p className="text-muted small">No subcategories for this category.</p>
-      ) : (
-        <ul className="list-group list-group-flush admin-list">
-          {subcategories.map((sub) => (
-            <li key={sub.id} className="list-group-item admin-list-item">
-              {editingSubcategory.id === sub.id ? (
-                <div className="w-100">
-                  <input
-                    type="text"
-                    className="form-control mb-2"
-                    value={editingSubcategory.name}
-                    onChange={(e) =>
-                      setEditingSubcategory({ ...editingSubcategory, name: e.target.value })
-                    }
-                  />
-
-                  {editingSubcategory.customFields.map((field, idx) => (
-                    <div className="input-group mb-2" key={idx}>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={field}
-                        onChange={(e) => handleFieldChange(idx, e.target.value, true)}
-                      />
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => removeField(idx, true)}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-
-                  <button
-                    className="btn btn-secondary btn-sm mb-2"
-                    onClick={() => addField(true)}
-                  >
-                    + Add Field
-                  </button>
-
-                  <div className="d-flex gap-2">
-                    <button className="btn btn-sm btn-success" onClick={saveEdit}>
-                      Save
-                    </button>
-                    <button className="btn btn-sm btn-secondary" onClick={cancelEditing}>
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="d-flex justify-content-between align-items-center w-100">
-                  <div>
-                    <span className="fw-semibold">{sub.name}</span>
-                    {sub.customFields && sub.customFields.length > 0 && (
-                      <div className="small text-muted">
-                        Fields: {sub.customFields.join(", ")}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="d-flex gap-2">
-                    <button
-                      className="btn btn-sm btn-info"
-                      onClick={() => startEditing(sub)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleDelete(sub.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
       )}
+
+      <ul className="list-group list-group-flush admin-list">
+        {subcategories.map(sub => (
+          <li key={sub.id} className="list-group-item admin-list-item">
+            {editingSubcategory.id === sub.id ? (
+              <div className="w-100">
+                <input
+                  type="text"
+                  className="form-control mb-2"
+                  value={editingSubcategory.name}
+                  onChange={(e) => setEditingSubcategory({ ...editingSubcategory, name: e.target.value })}
+                />
+
+                {editingSubcategory.customFields.map((field, idx) => (
+                  <div className="input-group mb-2" key={idx}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={field}
+                      onChange={(e) => handleFieldChange(idx, e.target.value, true)}
+                    />
+                    <button className="btn btn-danger" onClick={() => removeField(idx, true)}>
+                      ✕
+                    </button>
+                  </div>
+                ))}
+
+                <button className="btn btn-secondary btn-sm mb-2" onClick={() => addField(true)}>
+                  + Add Field
+                </button>
+
+                <div className="d-flex gap-2">
+                  <button className="btn btn-sm btn-success" onClick={saveEdit}>
+                    Save
+                  </button>
+                  <button className="btn btn-sm btn-secondary" onClick={cancelEditing}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <div>
+                  <span className="fw-semibold">{sub.name}</span>
+                  {sub.customFields && sub.customFields.length > 0 && (
+                    <div className="small text-muted">
+                      Fields: {sub.customFields.join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                <div className="d-flex gap-2">
+                  <button className="btn btn-sm btn-info" onClick={() => startEditing(sub)}>
+                    Edit
+                  </button>
+                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(sub.id)}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

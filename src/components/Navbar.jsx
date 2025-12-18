@@ -6,7 +6,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../Redux/authSlice";
 import CategoriesDropdown from "./CategoriesDropdown";
-import { getCategories } from "../api/categoriesApi";
+import { fetchCategories1 } from "../Redux/categoriesSlice";
 import "./Css/Navbar.css";
 import { toast } from "react-toastify";
 
@@ -15,29 +15,17 @@ export default function Navbar() {
   const dispatch = useDispatch();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const user = useSelector((state) => state.auth.user);
   const cartItems = useSelector((state) => state.cart.items || []);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [categories, setCategories] = useState({});
   const wishlistCount = useSelector((state) => state.wishlist?.count || 0);
 
-  useEffect(() => {
-    async function fetchCategories() {
-      try {
-        const res = await getCategories();
-        const catObj = {};
-        res.forEach(cat => {
-          catObj[cat.name] = cat.subcategories || [];
-        });
-        setCategories(catObj);
-      } catch (error) {
-        console.error("Failed to load categories:", error);
-      }
-    }
+  const categories = useSelector((state) => state.categories.data || []);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-    fetchCategories();
-  }, []);
+  // ---------- Fetch categories on mount ----------
+  useEffect(() => {
+    dispatch(fetchCategories1());
+  }, [dispatch]);
 
   const handleProfileClick = () => {
     isLoggedIn ? navigate("/profile") : navigate("/signup");
@@ -49,26 +37,21 @@ export default function Navbar() {
   };
 
   const closeDrawer = () => setDrawerOpen(false);
-  
-  const cartClick = ()=>{
+
+  const cartClick = () => {
     if (!isLoggedIn) {
       toast.warning("Please login first");
-      return;
+    } else {
+      navigate("/profile/cart");
     }
-    else
-    {
-      navigate("/login")
-    }
-}
+  };
+
   return (
     <>
       {/* MAIN NAV */}
       <nav className="premium-navbar navbar navbar-expand-lg sticky-top">
         <div className="container-fluid px-4">
-          {/* Logo */}
-          <span className="premium-logo" onClick={() => navigate("/")}>
-            eShop
-          </span>
+          <span className="premium-logo" onClick={() => navigate("/")}>eShop</span>
 
           {/* Mobile Search */}
           <div className="premium-search-box premium-mobile-search-inline-permanent d-lg-none">
@@ -117,9 +100,8 @@ export default function Navbar() {
             {/* Desktop Icons */}
             <div className="premium-nav-icons d-none d-lg-flex">
               <Link to="/profile/wishcart" className="premium-icon-btn icon-wishlist">
-                <i className="bi bi-heart"></i>{wishlistCount > 0 && (
-                  <span className="icon-badge">{wishlistCount}</span>
-                )}
+                <i className="bi bi-heart"></i>
+                {wishlistCount > 0 && <span className="icon-badge">{wishlistCount}</span>}
               </Link>
 
               <Link to="/profile/cart" className="premium-icon-btn icon-cart">
@@ -132,14 +114,10 @@ export default function Navbar() {
                   <div className="premium-icon-btn icon-profile" onClick={handleProfileClick}>
                     <i className="bi bi-person-circle"></i>
                   </div>
-                  <button className="premium-logout-btn btn-logout" onClick={handleLogout}>
-                    Logout
-                  </button>
+                  <button className="premium-logout-btn btn-logout" onClick={handleLogout}>Logout</button>
                 </>
               ) : (
-                <button className="premium-signup-btn btn-signup" onClick={() => navigate("/signup")}>
-                  Sign Up
-                </button>
+                <button className="premium-signup-btn btn-signup" onClick={() => navigate("/signup")}>Sign Up</button>
               )}
             </div>
           </div>
@@ -179,17 +157,16 @@ export default function Navbar() {
             <i className="bi bi-house-door"></i> Home
           </Link>
 
-           <Link to="/profile/wishcart" className="premium-icon-btn icon-wishlist">
-                <i className="bi bi-heart"></i>{wishlistCount > 0 && (
-                  <span className="icon-badge">{wishlistCount}</span>
-                )}
+          <Link to="/profile/wishcart" className="premium-icon-btn icon-wishlist">
+            <i className="bi bi-heart"></i>{wishlistCount > 0 && <span className="icon-badge">{wishlistCount}</span>}
           </Link>
 
-         <Link to="/profile/cart" className="premium-icon-btn icon-cart">
+          <Link to="/profile/cart" className="premium-icon-btn icon-cart">
             <i className="bi bi-cart3" onClick={cartClick}></i>
             <span className="icon-badge">{cartCount}</span>
           </Link>
 
+          {/* Mobile Categories */}
           <CategoriesDropdown mobile={true} categories={categories} closeDrawer={closeDrawer} />
 
           <Link to="/offers" onClick={closeDrawer} className="premium-drawer-link">
@@ -207,13 +184,7 @@ export default function Navbar() {
 
         {isLoggedIn && (
           <div className="premium-drawer-footer">
-            <button
-              onClick={() => {
-                closeDrawer();
-                handleLogout();
-              }}
-              className="premium-drawer-logout"
-            >
+            <button onClick={() => { closeDrawer(); handleLogout(); }} className="premium-drawer-logout">
               <i className="bi bi-box-arrow-right"></i> Logout
             </button>
           </div>

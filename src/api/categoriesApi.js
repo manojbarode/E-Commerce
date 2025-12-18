@@ -1,7 +1,5 @@
 import axiosInstance from "./axiosConfig";
 
-// ===================== CATEGORIES ===================== //
-
 export const getCategories = async () => {
   try {
     const res = await axiosInstance.get("/category/all");
