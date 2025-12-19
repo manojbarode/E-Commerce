@@ -7,7 +7,7 @@ import "./Profile.css";
 import {FaUser,FaMapMarkerAlt,FaShieldAlt,FaShoppingCart,FaBoxOpen,FaHeart,FaPlus,FaCamera} from "react-icons/fa";
 import {addAddress,deleteAddress,getAddresses,updateAddress} from "../../api/addressApi";
 import { uploadToCloudinary } from "../../api/productApi";
-import { fetchProfileFromApi, profileImageUpload, updateProfile } from "../../api/authApi";
+import { fetchProfileFromApi, fetchUserProfile, profileImageUpload, updateProfile } from "../../api/authApi";
 
 const emptyProfile = { name: "", email: "", phone: "", image: "" };
 const emptyAddress = {label: "Home",fullName: "",mobile: "",houseNo: "",street: "",city: "",
@@ -15,8 +15,6 @@ const emptyAddress = {label: "Home",fullName: "",mobile: "",houseNo: "",street: 
 
 const Profile = () => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.auth?.user || JSON.parse(localStorage.getItem("user")));
-  const userUid = user?.userUid;
   const fileInputRef = useRef(null);
   
   const [profile, setProfile] = useState(emptyProfile);
@@ -29,19 +27,26 @@ const Profile = () => {
   const [addressForm, setAddressForm] = useState(emptyAddress);
   const [userStats] = useState({cartItems: 0,totalOrders: 0,wishlistItems: 0});
   
-  useEffect(() => {
-    if (!userUid) return;
-    fetchProfile();
-  }, [userUid]);
+
   
- const fetchProfile = async () => {
+ const { token, user, userUid } = useSelector((state) => state.auth);
+
+const fetchProfileData = async () => {
+  if (!token) return;
   try {
-    const res = await fetchProfileFromApi(userUid);
-    setProfile(res.data.data);
-  } catch {
-    toast.error("Failed to load profile");
+    const data = await fetchUserProfile(token);
+    setProfile(data);
+  } catch (err) {
+    toast.error("Failed to fetch profile");
   }
 };
+
+
+useEffect(() => {
+  if (userUid) {
+    fetchProfileData();
+  }
+}, [userUid, token]);
 
   const fetchAddresses = async () => {
     try {
@@ -76,7 +81,7 @@ const handleImageUpload = async (e) => {
     // Single file upload
     const imageUrl = await uploadToCloudinary(file);
 
-    const res = await profileImageUpload(imageUrl, userUid);
+    const res = await profileImageUpload(imageUrl);
     setProfile((prev) => ({ ...prev, image: res.data.data.image }));
     toast.success("Profile image updated successfully");
   } catch (error) {
@@ -97,7 +102,7 @@ const handleImageUpload = async (e) => {
 }
   try {
     setLoading(true);
-    const res = await updateProfile(userUid, profile);
+    const res = await updateProfile(profile);
     setProfile(res.data.data);
     toast.success("Profile updated successfully");
   } catch (error) {

@@ -1,7 +1,6 @@
-// src/Redux/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
-// Use sessionStorage (auto clear on tab close)
+// Get token & user from sessionStorage
 const token = sessionStorage.getItem("token");
 const user = sessionStorage.getItem("user")
   ? JSON.parse(sessionStorage.getItem("user"))
@@ -9,12 +8,12 @@ const user = sessionStorage.getItem("user")
 
 const initialState = {
   isLoggedIn: !!token,
-  token: token,
-  user: user,
+  token: token || null,
+  user: user || null,
   userUid: user?.userUid || null,
 };
 
-export const authSlice = createSlice({
+const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {

@@ -4,46 +4,62 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-import { loginUser as apiLoginUser } from "../../api/authApi";
-import { loginUser } from "../../Redux/authSlice";
-import { setBuyerUid } from "../../Redux/orderSlice";
+import { loginUser as loginApi, fetchUserProfile } from "../../api/authApi";
+import { loginUser as loginUserAction } from "../../Redux/authSlice";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
 
-    try {
-      const res = await apiLoginUser({ email, password });
 
-      if (!res?.token) {
-        toast.error("Login failed");
-        return;
-      }
-
-      dispatch(
-        loginUser({
-          token: res.token,
-          user: {
-            userUid: res.userUid,
-            name: res.name,
-            email: res.email,
-          },
-        })
-      );
-
-      dispatch(setBuyerUid(res.userUid));
-
-      toast.success("Login successful");
-      navigate("/");
-    } catch (err) {
-      toast.error(err?.message || "Invalid email or password");
+    // Basic validation
+    if (!email || !password) {
+      toast.error("Please enter email and password");
+      return;
     }
+
+    setLoading(true);
+
+   try {
+  console.log("🔐 Logging in with:", email);
+  const res = await loginApi({ email, password });
+
+  const token = res.token;
+  if (!token) {
+    throw new Error("Token not received from server");
+  }
+  sessionStorage.setItem("token", token);
+  console.log("✅ Token stored:", token);
+  console.log("👤 Fetching user profile...");
+  const profile = await fetchUserProfile();
+  console.log("✅ Profile fetched:", profile);
+
+  dispatch(
+    loginUserAction({
+      token,
+      user: profile,
+    })
+  );
+  sessionStorage.setItem("user", JSON.stringify(profile));
+
+  toast.success("Login successful!");
+  navigate("/");
+
+} catch (err) {
+  console.error("❌ Login failed:", err);
+  toast.error(err.response?.data?.message || err.message || "Login failed");
+} finally {
+  setLoading(false);
+}
+
   };
 
   return (
@@ -62,6 +78,7 @@ const Login = () => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
                 required
               />
 
@@ -71,26 +88,30 @@ const Login = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
                 required
               />
 
               <button
                 type="submit"
                 className="btn btn-danger w-100 rounded-pill fw-bold"
+                disabled={loading}
               >
-                Sign In
+                {loading ? "Signing In..." : "Sign In"}
               </button>
             </form>
 
             <p className="text-center mt-3">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <button
                 className="btn btn-link p-0"
                 onClick={() => navigate("/signup")}
+                disabled={loading}
               >
                 Sign Up
               </button>
             </p>
+
           </div>
         </div>
       </div>

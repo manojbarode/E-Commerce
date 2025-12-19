@@ -21,8 +21,6 @@ export default function Navbar() {
 
   const categories = useSelector((state) => state.categories.data || []);
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // ---------- Fetch categories on mount ----------
   useEffect(() => {
     dispatch(fetchCategories1());
   }, [dispatch]);
