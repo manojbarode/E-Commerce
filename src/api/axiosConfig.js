@@ -9,7 +9,6 @@ const axiosInstance = axios.create({
   },
 });
 
-// ✅ Attach JWT automatically
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem("token");
@@ -20,8 +19,6 @@ axiosInstance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
-// ✅ Handle auth errors globally
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {

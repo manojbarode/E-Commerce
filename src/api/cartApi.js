@@ -21,7 +21,7 @@ export const fetchCartdata = async (userUid) => {
     const response = await axiosInstance.get("/cart/my-cart", {
       headers: { userUid: userUid }
     });
-    return response.data;
+    return response.data || { items: [] };
   } catch (err) {
     console.error("Fetch cart error:", err);
     throw err;

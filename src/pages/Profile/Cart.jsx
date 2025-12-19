@@ -25,23 +25,28 @@ const Cart = () => {
     navigate("/");
     return;
   }
-    const fetchCart = async () => {
-      try {
-        if (!userUid) {
-          setLoading(false);
-          return;
-        }
+   const fetchCart = async () => {
+  try {
+    if (!userUid) return;
 
-        const response = await fetchCartdata(userUid);
-        const items = response?.data?.items || response?.items || [];
-        dispatch(setCartItems(items));
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-        // toast.error("Failed to load cart");
-      } finally {
-        setLoading(false);
-      }
-    };
+    const response = await fetchCartdata(userUid);
+
+    // Ensure correct structure
+    const items = response?.data?.data?.items || response?.data?.items || [];
+    if (!Array.isArray(items)) {
+      console.warn("Unexpected cart data structure:", response);
+      dispatch(setCartItems([]));
+    } else {
+      dispatch(setCartItems(items));
+    }
+
+  } catch (error) {
+    // toast.error("Failed to load cart");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchCart();
   }, [userUid, dispatch]);
