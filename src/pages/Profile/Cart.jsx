@@ -37,7 +37,7 @@ const Cart = () => {
         dispatch(setCartItems(items));
       } catch (error) {
         console.error("Error fetching cart:", error);
-        toast.error("Failed to load cart");
+        // toast.error("Failed to load cart");
       } finally {
         setLoading(false);
       }
@@ -65,7 +65,8 @@ const Cart = () => {
       return;
     }
 
-    await deleteCartItem(userUid, productUid);
+    const res = await deleteCartItem(userUid, productUid);
+    console.log("Delete response:", res);
     dispatch(removeItem(productUid));
     toast.success("Item removed from cart");
   } catch (error) {

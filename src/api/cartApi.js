@@ -29,10 +29,13 @@ export const fetchCartdata = async (userUid) => {
 };
 
 export const deleteCartItem = async (userUid, productUid) => {
+  console.log("deleteCartItem called with:", { userUid, productUid });
   try{
-    return axiosInstance.delete(`/cart/remove/${productUid}`, {
+    const res = axiosInstance.delete(`/cart/remove/${productUid}`, {
       headers: { userUid }
     });
+    console.log("Delete response:", res.data);
+    return res.data;
   }
   catch(err) {
     console.error("Fetch cart error:", err);
