@@ -18,7 +18,6 @@ export default function Navbar() {
   const cartItems = useSelector((state) => state.cart.items || []);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const wishlistCount = useSelector((state) => state.wishlist?.count || 0);
-
   const categories = useSelector((state) => state.categories.data || []);
   const [drawerOpen, setDrawerOpen] = useState(false);
   useEffect(() => {
@@ -33,9 +32,7 @@ export default function Navbar() {
     dispatch(logoutUser());
     navigate("/");
   };
-
   const closeDrawer = () => setDrawerOpen(false);
-
   const cartClick = () => {
     if (!isLoggedIn) {
       toast.warning("Please login first");

@@ -29,7 +29,7 @@ const Profile = () => {
   
 
   
- const { token, user, userUid } = useSelector((state) => state.auth);
+ const { token, user,userUid} = useSelector((state) => state.auth);
 
 const fetchProfileData = async () => {
   if (!token) return;
@@ -50,7 +50,7 @@ useEffect(() => {
 
   const fetchAddresses = async () => {
     try {
-      const data = await getAddresses(userUid);
+      const data = await getAddresses();
       setAddresses(data || []);
     } catch {
       toast.error("Failed to load addresses");
@@ -135,11 +135,7 @@ const handleImageUpload = async (e) => {
   const saveAddress = async () => {
     try {
       if (editingAddress) {
-        const res = await updateAddress(
-          userUid,
-          editingAddress.addressUid,
-          addressForm
-        );
+        const res = await updateAddress(editingAddress.addressUid,addressForm);
 
         const updated = res?.addressUid ? res : res?.data || res;
 
@@ -151,7 +147,7 @@ const handleImageUpload = async (e) => {
 
         toast.success("Address updated");
       } else {
-        const res = await addAddress(userUid, addressForm);
+        const res = await addAddress(addressForm);
         const created = res?.addressUid ? res : res?.data || res;
 
         setAddresses(prev => [...prev, created]);
@@ -168,7 +164,7 @@ const handleImageUpload = async (e) => {
   const removeAddress = async (uid) => {
     if (!window.confirm("Delete this address?")) return;
     try {
-      await deleteAddress(userUid, uid);
+      await deleteAddress(uid);
       setAddresses(prev => prev.filter(a => a.addressUid !== uid));
       toast.success("Address deleted");
     } catch (err) {
