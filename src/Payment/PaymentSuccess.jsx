@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./paymentSuccess.css";
 
 export default function PaymentSuccess() {
   const location = useLocation();
   const navigate = useNavigate();
+  const orderData = location.state;
+  useEffect(() => {
+  if (!orderData || !orderData.orderUid) {
+    navigate("/");
+  }
+}, [orderData, navigate]);
 
-  const orderData = location.state?.data || location.state;
-
+  console.log("payment-success data"+orderData);
   /* ---------- GUARD ---------- */
   if (!orderData || !orderData.orderUid) {
     return (
@@ -24,20 +29,8 @@ export default function PaymentSuccess() {
   }
 
   /* ---------- DESTRUCTURE ---------- */
-  const {
-    orderUid,
-    orderStatus,
-    paymentStatus,
-    paymentMethod,
-    totalAmount,
-    totalQuantity,
-    shippingAmount,
-    currency = "INR",
-    orderDate,
-    items = [],
-    paymentPublicRef,
-    maskIdentifier,
-  } = orderData;
+  const {orderUid,orderStatus,paymentStatus,paymentMethod,totalAmount,totalQuantity,shippingAmount,
+    currency = "INR",orderDate,items = [],paymentPublicRef,maskIdentifier,} = orderData;
 
   /* ---------- STATUS STYLES ---------- */
   const paymentClass =
@@ -50,13 +43,6 @@ export default function PaymentSuccess() {
   return (
     <div className="success-container">
       <div className="success-card">
-
-        {/* SUCCESS ICON */}
-        <div className="success-icon">
-          <svg viewBox="0 0 24 24" strokeWidth="2">
-            <path d="M20 6L9 17l-5-5" />
-          </svg>
-        </div>
 
         <h2 className="success-title">Payment Successful</h2>
         <p className="success-msg">
@@ -156,7 +142,7 @@ export default function PaymentSuccess() {
         <div className="action-buttons">
           <button
             className="btn-secondary"
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate("/profile/userOrders")}
           >
             View Orders
           </button>

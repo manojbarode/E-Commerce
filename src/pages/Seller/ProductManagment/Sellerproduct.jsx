@@ -14,6 +14,7 @@ export default function SellerProducts() {
   const dispatch = useDispatch();
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+    
 
   const token = useSelector((state) => state.seller.token) || localStorage.getItem("sellerToken");
 
@@ -23,9 +24,11 @@ export default function SellerProducts() {
   try {
     setLoading(true);
     const data = await getSellerProducts(page, 10);
-    setProducts(data.products || []);
-    setCurrentPage(data.currentPage);
-    setTotalPages(data.totalPages);
+
+    setProducts(data.content || []);
+    setCurrentPage(data.number || 0);
+    setTotalPages(data.totalPages || 0);
+
   } catch (err) {
     console.error(err);
     toast.error("Failed to load products");
@@ -33,6 +36,7 @@ export default function SellerProducts() {
     setLoading(false);
   }
 };
+
 
 const handlePageChange = (newPage) => {
   if (newPage >= 0 && newPage < totalPages) {

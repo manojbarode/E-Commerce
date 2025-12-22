@@ -39,6 +39,10 @@ const SellerOrdersPage = () => {
     try {
       setLoading(true);
       const res = await SellerOrdersService.getSellerOrders(page, PAGE_SIZE);
+      
+    console.log("Response from API:", res); // log the entire API response
+    console.log("Orders content:", res.content);
+
       setOrders(res.content || []);
       setFilteredOrders(res.content || []);
       setTotalPages(res.totalPages || 0);
@@ -123,11 +127,11 @@ const SellerOrdersPage = () => {
                     {filteredOrders.map((o) => (
                       <tr key={o.orderUid}>
                         <td>
-                          <div className="fw-bold text-primary">{o.orderUid}</div>
                           <div className="small text-muted">{o.maskIdentifier}</div>
                         </td>
                         <td className="d-flex align-items-center gap-3">
-                          <img src={o.imageUrls?.[0]} width="60" height="60" className="rounded-3" alt="product" />
+                          <img src={o.items?.[0]?.imageUrls?.[0] || "https://via.placeholder.com/60"} width="60"
+                            height="60" className="rounded-3"alt={o.items?.[0]?.productName || "product"}/> 
                           {o.productTitle}
                         </td>
                         <td className="text-center">{o.quantity}</td>
@@ -155,10 +159,11 @@ const SellerOrdersPage = () => {
                     <div className="card mobile-order-card shadow-sm border-0">
                       <div className="card-body">
                         <div className="d-flex gap-3 mb-3">
-                          <img src={o.imageUrls?.[0]} width="80" height="80" className="rounded-3" alt="product" />
+                          <img src={o.items?.[0]?.imageUrls?.[0] || "https://via.placeholder.com/80"}
+                            width="80" height="80" className="rounded-3" alt={o.items?.[0]?.productName || "product"}/>
+
                           <div>
                             <h6 className="fw-bold mb-1">{o.productTitle}</h6>
-                            <div className="small text-muted">{o.orderUid}</div>
                             <span className={`badge bg-${SellerOrdersService.getStatusBadgeClass(o.orderStatus)}`}>
                               {o.orderStatus}
                             </span>
