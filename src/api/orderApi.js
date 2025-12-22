@@ -107,10 +107,10 @@ export const getUserOrders = async (page = 0, size = 100) => {
  */
 export const getSellerOrders = async (page = 0, size = 100) => {
   try {
-    const response = await axiosInstance.get('/orders/seller', {
+    const response = await sellerAxios.get('/orders/seller', {
       params: { page, size }
     });
-    return response.data.data; // Returns Page<OrderDTO>
+    return response.data.data;
   } catch (error) {
     console.error('❌ Error fetching seller orders:', error);
     throw error;

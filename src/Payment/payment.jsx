@@ -20,18 +20,17 @@ export default function PaymentForm() {
   const [formData, setFormData] = useState({});
   const [currency, setCurrency] = useState("INR");
   const [paymentInProgress, setPaymentInProgress] = useState(false);
-
+  const [orderUid, setOrderUid] = useState(null);
   /* ---------- GUARD ---------- */
- const orderUid = location.state?.orderUid || new URLSearchParams(location.search).get("orderUid");
- console.log("orderUid payment"+orderUid)
-
 useEffect(() => {
-  if (!orderUid) {
+  const uid = location.state?.orderUid || new URLSearchParams(location.search).get("orderUid");
+  if (!uid) {
     toast.error("Invalid payment session");
     navigate("/");
+    return;
   }
-}, [orderUid, navigate]);
-
+  setOrderUid(uid);
+}, [location, navigate]);
 
   useEffect(() => {
     const fetchMethods = async () => {
@@ -77,53 +76,47 @@ useEffect(() => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  /* ---------- SUBMIT PAYMENT ---------- */
-  const handleSubmit = async () => {
-    if (paymentInProgress) return;
+ const handleSubmit = async () => {
+  if (paymentInProgress) return;
 
-    if (!selectedMethodId) {
-      toast.info("Please select a payment method");
+  if (!selectedMethodId) {
+    toast.info("Please select a payment method");
+    return;
+  }
+
+  for (let field of fields) {
+    if (field.required && !formData[field.name]) {
+      toast.error(`Please fill ${field.label}`);
       return;
     }
+  }
 
-    for (let field of fields) {
-      if (field.required && !formData[field.name]) {
-        toast.error(`Please fill ${field.label}`);
-        return;
-      }
+  setPaymentInProgress(true);
+  dispatch(setPaymentStatus("PENDING"));
+
+  try {
+    const payload = {
+      orderUid,
+      paymentMethodId: selectedMethodId,
+      currency,
+      customFields: formData,
+    };
+
+    const res = await submitPayment(payload);
+
+    if (res?.status !== 202) {
+      throw new Error("Payment failed");
     }
-
-    setPaymentInProgress(true);
-    dispatch(setPaymentStatus("PENDING"));
-
-    try {
-      const payload = {
-        orderUid,
-        paymentMethodId: selectedMethodId,
-        currency,
-        customFields: formData,
-      };
-
-      const res = await submitPayment(payload);
-
-      if (res?.status !== 202) {
-        throw new Error("Payment failed");
-      }
-
-      dispatch(setPaymentStatus("SUCCESS"));
-    console.log("response create order"+res)
-      
-      navigate("/payment-success", { state: res.data?.data });
-
-    } catch (err) {
-      dispatch(setPaymentStatus("FAILED"));
-      toast.error(err.response?.data?.message || "Payment failed");
-    } finally {
-      setPaymentInProgress(false);
-    }
-  };
-
-  /* ---------- UI ---------- */
+    console.log("res"+res.data);
+    dispatch(setPaymentStatus("SUCCESS"));
+    navigate("/payment-success", {state: res.data});
+  } catch (err) {
+    dispatch(setPaymentStatus("FAILED"));
+    toast.error(err.response?.data?.message || "Payment failed");
+  } finally {
+    setPaymentInProgress(false);
+  }
+};
   return (
     <div className="payment-container premium">
       <h2 className="title">Secure Payment</h2>
