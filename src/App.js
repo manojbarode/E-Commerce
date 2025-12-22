@@ -32,7 +32,7 @@ import ProductDetails from "./pages/Product/ProductDetails";
 import UserOrderedProducts from "./pages/Profile/UserOrderedProducts";
 import Checkout from "./pages/Profile/Checkout";
 import PaymentForm from "./Payment/payment";
-import PaymentSuccess from "./Payment/PaymentSuccess";
+import Order from "./pages/Seller/SellerAuth/Order/order"; 
 
 const App = () => {
   return (
@@ -64,7 +64,8 @@ const App = () => {
           <Route path="/profile/userOrders" element={<UserOrderedProducts />}/>
           <Route path="/checkout" element={<Checkout />}/>
           <Route path="/payment" element={<PaymentForm />}/>
-          <Route path="/payment-success" element={<PaymentSuccess />}/>
+          <Route path="/payment-success" element={<PaymentForm />}/>
+          <Route path="/order" element={<Order/>}/>
         </Route>
       </Routes>
     </>
