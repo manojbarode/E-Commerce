@@ -66,12 +66,26 @@ const Cart = () => {
     }
   };
 
+<<<<<<< HEAD
   const toggleWishlist = async (productUid) => {
     if (!isLoggedIn) {
       toast.warning("Login required to access wishlist");
       navigate("/login");
       return;
     }
+=======
+    const res = await deleteCartItem(userUid, productUid);
+    console.log("Delete response:", res);
+    dispatch(removeItem(productUid));
+    toast.success("Item removed from cart");
+  } catch (error) {
+    console.error("Failed to remove item:", error);
+    toast.error("Failed to remove item");
+  }
+};
+
+  const toggleWishlist = (productUid) => {
+>>>>>>> 6baef87127ecba4452a9fffc7c14379d7d310060
     setWishlist((prev) =>
       prev.includes(productUid)? prev.filter((i) => i !== productUid): [...prev, productUid]
     );
