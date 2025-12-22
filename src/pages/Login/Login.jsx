@@ -82,6 +82,7 @@ const Login = () => {
     );
 
     toast.success("Login successful!");
+    toast.info("Your session will expire in 1 hour because of security.");
     navigate("/");
 
   } catch (err) {
