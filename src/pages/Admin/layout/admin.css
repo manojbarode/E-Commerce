@@ -1,0 +1,33 @@
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: #1e1e2f;
+  padding-top: 10px;
+}
+
+.admin-sidebar .nav-link {
+  color: #bdbdbd;
+  padding: 12px 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.admin-sidebar .nav-link.active {
+  background: #343a40;
+  color: #fff;
+}
+
+.admin-content {
+  flex: 1;
+  background: #f5f6fa;
+}
+
+.admin-header {
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
