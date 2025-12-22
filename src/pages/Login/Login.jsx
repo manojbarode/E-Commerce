@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { loginUser as loginApi, fetchUserProfile } from "../../api/authApi";
-import { loginUser as loginUserAction } from "../../Redux/authSlice";
+import { loginUser as loginUserAction, logoutUser } from "../../Redux/authSlice";
+
+const ONE_HOUR = 60 * 60 * 1000; // 1 hour in ms
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,12 +17,40 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  /* ==============================
+      CHECK SESSION ON REFRESH
+  ============================== */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const expiry = localStorage.getItem("tokenExpiry");
+
+    if (token && expiry) {
+      if (Date.now() > Number(expiry)) {
+        // session expired
+        localStorage.clear();
+        dispatch(logoutUser());
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+      } else {
+        // auto logout timer (without refresh)
+        const remainingTime = Number(expiry) - Date.now();
+        setTimeout(() => {
+          localStorage.clear();
+          dispatch(logoutUser());
+          toast.error("Session expired. Please login again.");
+          navigate("/login");
+        }, remainingTime);
+      }
+    }
+  }, [dispatch, navigate]);
+
+  /* ==============================
+      LOGIN HANDLER
+  ============================== */
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
 
-
-    // Basic validation
     if (!email || !password) {
       toast.error("Please enter email and password");
       return;
@@ -28,40 +58,51 @@ const Login = () => {
 
     setLoading(true);
 
-   try {
-  console.log("🔐 Logging in with:", email);
-  const res = await loginApi({ email, password });
+    try {
+      console.log("🔐 Logging in with:", email);
 
-  const token = res.token;
-  if (!token) {
-    throw new Error("Token not received from server");
-  }
-  sessionStorage.setItem("token", token);
-  console.log("✅ Token stored:", token);
-  console.log("👤 Fetching user profile...");
-  const profile = await fetchUserProfile();
-  console.log("✅ Profile fetched:", profile);
+      const res = await loginApi({ email, password });
+      const token = res.token;
 
-  dispatch(
-    loginUserAction({
-      token,
-      user: profile,
-    })
-  );
-  sessionStorage.setItem("user", JSON.stringify(profile));
+      if (!token) {
+        throw new Error("Token not received from server");
+      }
 
-  toast.success("Login successful!");
-  navigate("/");
+      //  set expiry time (1 hour)
+      const expiryTime = Date.now() + ONE_HOUR;
 
-} catch (err) {
-  console.error("❌ Login failed:", err);
-  toast.error(err.response?.data?.message || err.message || "Login failed");
-} finally {
-  setLoading(false);
-}
+      localStorage.setItem("token", token);
+      localStorage.setItem("tokenExpiry", expiryTime);
 
+      console.log("✅ Token stored");
+
+      const profile = await fetchUserProfile();
+      console.log("✅ Profile fetched:", profile);
+
+      dispatch(
+        loginUserAction({
+          token,
+          user: profile,
+        })
+      );
+
+      localStorage.setItem("user", JSON.stringify(profile));
+
+      toast.success("Login successful!");
+      toast.info("Your session will expire in 1 hour beacause of security reasons.");
+      navigate("/");
+
+    } catch (err) {
+      console.error(" Login failed:", err);
+      toast.error(err.response?.data?.message || err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* ==============================
+      UI
+  ============================== */
   return (
     <div style={{ background: "#f8f9fa", padding: "60px 0" }}>
       <div className="container d-flex justify-content-center">

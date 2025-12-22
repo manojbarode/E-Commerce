@@ -71,7 +71,7 @@ const Cart = () => {
     }
 
     const res = await deleteCartItem(userUid, productUid);
-    console.log("Delete response:", res);
+    // console.log("Delete response:", res);
     dispatch(removeItem(productUid));
     toast.success("Item removed from cart");
   } catch (error) {
