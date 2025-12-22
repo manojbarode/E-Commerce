@@ -2,6 +2,9 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f8f9fc, #eef1f7);
   padding: 60px 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* allow natural growth */
 }
 
 .checkout-card {
@@ -9,6 +12,7 @@
   border-radius: 18px;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  width: 100%;
 }
 
 .checkout-header {

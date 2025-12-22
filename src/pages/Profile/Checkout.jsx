@@ -10,20 +10,24 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const cartItems = useSelector(state => state.cart.items || []);
-  const items = location.state?.items? location.state.items: cartItems.map(item => ({
+  const cartItems = useSelector((state) => state.cart.items || []);
+  console.log("cart itmes "+cartItems);
+
+  // Determine the items to checkout
+  const items = location.state?.items
+    ? location.state.items
+    : cartItems.map((item) => ({
         productUid: item.productUid,
         quantity: item.quantity,
+        price: item.price, // include price for subtotal
       }));
 
+  // Calculate subtotal
   const subtotal = useMemo(() => {
-    if (location.state?.items) return 0;
-    return cartItems.reduce(
-      (sum, item) => sum + (item.price || 0) * item.quantity,
-      0
-    );
-  }, [cartItems, location.state]);
+    return items.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+  }, [items]);
 
+  // Shipping amount (example flat rate)
   const shippingAmount = items.length > 0 ? 15 : 0;
 
   const handlePlaceOrder = async () => {
@@ -42,8 +46,7 @@ const Checkout = () => {
       const res = await createOrder(payload);
       dispatch(clearCart());
       const orderUid = res.data?.orderUid;
-      console.log("orderUid checkout " +orderUid);
-      navigate("/payment", { state: {orderUid } });
+      navigate("/payment", { state: { orderUid } });
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to place order");
     }
@@ -54,7 +57,6 @@ const Checkout = () => {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-lg-7 col-md-9">
-
             <div className="checkout-card">
               <div className="checkout-header">
                 <h4>Secure Checkout</h4>
@@ -108,7 +110,6 @@ const Checkout = () => {
                 </button>
               </div>
             </div>
-
           </div>
         </div>
       </div>
