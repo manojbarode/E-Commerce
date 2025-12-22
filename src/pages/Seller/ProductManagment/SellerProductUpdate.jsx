@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 
 export default function UpdateProduct() {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({});
   const [dynamicFields, setDynamicFields] = useState({});
   const [loading, setLoading] = useState(false);
@@ -20,7 +19,6 @@ export default function UpdateProduct() {
     const loadProduct = async () => {
       try {
         const data = await getProductById(productUid);
-
         if (!data) {
           toast.error("Product not found");
           return;
@@ -77,7 +75,7 @@ export default function UpdateProduct() {
       const finalData = {...form,dynamicFields,imageUrls,};
       delete finalData.images;
 
-      await updateProduct(productUid, sellerUid, finalData);
+      await updateProduct(productUid, finalData);
       toast.success("Product Updated Successfully");
       navigate("/seller/sellerproduct");
     } catch (err) {

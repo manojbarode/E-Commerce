@@ -9,16 +9,12 @@ import "./ProductDetails.css";
 export default function ProductDetails() {
   const dispatch = useDispatch();
   const productUid = useSelector((state) => state.product.productUid);
-
   const [product, setProduct] = useState(null);
   const [quantity, setLocalQuantity] = useState("1");
-
-  /* ---------- Load Product ---------- */
   useEffect(() => {
     const loadProduct = async () => {
       try {
         const res = await getProductById(productUid);
-        console.log(" productUid " +productUid);
         setProduct(res);
       } catch (err) {
         console.error("Product load failed", err);
@@ -27,22 +23,17 @@ export default function ProductDetails() {
 
     if (productUid) loadProduct();
   }, [productUid]);
-
-  /* ---------- Prepare Redux Order State ---------- */
   useEffect(() => {
     if (!product) return;
 
     dispatch(setProductUid(product.productUid));
     dispatch(setSellerUid(product.sellerUid));
     dispatch(setAmount(product.price));
-    dispatch(setQuantity(1)); // initial quantity
+    dispatch(setQuantity(1));
     setLocalQuantity("1");
   }, [product, dispatch]);
-
-  /* ---------- Quantity Handlers ---------- */
   const handleQuantityChange = (e) => {
     const val = e.target.value;
-    // Only allow digits
     if (/^\d*$/.test(val)) {
       setLocalQuantity(val);
     }

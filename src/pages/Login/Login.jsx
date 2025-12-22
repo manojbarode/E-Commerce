@@ -48,57 +48,49 @@ const Login = () => {
       LOGIN HANDLER
   ============================== */
   const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return;
+  e.preventDefault();
+  if (loading) return;
 
-    if (!email || !password) {
-      toast.error("Please enter email and password");
-      return;
+  if (!email || !password) {
+    toast.error("Please enter email and password");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    // 1️⃣ Login → token only
+    const res = await loginApi({ email, password });
+
+    const token = res.token;
+    if (!token) {
+      throw new Error("Token not received from server");
     }
 
-    setLoading(true);
+    // 2️⃣ Save token first
+    sessionStorage.setItem("token", token);
 
-    try {
-      console.log("🔐 Logging in with:", email);
+    // 3️⃣ Fetch profile using token
+    const profile = await fetchUserProfile();
 
-      const res = await loginApi({ email, password });
-      const token = res.token;
+    // 4️⃣ Redux update
+    dispatch(
+      loginUserAction({
+        token,
+        user: profile,
+      })
+    );
 
-      if (!token) {
-        throw new Error("Token not received from server");
-      }
+    toast.success("Login successful!");
+    navigate("/");
 
-      //  set expiry time (1 hour)
-      const expiryTime = Date.now() + ONE_HOUR;
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("tokenExpiry", expiryTime);
-
-      console.log("✅ Token stored");
-
-      const profile = await fetchUserProfile();
-      console.log("✅ Profile fetched:", profile);
-
-      dispatch(
-        loginUserAction({
-          token,
-          user: profile,
-        })
-      );
-
-      localStorage.setItem("user", JSON.stringify(profile));
-
-      toast.success("Login successful!");
-      toast.info("Your session will expire in 1 hour beacause of security reasons.");
-      navigate("/");
-
-    } catch (err) {
-      console.error(" Login failed:", err);
-      toast.error(err.response?.data?.message || err.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   /* ==============================
       UI
@@ -113,42 +105,20 @@ const Login = () => {
             </h3>
 
             <form onSubmit={handleLoginSubmit}>
-              <input
-                type="email"
-                className="form-control mb-3 rounded-pill"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                required
-              />
+              <input type="email" className="form-control mb-3 rounded-pill" placeholder="Email"
+                value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} required/>
 
-              <input
-                type="password"
-                className="form-control mb-3 rounded-pill"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                required
-              />
+              <input type="password" className="form-control mb-3 rounded-pill" placeholder="Password"
+                value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required/>
 
-              <button
-                type="submit"
-                className="btn btn-danger w-100 rounded-pill fw-bold"
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn-danger w-100 rounded-pill fw-bold" disabled={loading}>
                 {loading ? "Signing In..." : "Sign In"}
               </button>
             </form>
 
             <p className="text-center mt-3">
               Don&apos;t have an account?{" "}
-              <button
-                className="btn btn-link p-0"
-                onClick={() => navigate("/signup")}
-                disabled={loading}
-              >
+              <button className="btn btn-link p-0" onClick={() => navigate("/signup")} disabled={loading}>
                 Sign Up
               </button>
             </p>

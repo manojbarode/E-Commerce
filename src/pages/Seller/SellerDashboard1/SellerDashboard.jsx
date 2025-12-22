@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import SellerSidebar from "./SellerSidebar";
 import SellerStatsCard from "./SellerStatsCard";
 import { Line, Pie } from "react-chartjs-2";
-
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title,Tooltip,Legend,
   ArcElement,} from "chart.js";
-
 import "../Css/SellerDashboard.css";
 import { getCategoryStats, getMonthlySales, getSellerStats } from "../../../api/SellApi";
 
@@ -26,12 +24,14 @@ export default function SellerDashboard() {
   const [sales, setSales] = useState([]);
   const [categoryStats, setCategoryStats] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+const location = useLocation();
 
+console.log("Current path:", location.pathname);
  useEffect(() => {
-  if (!sellerUid) {
-    navigate("/seller-auth");
-    return;
-  }
+  // if (!sellerUid) {
+  //   navigate("/seller-auth");
+  //   return;
+  // }
 
   const loadDashboard = async () => {
     try {
@@ -59,8 +59,6 @@ export default function SellerDashboard() {
 const filteredSales = sales.filter(s =>
   (s.month || "").toString().toLowerCase().includes(searchTerm.toLowerCase())
 );
-
-
 
   const salesData = {
   labels: filteredSales.map((s) => (s.month || "").toString()),
