@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { loginUser as loginApi, fetchUserProfile } from "../../api/authApi";
-import { loginUser as loginUserAction } from "../../Redux/authSlice";
+import { loginUser as loginUserAction, logoutUser } from "../../Redux/authSlice";
+
+const ONE_HOUR = 60 * 60 * 1000; // 1 hour in ms
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +17,36 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  /* ==============================
+      CHECK SESSION ON REFRESH
+  ============================== */
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const expiry = localStorage.getItem("tokenExpiry");
+
+    if (token && expiry) {
+      if (Date.now() > Number(expiry)) {
+        // session expired
+        localStorage.clear();
+        dispatch(logoutUser());
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+      } else {
+        // auto logout timer (without refresh)
+        const remainingTime = Number(expiry) - Date.now();
+        setTimeout(() => {
+          localStorage.clear();
+          dispatch(logoutUser());
+          toast.error("Session expired. Please login again.");
+          navigate("/login");
+        }, remainingTime);
+      }
+    }
+  }, [dispatch, navigate]);
+
+  /* ==============================
+      LOGIN HANDLER
+  ============================== */
   const handleLoginSubmit = async (e) => {
   e.preventDefault();
   if (loading) return;
@@ -50,6 +82,7 @@ const Login = () => {
     );
 
     toast.success("Login successful!");
+    toast.info("Your session will expire in 1 hour because of security.");
     navigate("/");
 
   } catch (err) {
@@ -60,6 +93,9 @@ const Login = () => {
 };
 
 
+  /* ==============================
+      UI
+  ============================== */
   return (
     <div style={{ background: "#f8f9fa", padding: "60px 0" }}>
       <div className="container d-flex justify-content-center">
