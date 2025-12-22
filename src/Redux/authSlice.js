@@ -10,7 +10,6 @@ const initialState = {
   isLoggedIn: !!token,
   token: token || null,
   user: user || null,
-  userUid: user?.userUid || null,
 };
 
 const authSlice = createSlice({
@@ -23,7 +22,6 @@ const authSlice = createSlice({
       state.isLoggedIn = true;
       state.token = token;
       state.user = user;
-      state.userUid = user.userUid;
 
       sessionStorage.setItem("token", token);
       sessionStorage.setItem("user", JSON.stringify(user));
@@ -33,7 +31,6 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.token = null;
       state.user = null;
-      state.userUid = null;
 
       sessionStorage.removeItem("token");
       sessionStorage.removeItem("user");

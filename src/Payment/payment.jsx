@@ -3,15 +3,17 @@ import "./Payment.css";
 import {getPaymentMethods,getPaymentFields,submitPayment,} from "../api/paymentApi";
 import { FaCreditCard, FaPaypal, FaMobileAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import {resetOrder,setPaymentMethod,setPaymentStatus,} from "../Redux/orderSlice";
-import { createOrder } from "../api/orderApi";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import {setPaymentMethod,setPaymentStatus,} from "../Redux/orderSlice";
 
 export default function PaymentForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
+  /* ---------- REQUIRED ---------- */
+    
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedMethodId, setSelectedMethodId] = useState(null);
   const [fields, setFields] = useState([]);
@@ -19,28 +21,35 @@ export default function PaymentForm() {
   const [currency, setCurrency] = useState("INR");
   const [paymentInProgress, setPaymentInProgress] = useState(false);
 
-  const order = useSelector((state) => state.order);
-  const buyerUid = useSelector((state) => state.auth.user?.userUid);
+  /* ---------- GUARD ---------- */
+ const orderUid = location.state?.orderUid || new URLSearchParams(location.search).get("orderUid");
+ console.log("orderUid payment"+orderUid)
 
-  const productUid = useSelector((state) => state.productUid) || localStorage.getItem("productUid");
-  const amount = order.totalAmount;
+useEffect(() => {
+  if (!orderUid) {
+    toast.error("Invalid payment session");
+    navigate("/");
+  }
+}, [orderUid, navigate]);
+
 
   useEffect(() => {
     const fetchMethods = async () => {
       try {
         const methods = await getPaymentMethods();
-        const enriched = methods.map((m) => ({
-          ...m,
-          icon:
-            m.type === "card"
-              ? <FaCreditCard />
-              : m.type === "upi"
-              ? <FaMobileAlt />
-              : m.type === "paypal"
-              ? <FaPaypal />
-              : <FaCreditCard />,
-        }));
-        setPaymentMethods(enriched);
+        setPaymentMethods(
+          methods.map((m) => ({
+            ...m,
+            icon:
+              m.type === "card"
+                ? <FaCreditCard />
+                : m.type === "upi"
+                ? <FaMobileAlt />
+                : m.type === "paypal"
+                ? <FaPaypal />
+                : <FaCreditCard />,
+          }))
+        );
       } catch {
         toast.error("Failed to load payment methods");
       }
@@ -48,6 +57,7 @@ export default function PaymentForm() {
     fetchMethods();
   }, []);
 
+  /* ---------- METHOD SELECT ---------- */
   const handleMethodClick = async (method) => {
     setSelectedMethodId(method.id);
     setFormData({});
@@ -58,17 +68,16 @@ export default function PaymentForm() {
       setFields(methodFields);
     } catch {
       toast.error("Failed to load payment fields");
-      setFields([]);
     }
   };
 
-  /* ---------- Input Change ---------- */
+  /* ---------- INPUT CHANGE ---------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  /* ---------- Submit Payment ---------- */
+  /* ---------- SUBMIT PAYMENT ---------- */
   const handleSubmit = async () => {
     if (paymentInProgress) return;
 
@@ -76,66 +85,45 @@ export default function PaymentForm() {
       toast.info("Please select a payment method");
       return;
     }
-    if (!buyerUid) {
-      toast.error("Please login to continue");
-      return;
-    }
-    if (!amount || amount <= 0) {
-      toast.error("Invalid amount");
-      return;
-    }
 
-    const allowedCurrencies = ["INR", "USD", "EUR", "GBP"];
-    if (!allowedCurrencies.includes(currency)) {
-      toast.error("Invalid currency selected");
-      return;
-    }
-
-    // Required fields validation
     for (let field of fields) {
       if (field.required && !formData[field.name]) {
-        toast.error(`Please fill the ${field.label} field`);
+        toast.error(`Please fill ${field.label}`);
         return;
       }
-    }
-
-    // Optional: Basic format validation
-    if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email)) {
-      toast.error("Invalid email format");
-      return;
     }
 
     setPaymentInProgress(true);
     dispatch(setPaymentStatus("PENDING"));
 
-    const paymentPayload = {paymentMethodId: selectedMethodId, amount, currency,customFields: formData,productUid,};
-
     try {
-      const paymentResponse = await submitPayment(paymentPayload);
+      const payload = {
+        orderUid,
+        paymentMethodId: selectedMethodId,
+        currency,
+        customFields: formData,
+      };
 
-      if (paymentResponse?.status !== 202) {
+      const res = await submitPayment(payload);
+
+      if (res?.status !== 202) {
         throw new Error("Payment failed");
       }
 
-      const paymentData = paymentResponse.data;
       dispatch(setPaymentStatus("SUCCESS"));
-      const orderResponse = await createOrder({sellerUid: order.sellerUid,productUid,buyerUid,
-          quantity: order.quantity,totalAmount: order.totalAmount,currency,
-          paymentMethod: order.paymentMethod,
-        },
-        paymentData.publicRef
-      );
+    console.log("response create order"+res)
+      
+      navigate("/payment-success", { state: res.data?.data });
 
-      dispatch(resetOrder());
-      navigate("/payment-success", { state: orderResponse.data });
-    } catch (error) {
+    } catch (err) {
       dispatch(setPaymentStatus("FAILED"));
-      toast.error(error.response?.data?.message || error.message);
+      toast.error(err.response?.data?.message || "Payment failed");
     } finally {
       setPaymentInProgress(false);
     }
   };
 
+  /* ---------- UI ---------- */
   return (
     <div className="payment-container premium">
       <h2 className="title">Secure Payment</h2>
@@ -143,7 +131,10 @@ export default function PaymentForm() {
 
       <div className="payment-cards-container">
         {paymentMethods.map((method) => (
-          <div key={method.id} className={`payment-card ${ selectedMethodId === method.id ? "selected" : ""
+          <div
+            key={method.id}
+            className={`payment-card ${
+              selectedMethodId === method.id ? "selected" : ""
             }`}
             onClick={() => handleMethodClick(method)}
           >
@@ -156,13 +147,11 @@ export default function PaymentForm() {
       {fields.length > 0 && (
         <div className="payment-form">
           <div className="form-group">
-            <label>Amount</label>
-            <input type="number" value={amount} readOnly />
-          </div>
-
-          <div className="form-group">
             <label>Currency</label>
-            <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            <select
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
               <option value="INR">INR</option>
               <option value="USD">USD</option>
               <option value="EUR">EUR</option>
@@ -173,15 +162,23 @@ export default function PaymentForm() {
           {fields.map((field) => (
             <div className="form-group" key={field.name}>
               <label>{field.label}</label>
-              <input type={field.type || "text"} name={field.name}value={formData[field.name] || ""}
-                onChange={handleChange}required={field.required}
+              <input
+                type={field.type || "text"}
+                name={field.name}
+                value={formData[field.name] || ""}
+                onChange={handleChange}
+                required={field.required}
               />
             </div>
           ))}
         </div>
       )}
 
-      <button className="submit-btn" onClick={handleSubmit}disabled={paymentInProgress}>
+      <button
+        className="submit-btn"
+        onClick={handleSubmit}
+        disabled={paymentInProgress}
+      >
         {paymentInProgress ? "Processing..." : "Complete Payment"}
       </button>
     </div>

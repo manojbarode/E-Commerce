@@ -1,22 +1,12 @@
-  import axiosInstance from "./axiosConfig";
-  export const registerSeller = async (data) => {
-    try {
-      const response = await axiosInstance.post("/seller/register", data);
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  };
+import sellerAxios from "./sellerAxios";
+import axiosInstance from "./axiosConfig";
 
-  export const loginSeller = async (credentials) => {
-    try {
-      const response = await axiosInstance.post("/seller/login", credentials);
-      return response;
-    } 
-    catch (error) {
-      throw error;
-    }
-  };
+export const registerSeller = (data) =>
+  sellerAxios.post("/seller/register", data);
+
+export const loginSeller = (credentials) =>
+  sellerAxios.post("/seller/login", credentials);
+
 
   export const sellerDetails = async (sellerId, formData) => {
     try {
@@ -27,9 +17,6 @@
     }
   };
 
-
-
-
 export const getSellerStats = async (sellerUid) => {
   const res = await axiosInstance.get(`/seller/${sellerUid}/stats`);
   return res.data.data;
@@ -38,7 +25,7 @@ export const getSellerStats = async (sellerUid) => {
 
 export const getMonthlySales = async (sellerUid) => {
   const res = await axiosInstance.get(`/seller/${sellerUid}/sales`);
-  return res.data.data;   // 👈 unwrap
+  return res.data.data;
 };
 
 export const getCategoryStats = async (sellerUid) => {
@@ -47,56 +34,41 @@ export const getCategoryStats = async (sellerUid) => {
 };
 
 
-  export const getSellerProducts = async () => {
-    try {
-      const sellerUid = localStorage.getItem("sellerUid");
-      if (!sellerUid) {
-        throw new Error("Seller ID not found.");
-      }
+export const getSellerProducts = async (page = 0, size = 10) => {
+  try {
+    const res = await sellerAxios.get("/seller/seller-product", {
+      params: { page, size }
+    });
+    return res.data.data;   
+  } catch (err) {
+    return { products: [], currentPage: 0, totalItems: 0, totalPages: 0 };
+  }
+};
 
-      const res = await axiosInstance.get("/product/seller-id", {
+export const updateProduct = async (productUid, productData) => {
+  try {
+    const res = await sellerAxios.put(
+      "/seller/seller-productupdate",
+      productData,
+      {
         headers: {
-          sellerId: sellerUid, // sellerUid is sent in the headers
+          productUid: productUid,
         },
-      });
-      console.log(res.data.data);
-      return res.data.data;
+      }
+    );
+    return res.data;
+  } catch (err) {
+    console.error("Update API error:", err.response?.data || err.message);
+    throw err;
+  }
+};
 
-    } catch (err) {
-      console.error("API error:", err);
-      return [];
-    }
-  };
 
-
-  export const updateProduct = async (productUid, sellerUid, productData) => {
+  export const deleteProduct = async (productUid) => {
     try {
-      const res = await axiosInstance.put(
-        "/product/update",
-        productData,
-        {
-          headers: {
-            "Product-Uid": productUid,
-            "Seller-Uid": sellerUid,
-          },
-        }
-      );
-      return res.data;
-    } catch (err) {
-      console.error("Update API error:", err);
-      throw err;
-    }
-  };
-
-
-
-
-  export const deleteProduct = async (productId) => {
-    try {
-      const sellerId = localStorage.getItem("sellerUid");
-      const res = await axiosInstance.delete(`/product/delete/${productId}`, {
+      const res = await sellerAxios.delete(`/seller/seller-delete-Product`, {
         headers: {
-          sellerId,
+          productUid,
         },
       });
       return res.data;

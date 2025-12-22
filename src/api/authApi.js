@@ -1,7 +1,5 @@
 import axiosInstance from "./axiosConfig";
 
-/* ================= AUTH ================= */
-
 export const signupUser = async (userData) => {
   const res = await axiosInstance.post("/user/signup", userData);
   return res.data;
@@ -14,11 +12,8 @@ export const loginUser = async (credentials) => {
   return res.data.data;
 };
 
-export const fetchUserProfile = async (token) => {
-  const response = await axiosInstance.get("/user/profile/me", {
-  headers: { Authorization: `Bearer ${token}` }
-  });
-  console.log(response.data.data);
+export const fetchUserProfile = async () => {
+  const response = await axiosInstance.get("/user/profile/me");
   return response.data.data;
 };
 
@@ -30,16 +25,12 @@ export const profileImageUpload = async (imageUrl) => {
   return res.data;
 };
 
-
-// ✅ JWT-based update (no userUid header)
 export const updateProfile = async (data) => {
   const res = await axiosInstance.put("/user/profile", data);
-  return res.data;
+  return res.data.data;
 };
 
-/* ================= ORDERS ================= */
-
-export const productFetchedByUser = async (buyerUid) => {
-  const res = await axiosInstance.get(`/orders/user/${buyerUid}`);
+export const productFetchedByUser = async () => {
+  const res = await axiosInstance.get(`/orders/buyer`);
   return res.data.data.content;
 };

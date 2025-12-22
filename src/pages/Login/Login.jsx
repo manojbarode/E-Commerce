@@ -16,51 +16,49 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    if (loading) return;
+  e.preventDefault();
+  if (loading) return;
 
+  if (!email || !password) {
+    toast.error("Please enter email and password");
+    return;
+  }
 
-    // Basic validation
-    if (!email || !password) {
-      toast.error("Please enter email and password");
-      return;
+  setLoading(true);
+
+  try {
+    // 1️⃣ Login → token only
+    const res = await loginApi({ email, password });
+
+    const token = res.token;
+    if (!token) {
+      throw new Error("Token not received from server");
     }
 
-    setLoading(true);
+    // 2️⃣ Save token first
+    sessionStorage.setItem("token", token);
 
-   try {
-  console.log("🔐 Logging in with:", email);
-  const res = await loginApi({ email, password });
+    // 3️⃣ Fetch profile using token
+    const profile = await fetchUserProfile();
 
-  const token = res.token;
-  if (!token) {
-    throw new Error("Token not received from server");
+    // 4️⃣ Redux update
+    dispatch(
+      loginUserAction({
+        token,
+        user: profile,
+      })
+    );
+
+    toast.success("Login successful!");
+    navigate("/");
+
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login failed");
+  } finally {
+    setLoading(false);
   }
-  sessionStorage.setItem("token", token);
-  console.log("✅ Token stored:", token);
-  console.log("👤 Fetching user profile...");
-  const profile = await fetchUserProfile();
-  console.log("✅ Profile fetched:", profile);
+};
 
-  dispatch(
-    loginUserAction({
-      token,
-      user: profile,
-    })
-  );
-  sessionStorage.setItem("user", JSON.stringify(profile));
-
-  toast.success("Login successful!");
-  navigate("/");
-
-} catch (err) {
-  console.error("❌ Login failed:", err);
-  toast.error(err.response?.data?.message || err.message || "Login failed");
-} finally {
-  setLoading(false);
-}
-
-  };
 
   return (
     <div style={{ background: "#f8f9fa", padding: "60px 0" }}>
@@ -72,42 +70,20 @@ const Login = () => {
             </h3>
 
             <form onSubmit={handleLoginSubmit}>
-              <input
-                type="email"
-                className="form-control mb-3 rounded-pill"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                required
-              />
+              <input type="email" className="form-control mb-3 rounded-pill" placeholder="Email"
+                value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} required/>
 
-              <input
-                type="password"
-                className="form-control mb-3 rounded-pill"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                required
-              />
+              <input type="password" className="form-control mb-3 rounded-pill" placeholder="Password"
+                value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} required/>
 
-              <button
-                type="submit"
-                className="btn btn-danger w-100 rounded-pill fw-bold"
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn-danger w-100 rounded-pill fw-bold" disabled={loading}>
                 {loading ? "Signing In..." : "Sign In"}
               </button>
             </form>
 
             <p className="text-center mt-3">
               Don&apos;t have an account?{" "}
-              <button
-                className="btn btn-link p-0"
-                onClick={() => navigate("/signup")}
-                disabled={loading}
-              >
+              <button className="btn btn-link p-0" onClick={() => navigate("/signup")} disabled={loading}>
                 Sign Up
               </button>
             </p>

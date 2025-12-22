@@ -5,26 +5,25 @@ import { ProductAdd, uploadMultipleToCloudinary } from "../../api/productApi";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getCategories, getSubcategories } from "../../api/categoriesApi";
+import { useSelector } from "react-redux";
 
 export default function ProductUpload() {
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState([]);
   const [fields, setFields] = useState([]);
-  const [form, setForm] = useState({
-    categoryId: "",
-    subcategoryId: "",
-    title: "",
-    description: "",
-    price: "",
-    stock: "",
-    images: [],
-    previews: [],
-  });
+  const [form, setForm] = useState({categoryId: "",subcategoryId: "",title: "",description: "",price: "",stock: "",
+    images: [],previews: [],});
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
-
-  // Load categories once
+  const token = useSelector((state) => state.seller.token) || localStorage.getItem("sellerToken");
+  console.log("Seller token:", localStorage.getItem("sellerToken"));
+  useEffect(()=>{
+    if (!token){
+    toast.warning("Login required to access seller dashboard");
+    navigate("/seller");
+      return;
+  }
+  })
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -37,18 +36,11 @@ export default function ProductUpload() {
     loadCategories()
   }, []);
 
-  // Handle category change
   const handleCategoryChange = useCallback(
     async (categoryId) => {
-      if (categoryId === form.categoryId) return; // prevent duplicate API calls
+      if (categoryId === form.categoryId) return;
 
-      setForm((prev) => ({
-        ...prev,
-        categoryId,
-        subcategoryId: "",
-        images: [],
-        previews: [],
-      }));
+      setForm((prev) => ({...prev,categoryId,subcategoryId: "",images: [],previews: [],}));
       setFields([]);
       setSubcategories([]);
 
@@ -61,8 +53,6 @@ export default function ProductUpload() {
     },
     [form.categoryId]
   );
-
-  // Handle subcategory change
   const handleSubcategoryChange = (subcategoryId) => {
     setForm((prev) => ({ ...prev, subcategoryId }));
 
@@ -71,15 +61,8 @@ export default function ProductUpload() {
     );
 
     if (selected?.customFields && Array.isArray(selected.customFields)) {
-      const dynamicFields = selected.customFields.map((f) => ({
-        name: f,
-        label: f,
-        type: "text",
-        required: true,
-      }));
+      const dynamicFields = selected.customFields.map((f) => ({name: f,label: f,type: "text",required: true,}));
       setFields(dynamicFields);
-
-      // Initialize dynamic fields in form state
       setForm((prev) => {
         const updated = { ...prev };
         dynamicFields.forEach((df) => (updated[df.name] = ""));
@@ -90,7 +73,6 @@ export default function ProductUpload() {
     }
   };
 
-  // Input change
   const handleInputChange = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -102,17 +84,10 @@ export default function ProductUpload() {
         "Images will be automatically resized to 1024×1024 like Amazon/Flipkart!"
       );
     }
-    setForm((prev) => ({
-      ...prev,
-      images: [...prev.images, ...newFiles],
-      previews: [
-        ...prev.previews,
-        ...newFiles.map((file) => URL.createObjectURL(file)),
-      ],
-    }));
+    setForm((prev) => ({...prev,images: [...prev.images, ...newFiles],
+      previews: [...prev.previews,...newFiles.map((file) => URL.createObjectURL(file)),],}));
   };
 
-  // Submit product
   const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -124,29 +99,18 @@ export default function ProductUpload() {
   try {
     setLoading(true);
 
-    // Upload images to Cloudinary
     const uploadedUrls = await uploadMultipleToCloudinary(form.images);
-
-    // Map dynamic fields
     const dynamicFieldsMap = {};
     fields.forEach((f) => {
       dynamicFieldsMap[f.name] = form[f.name];
     });
-    const dataToSend = {
-      categoryId: Number(form.categoryId),
-      subcategoryId: Number(form.subcategoryId),
-      title: form.title,
-      description: form.description,
-      price: Number(form.price),
-      stock: Number(form.stock),
-      imageUrls: uploadedUrls,
-      dynamicFields: dynamicFieldsMap,
-    };
+    const dataToSend = {categoryId: Number(form.categoryId),subcategoryId: Number(form.subcategoryId),
+      title: form.title,description: form.description,price: Number(form.price),stock: Number(form.stock),
+      imageUrls: uploadedUrls,dynamicFields: dynamicFieldsMap,};
 
     await ProductAdd(dataToSend);
-
     toast.success("Product added successfully!");
-    navigate("/sellerdashboard");
+    navigate("/seller/dashboard");
   } catch (err) {
     toast.error("Failed to add product!");
   } finally {
@@ -181,12 +145,8 @@ export default function ProductUpload() {
           {/* SUBCATEGORY */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Subcategory</label>
-            <select
-              className="form-control form-control-lg"
-              value={form.subcategoryId}
-              onChange={(e) => handleSubcategoryChange(e.target.value)}
-              required
-            >
+            <select className="form-control form-control-lg" value={form.subcategoryId}
+              onChange={(e) => handleSubcategoryChange(e.target.value)} required>
               <option value="">Select Subcategory</option>
               {subcategories.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -199,10 +159,7 @@ export default function ProductUpload() {
           {/* TITLE */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Title</label>
-            <input
-              type="text"
-              className="form-control"
-              value={form.title}
+            <input type="text" className="form-control" value={form.title}
               onChange={(e) => handleInputChange("title", e.target.value)}
               required
             />
@@ -211,10 +168,7 @@ export default function ProductUpload() {
           {/* DESCRIPTION */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Description</label>
-            <textarea
-              className="form-control"
-              rows="3"
-              value={form.description}
+            <textarea className="form-control" rows="3" value={form.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               required
             ></textarea>
@@ -223,10 +177,7 @@ export default function ProductUpload() {
           {/* PRICE */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Price</label>
-            <input
-              type="number"
-              className="form-control"
-              value={form.price}
+            <input type="number" className="form-control" value={form.price}
               onChange={(e) => handleInputChange("price", e.target.value)}
               required
             />
@@ -235,10 +186,7 @@ export default function ProductUpload() {
           {/* STOCK */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Stock</label>
-            <input
-              type="number"
-              className="form-control"
-              value={form.stock}
+            <input type="number" className="form-control" value={form.stock}
               onChange={(e) => handleInputChange("stock", e.target.value)}
               required
             />
@@ -251,13 +199,8 @@ export default function ProductUpload() {
               {fields.map((f) => (
                 <div key={f.name} className="mb-3">
                   <label className="form-label">{f.label}</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={form[f.name]}
-                    onChange={(e) =>
-                      handleInputChange(f.name, e.target.value)
-                    }
+                  <input type="text" className="form-control" value={form[f.name]} onChange={(e) =>
+                      handleInputChange(f.name, e.target.value)}
                     required
                   />
                 </div>
@@ -268,11 +211,7 @@ export default function ProductUpload() {
           {/* IMAGE UPLOAD */}
           <div className="mb-3">
             <label className="form-label fw-semibold">Product Images</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              className="form-control"
+            <input type="file" multiple accept="image/*" className="form-control"
               onChange={(e) => handleImageChange(e.target.files)}
               required
             />
@@ -284,21 +223,13 @@ export default function ProductUpload() {
               <h6 className="fw-bold">Image Preview</h6>
               <div className="d-flex gap-3 flex-wrap">
                 {form.previews.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt="preview"
-                    className="img-preview-box"
-                  />
+                  <img key={i} src={src} alt="preview"className="img-preview-box"/>
                 ))}
               </div>
             </div>
           )}
 
-          <button
-            className="btn btn-gradient w-100 btn-lg fw-bold mt-3"
-            disabled={loading}
-          >
+          <button className="btn btn-gradient w-100 btn-lg fw-bold mt-3" disabled={loading}>
             {loading ? "Uploading..." : "Submit Product"}
           </button>
         </form>

@@ -13,13 +13,14 @@ import { toast } from "react-toastify";
 export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+   const { isLoggedIn } = useSelector((state) => state.auth);
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const cartItems = useSelector((state) => state.cart.items || []);
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const wishlistCount = useSelector((state) => state.wishlist?.count || 0);
   const categories = useSelector((state) => state.categories.data || []);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  
   useEffect(() => {
     dispatch(fetchCategories1());
   }, [dispatch]);
@@ -35,15 +36,25 @@ export default function Navbar() {
   const closeDrawer = () => setDrawerOpen(false);
   const cartClick = () => {
     if (!isLoggedIn) {
-      toast.warning("Please login first");
+      toast.warning("Login required to access cart");
+      navigate("/login");
+      return;
     } else {
       navigate("/profile/cart");
     }
   };
+  const goWishlist = () => {
+    if (!isLoggedIn) {
+      toast.warning("Login required to access wishlist");
+      navigate("/login");
+      return;
+    }
+    navigate("/cart");
+  };
+
 
   return (
     <>
-      {/* MAIN NAV */}
       <nav className="premium-navbar navbar navbar-expand-lg sticky-top">
         <div className="container-fluid px-4">
           <span className="premium-logo" onClick={() => navigate("/")}>eShop</span>
@@ -74,7 +85,7 @@ export default function Navbar() {
               </li>
 
               <li className="nav-item">
-                <Link className="premium-nav-link nav-link-seller" to="/Addseller">
+                <Link className="premium-nav-link nav-link-seller" to="/seller">
                   <i className="bi bi-shop me-2"></i>Seller
                 </Link>
               </li>
@@ -95,7 +106,7 @@ export default function Navbar() {
             {/* Desktop Icons */}
             <div className="premium-nav-icons d-none d-lg-flex">
               <Link to="/profile/wishcart" className="premium-icon-btn icon-wishlist">
-                <i className="bi bi-heart"></i>
+                <i className="bi bi-heart" onClick={goWishlist}></i>
                 {wishlistCount > 0 && <span className="icon-badge">{wishlistCount}</span>}
               </Link>
 
@@ -168,7 +179,7 @@ export default function Navbar() {
             <i className="bi bi-tag"></i> Offers
           </Link>
 
-          <Link to="/Addseller" onClick={closeDrawer} className="premium-drawer-link">
+          <Link to="/seller" onClick={closeDrawer} className="premium-drawer-link">
             <i className="bi bi-shop"></i> Seller
           </Link>
 

@@ -12,21 +12,12 @@ export default function AddressBook() {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [formData, setFormData] = useState({
-    fullName: "",
-    mobile: "",
-    houseNo: "",
-    street: "",
-    city: "",
-    state: "",
-    country: "",
-    zipCode: "",
-    defaultAddress: false,
-  });
+  const [formData, setFormData] = useState({fullName: "",mobile: "",houseNo: "",street: "",city: "",state: "",
+    country: "",zipCode: "",defaultAddress: false,});
 
   const navigate = useNavigate();
-  const { userUid } = useSelector((state) => state.auth);
   const price = useSelector((state) => state.order.totalAmount);
+  const { token} = useSelector((state) => state.auth);
 
   const indianStates = [
     "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Delhi","Goa",
@@ -37,13 +28,13 @@ export default function AddressBook() {
   ];
 
   useEffect(() => {
-    if (userUid) fetchAddresses();
-  }, [userUid]);
+    if (token) fetchAddresses();
+  }, [token]);
 
   const fetchAddresses = async () => {
     try {
-      if (!userUid) return toast.error("User not logged in!");
-      const res = await getAddresses(userUid);
+      if (!token) return toast.error("User not logged in!");
+      const res = await getAddresses();
       const data = res?.addressUid ? [res] : res?.data || res || [];
       setAddresses(data);
     } catch (err) {
@@ -53,14 +44,7 @@ export default function AddressBook() {
   };
 
   const resetForm = () => {
-    setFormData({
-      fullName: "",
-      mobile: "",
-      houseNo: "",
-      street: "",
-      city: "",
-      state: "",
-      country: "",
+    setFormData({fullName: "",mobile: "",houseNo: "",street: "",city: "",state: "",country: "",
       zipCode: "",
       defaultAddress: false,
     });
@@ -84,7 +68,7 @@ export default function AddressBook() {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
     try {
       const addressUid = addresses[index].addressUid;
-      await deleteAddress(userUid, addressUid);
+      await deleteAddress(addressUid);
       setAddresses(prev => prev.filter((_, i) => i !== index));
       if (selectedIndex === index) setSelectedIndex(null);
       toast.success("Address deleted successfully");
@@ -106,7 +90,7 @@ export default function AddressBook() {
 
       if (editIndex !== null) {
         const addressUid = addresses[editIndex].addressUid;
-        const res = await updateAddress(userUid, addressUid, payload);
+        const res = await updateAddress(addressUid, payload);
         const updated = res?.addressUid ? res : res?.data || res;
 
         const updatedList = [...addresses];
@@ -114,7 +98,7 @@ export default function AddressBook() {
         setAddresses(updatedList);
         toast.success("Address updated successfully");
       } else {
-        const res = await addAddress(userUid, payload);
+        const res = await addAddress(payload);
         const created = res?.addressUid ? res : res?.data || res;
 
         setAddresses([...addresses, created]);

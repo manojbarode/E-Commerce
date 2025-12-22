@@ -12,28 +12,37 @@ export default function SellerProducts() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
-  const sellerUid = useSelector((state) => state.seller.sellerUid);
+  const token = useSelector((state) => state.seller.token) || localStorage.getItem("sellerToken");
 
-  console.log("Seller Uid " + sellerUid);
+  console.log("token " + token);
 
-  const loadProducts = async () => {
-    if (!sellerUid) return;
-    try {
-      setLoading(true);
-      const data = await getSellerProducts(sellerUid);
-      setProducts(data || []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadProducts = async (page = 0) => {
+  try {
+    setLoading(true);
+    const data = await getSellerProducts(page, 10);
+    setProducts(data.products || []);
+    setCurrentPage(data.currentPage);
+    setTotalPages(data.totalPages);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load products");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handlePageChange = (newPage) => {
+  if (newPage >= 0 && newPage < totalPages) {
+    loadProducts(newPage);
+  }
+};
 
   useEffect(() => {
     loadProducts();
-  }, [sellerUid]);
+  }, [token]);
 
   const handleDelete = async (productUid) => {
     if (window.confirm("Are you sure you want to delete this product?")) {

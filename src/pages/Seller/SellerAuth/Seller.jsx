@@ -11,7 +11,6 @@ export default function SellerAuth() {
   const [tab, setTab] = useState("login");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-
   const [form, setForm] = useState({ email: "", mobile: "", password: "" });
 
   const handleChange = (e) => {
@@ -52,16 +51,14 @@ export default function SellerAuth() {
           toast.success(res.data.message || "Login Successful!");
 
           const sellerData = {
-            sellerUid: res.data.data.sellerUid,
-            sellerName: res.data.data.fullName,
-            token: res.data.data.token,
-          };
+              token: res.data.data.token,
+              sellerName: res.data.data.sellerName
+            };
+            console.log(sellerData.token);
+            dispatch(setSeller(sellerData));
+            localStorage.setItem("sellerToken", res.data.data.token);
+            navigate("/seller/dashboard");
 
-          // Redux dispatch
-          dispatch(setSeller(sellerData));
-          localStorage.setItem("sellerData", JSON.stringify(sellerData));
-
-          navigate("/sellerdashboard");
         } else {
           toast.error(res.data.message || "Login failed!");
         }
