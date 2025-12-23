@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosConfig";
+
 import { publicAxios } from "./publicApi";
 import sellerAxios from "./sellerAxios";
 import axios from "axios";

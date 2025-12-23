@@ -11,10 +11,19 @@ export const fetchCartdata = async () => {
   return response.data?.data || null;
 };
 
-export const deleteCartItem = async (productUid) => {
-  return axiosInstance.delete(`/cart`, {
-    headers: { 'productUid': productUid }
-  });
+export const deleteCartItem = async (userUid, productUid) => {
+  console.log("deleteCartItem called with:", { userUid, productUid });
+  try{
+    const res = axiosInstance.delete(`/cart/remove/${productUid}`, {
+      headers: { userUid }
+    });
+    console.log("Delete response:", res.data);
+    return res.data;
+  }
+  catch(err) {
+    console.error("Fetch cart error:", err);
+    throw err;
+  }
 };
 
 

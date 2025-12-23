@@ -66,12 +66,7 @@ const Cart = () => {
     }
   };
 
-  const toggleWishlist = async (productUid) => {
-    if (!isLoggedIn) {
-      toast.warning("Login required to access wishlist");
-      navigate("/login");
-      return;
-    }
+  const toggleWishlist =async (productUid) => {
     setWishlist((prev) =>
       prev.includes(productUid)? prev.filter((i) => i !== productUid): [...prev, productUid]
     );

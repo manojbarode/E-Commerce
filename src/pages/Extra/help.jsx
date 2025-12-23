@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Container,
-  Row,
+  Row,  
   Col,
   Card,
   Form,
@@ -23,6 +23,8 @@ import {
   FaEnvelope,
   FaComments,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; // ✅ added
+import { toast } from "react-toastify"; // optional, for info message
 
 const helpData = {
   orderIssues: {
@@ -103,6 +105,7 @@ const faqs = [
 const HelpCenter = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate(); // ✅ added
 
   // ---------------- CATEGORY PAGE ----------------
   if (selectedCategory) {
@@ -129,9 +132,7 @@ const HelpCenter = () => {
             <Card.Body className="p-4 text-dark">
               <div className="d-flex align-items-center gap-3 mb-3">
                 {category.icon}
-                <h2 className="h3 fw-bold mb-0 text-dark">
-                  {category.title}
-                </h2>
+                <h2 className="h3 fw-bold mb-0 text-dark">{category.title}</h2>
               </div>
               <p className="text-muted mb-4">Select a topic to get help</p>
 
@@ -141,6 +142,14 @@ const HelpCenter = () => {
                     key={idx}
                     className="border hover-shadow"
                     style={{ cursor: "pointer" }}
+                    // ✅ added: navigate to order.jsx if it's Order Issues
+                    onClick={() => {
+                      if (selectedCategory === "orderIssues") {
+                        navigate("/order"); // goes to order page
+                      } else {
+                        toast.info(`${item} clicked!`); // optional feedback
+                      }
+                    }}
                   >
                     <Card.Body className="d-flex justify-content-between align-items-center py-3 text-dark">
                       <span className="fw-medium text-dark">{item}</span>
@@ -155,9 +164,7 @@ const HelpCenter = () => {
           {/* Contact */}
           <Card className="shadow-sm">
             <Card.Body className="p-4 text-dark">
-              <h3 className="h5 fw-bold mb-4 text-dark">
-                Still need help?
-              </h3>
+              <h3 className="h5 fw-bold mb-4 text-dark">Still need help?</h3>
               <Row className="g-3">
                 <Col md={4}>
                   <Card className="text-center h-100 hover-shadow">
@@ -182,9 +189,7 @@ const HelpCenter = () => {
                     <Card.Body className="text-dark">
                       <FaEnvelope size={24} className="text-primary mb-2" />
                       <h6 className="fw-bold">Email</h6>
-                      <p className="text-muted small">
-                        We'll respond soon
-                      </p>
+                      <p className="text-muted small">We'll respond soon</p>
                     </Card.Body>
                   </Card>
                 </Col>
@@ -230,12 +235,8 @@ const HelpCenter = () => {
                     <div className="d-flex gap-3">
                       {category.icon}
                       <div>
-                        <h5 className="fw-bold text-dark">
-                          {category.title}
-                        </h5>
-                        <p className="text-muted small">
-                          {category.items[0]}
-                        </p>
+                        <h5 className="fw-bold text-dark">{category.title}</h5>
+                        <p className="text-muted small">{category.items[0]}</p>
                       </div>
                     </div>
                     <FaChevronRight className="text-muted" />
