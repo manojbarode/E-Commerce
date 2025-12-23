@@ -35,6 +35,7 @@ import PaymentForm from "./Payment/payment";
 import PaymentSuccess from "./Payment/PaymentSuccess";
 import AdminRoutes from "./pages/Admin/routes/AdminRoutes";
 import AdminLayout from "./pages/Admin/layout/AdminLayout";
+import Dashboard from "./pages/Admin/pages/Dashboard";
 
 const App = () => {
   return (
@@ -71,15 +72,15 @@ const App = () => {
         </Route>
         {/* Admin */}
 
-        <Routes>
+        <Route  >
             <Route path="/admin" element={<AdminRoutes><AdminLayout/></AdminRoutes>}/>
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="users" element={<Users />} />
+            {/* <Route path="users" element={<Users />} />
             <Route path="sellers" element={<Sellers />} />
             <Route path="products" element={<Products />} />
             <Route path="orders" element={<Orders />} />
-            <Route path="payments" element={<Payments />} />
-        </Routes>
+            <Route path="payments" element={<Payments />} /> */}
+        </Route>
       </Routes>
     </>
   );
