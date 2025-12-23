@@ -15,37 +15,45 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
- const handleLoginSubmit = async (e) => {
+  const handleLoginSubmit = async (e) => {
   e.preventDefault();
   if (loading) return;
-  
+
   if (!email || !password) {
     toast.error("Please enter email and password");
     return;
   }
-  
+
   setLoading(true);
-  
+
   try {
-    // Login and get response
+    // 1️⃣ Login → token only
     const res = await loginApi({ email, password });
-    const token = res?.token;
+
+    const token = res.token;
+    if (!token) {
+      throw new Error("Token not received from server");
+    }
+
+    // 2️⃣ Save token first
     sessionStorage.setItem("token", token);
-    const user = {
-      token: token
-    };
+
+    // 3️⃣ Fetch profile using token
+    const profile = await fetchUserProfile();
+
+    // 4️⃣ Redux update
     dispatch(
       loginUserAction({
-        user: user
+        token,
+        user: profile,
       })
     );
-    
+
     toast.success("Login successful!");
     navigate("/");
-    
+
   } catch (err) {
-    console.error("Login error:", err);
-    toast.error(err.response?.data?.message || err.message || "Login failed");
+    toast.error(err.response?.data?.message || "Login failed");
   } finally {
     setLoading(false);
   }
