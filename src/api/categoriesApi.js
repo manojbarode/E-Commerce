@@ -1,4 +1,5 @@
 import axiosInstance from "./axiosConfig";
+import adminInstance from "./services/adminApi";
 
 export const getCategories = async () => {
   try {
@@ -12,7 +13,7 @@ export const getCategories = async () => {
 
 export const addCategory = async (name) => {
   try {
-    const res = await axiosInstance.post("/category/add", { name });
+    const res = await adminInstance.post("/category/add", { name });
     return res.data.data;
   } catch (err) {
     console.error("Error adding category:", err);
@@ -22,7 +23,7 @@ export const addCategory = async (name) => {
 
 export const updateCategory = async (id, name) => {
   try {
-    const res = await axiosInstance.put(`/category/update/${id}`, { name });
+    const res = await adminInstance.put(`/category/update/${id}`, { name });
     return res.data.data;
   } catch (err) {
     console.error("Error updating category:", err);
@@ -32,7 +33,7 @@ export const updateCategory = async (id, name) => {
 
 export const deleteCategory = async (id) => {
   try {
-    const res = await axiosInstance.delete(`/category/delete/${id}`);
+    const res = await adminInstance.delete(`/category/delete/${id}`);
     return res.data.data;
   } catch (err) {
     console.error("Error deleting category:", err);
@@ -41,12 +42,18 @@ export const deleteCategory = async (id) => {
 };
 
 export const getSubcategories = async (categoryId) => {
-  const res = await axiosInstance.get(`/category/${categoryId}/subcategories`);
-  return res.data.data;
+  try {
+    const res = await adminInstance.get(`/category/${categoryId}/subcategories`);
+    return res.data.data || [];
+  } catch (err) {
+    console.error(`Failed to fetch subcategories for ${categoryId}:`, err);
+    return [];
+  }
 };
 
+
 export const addSubcategory = async (categoryId, { name, customFields = [] }) => {
-  const res = await axiosInstance.post(`/category/${categoryId}/add-subcategory`, {
+  const res = await adminInstance.post(`/category/${categoryId}/add-subcategory`, {
     name,
     customFields,
   });
@@ -54,7 +61,7 @@ export const addSubcategory = async (categoryId, { name, customFields = [] }) =>
 };
 
 export const updateSubcategory = async (id, { name, customFields = [] }) => {
-  const res = await axiosInstance.put(`/category/update-subcategory/${id}`, {
+  const res = await adminInstance.put(`/category/update-subcategory/${id}`, {
     name,
     customFields,
   });
@@ -63,6 +70,6 @@ export const updateSubcategory = async (id, { name, customFields = [] }) => {
 
 // Delete subcategory
 export const deleteSubcategory = async (id) => {
-  const res = await axiosInstance.delete(`/category/delete-subcategory/${id}`);
+  const res = await adminInstance.delete(`/category/delete-subcategory/${id}`);
   return res.data.data;
 };

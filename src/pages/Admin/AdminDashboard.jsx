@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       <div className="mt-4">
         <button
           className="btn btn-primary"
-          onClick={() => navigate("/admin/payment-method")}
+          onClick={() => navigate("/admin/payment/form")}
         >
           ➕ Add Payment Method
         </button>

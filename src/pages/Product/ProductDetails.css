@@ -1,7 +1,7 @@
 /* Sticky left column */
 .sticky-left {
   position: sticky;
-  top: 90px;
+  top:90px;
   z-index: 1;
 }
 

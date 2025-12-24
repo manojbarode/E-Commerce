@@ -17,24 +17,22 @@ const handleSignupSubmit = async (e) => {
 
   try {
     const res = await signupUser({ name, email, password });
-
-    if (res && Number(res.status) === 201) {
-      toast.success(res.message);
+    if (res.status === 201) {
+      toast.success(res.data.message);
       navigate("/login");
-    } else {
+    }
+    else {
       toast.error(res.message || "Signup failed!");
     }
 
   } catch (error) {
-    toast.error(error?.message || "Signup failed!");
-  }
+  toast.error(
+    error?.response?.data?.message || "Signup failed!"
+  );
+}
 };
   return (
     <div className="container py-5" style={{ background: "#f8f9fa" }}>
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-      />
       <div className="row justify-content-center">
         <div className="col-md-7 col-lg-5">
           <div className="card shadow-lg border-0 rounded-4 p-4">
@@ -61,41 +59,21 @@ const handleSignupSubmit = async (e) => {
 
             <form onSubmit={handleSignupSubmit}>
               <div className="mb-3">
-                <input
-                  type="text"
-                  className="form-control form-control-sm rounded-pill shadow-sm"
-                  placeholder="Name"
-                  value={name}
-                  onChange={(e) =>
-                    setName(e.target.value.replace(/[^a-zA-Z ]/g, ""))
-                  }
+                <input type="text" className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Name" value={name}onChange={(e) => setName(e.target.value.replace(/[^a-zA-Z ]/g, ""))}
                   required
                 />
               </div>
               <div className="mb-3">
-                <input
-                  type="email"
-                  className="form-control form-control-sm rounded-pill shadow-sm"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                <input type="email" className="form-control form-control-sm rounded-pill shadow-sm"placeholder="Email"
+                  value={email} onChange={(e) => setEmail(e.target.value)}required/>
               </div>
               <div className="mb-3">
-                <input
-                  type="password"
-                  className="form-control form-control-sm rounded-pill shadow-sm"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <input type="password" className="form-control form-control-sm rounded-pill shadow-sm"
+                  placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required/>
               </div>
               <div className="d-grid mb-3">
-                <button
-                  type="submit"
-                  className="btn btn-danger btn-gradient shadow-sm rounded-pill fw-bold"
+                <button type="submit" className="btn btn-danger btn-gradient shadow-sm rounded-pill fw-bold"
                   style={{ padding: "0.5rem", fontSize: "1rem" }}
                 >
                   Sign Up

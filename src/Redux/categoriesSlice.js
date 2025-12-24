@@ -1,16 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getCategories, getSubcategories } from "../api/categoriesApi";
 
-// Fetch categories along with their subcategories
 export const fetchCategories1 = createAsyncThunk(
   "categories/fetchCategories1",
   async (_, { rejectWithValue }) => {
     try {
-      const cats = await getCategories(); // [{id, name}, ...]
+      const cats = await getCategories(); // [{id, name}]
+      // Only fetch subcategories if needed
       const categoriesWithSubs = await Promise.all(
         cats.map(async (cat) => {
-          const subs = await getSubcategories(cat.id); // fetch subcategories
-          return { ...cat, subcategories: subs || [] };
+          try {
+            const subs = await getSubcategories(cat.id);
+            return { ...cat, subcategories: subs || [] };
+          } catch (err) {
+            // console.error(`Failed to fetch subcategories for ${cat.id}:`, err);
+            return { ...cat, subcategories: [] };
+          }
         })
       );
       return categoriesWithSubs;
@@ -19,6 +24,7 @@ export const fetchCategories1 = createAsyncThunk(
     }
   }
 );
+
 
 const categoriesSlice = createSlice({
   name: "categories",

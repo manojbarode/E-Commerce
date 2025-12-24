@@ -1,189 +1,163 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Product.css";
-import { ShowProduct } from "../../api/productApi";
+import { ShowProductPaginated } from "../../api/productApi";
 import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import { addProduct, setProductUid } from "../../Redux/productSlice";
-import { setAmount, setQuantity, setSellerUid } from "../../Redux/orderSlice";
-import { addToCartApi, addwishlist } from "../../api/cartApi";
+import { useSelector } from "react-redux";
+import { addToCartApi, addWishlist } from "../../api/cartApi";
 import { FaCartPlus, FaShoppingBag, FaHeart } from "react-icons/fa";
 
 export default function Product() {
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const loaderRef = useRef(null);
 
-  const { isLoggedIn, userUid } = useSelector((state) => state.auth);
+  const fetchProducts = async (currentPage) => {
+    if (loading || !hasMore) return;
 
+    setLoading(true);
+    try {
+      const response = await ShowProductPaginated(currentPage, 10);
+      const responseData = response.data || response;
+
+      if (!Array.isArray(responseData.products)) {
+        toast.error("Invalid product data");
+        return;
+      }
+
+      const cleaned = responseData.products.map((p) => ({
+        ...p,
+        imageUrls: Array.from(new Set(p.imageUrls || [])),
+      }));
+
+      setProducts((prev) => [...prev, ...cleaned]);
+
+      if (currentPage + 1 >= responseData.totalPages) {
+        setHasMore(false);
+      }
+    } catch (err) {
+      toast.error("Failed to load products");
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await ShowProduct();
-        if (!Array.isArray(response)) {
-          setProducts([]);
-          return;
-        }
-
-        const cleaned = response.map((p) => ({
-          ...p,
-          imageUrls: Array.from(new Set(p.imageUrls || [])),
-        }));
-
-        setProducts(cleaned);
-      } catch (err) {
-        console.error("Error fetching products:", err);
-        toast.error("Failed to fetch products");
-        setProducts([]);
-      }
-    };
-
-    fetchProducts();
+    fetchProducts(0);
   }, []);
 
-
   useEffect(() => {
-    const fetchWishlist = async () => {
-      if (!isLoggedIn) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !loading && hasMore) {
+          setPage((prev) => {
+            const next = prev + 1;
+            fetchProducts(next);
+            return next;
+          });
+        }
+      },
+      { threshold: 0.5 }
+    );
 
-      try {
-        const response = await fetchWishlist(userUid);
-        const productUids = response.data.map((item) => item.productUid);
-        setWishlist(productUids);
-      } catch (error) {
-        console.error("Failed to fetch wishlist:", error);
-      }
-    };
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => loaderRef.current && observer.unobserve(loaderRef.current);
+  }, [loading, hasMore]);
 
-    fetchWishlist();
-  }, [isLoggedIn, userUid]);
+  /* ---------------- CART ---------------- */
 
   const handleAddToCart = async (product) => {
-    if (!isLoggedIn) {
-      toast.warning("Please login first");
-      return;
-    }
-
+    if (!isLoggedIn) return toast.warning("Please login first");
     try {
-      const res = await addToCartApi(product.productUid, 1, userUid);
-
-      if (res.status === 200 || res.status === 201) {
-        toast.success(res.message || "Product added to cart");
-      } else {
-        toast.error(res.message || "Failed to add to cart");
-      }
+      const res = await addToCartApi(product.productUid, 1);
+      toast.success(res.message || "Product added to cart");
     } catch (err) {
-      console.error("Add to cart failed:", err);
-      toast.error("Something went wrong");
+      toast.error(err.response?.data?.message || "Failed to add product");
     }
   };
 
-  const handleBuyNow = (product) => {
-    if (!isLoggedIn) {
-      toast.warning("Please login first");
-      return;
-    }
 
-    dispatch(setProductUid(product.productUid));
-    dispatch(setSellerUid(product.sellerUid));
-    dispatch(setAmount(Number(product.price)));
-    dispatch(setQuantity(1));
-    dispatch(addProduct(product));
+ const handleBuyNow = (product) => {
+  if (!isLoggedIn) {
+    toast.warning("Please login first");
+    return;
+  }
 
-    navigate("/buynow");
-  };
+  navigate("/checkout", {
+    state: {
+      items: [
+        {
+          productUid: product.productUid,
+          name: product.title,
+          image: product.imageUrls?.[0] || "/no-image.png",
+          quantity: 1,
+          price: product.price,
+        },
+      ],
+      source: "BUY_NOW",
+    },
+  });
+};
 
   const handleWishlist = async (productUid) => {
-    if (!isLoggedIn) {
-      toast.warning("Please login first");
-      return;
-    }
-
+    if (!isLoggedIn) return toast.warning("Please login first");
     try {
-      const response = await addwishlist(userUid, productUid);
-
-      setWishlist((prev) =>
-        prev.includes(productUid)
-          ? prev.filter((id) => id !== productUid)
-          : [...prev, productUid]
-      );
-
-      toast.success(response.data.message);
-    } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Failed to update wishlist"
-      );
+      await addWishlist(productUid);
+      setWishlist((prev) => [...prev, productUid]);
+      toast.success("Added to wishlist");
+    } catch {
+      toast.error("Failed to update wishlist");
     }
-  };
-
-  const imageClick = (product) => {
-    dispatch(setProductUid(product.productUid));
-    dispatch(addProduct(product));
   };
 
   return (
     <div className="product-page">
       <div className="container">
-        <div className="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-          <h2 className="page-heading">Featured Products</h2>
-          <p className="page-subtitle">Explore top deals and best picks</p>
-        </div>
+        <h2 className="page-heading mb-4">Featured Products</h2>
 
         <div className="product-grid">
-          {products.length === 0 && (
-            <p className="text-center text-muted w-100">
-              No products available right now.
-            </p>
-          )}
+          {products.map((product) => (
+            <div key={product.productUid} className="product-card">
 
-          {products.map((product) => {
-            const productUid = product.productUid;
-            const mainImage =
-              product.imageUrls?.[0] || "/no-image.png";
+              <button
+                className={`wishlist-icon ${wishlist.includes(product.productUid) ? "active" : ""}`}
+                onClick={() => handleWishlist(product.productUid)}
+              >
+                <FaHeart />
+              </button>
 
-            return (
-              <div key={productUid} className="product-card">
-                {/* WISHLIST ICON */}
-                <button type="button" className={`wishlist-icon ${wishlist.includes(productUid) ? "active" : ""}`}
-                  onClick={() => handleWishlist(productUid)}>
-                  <FaHeart />
+              <Link to={`/products/${product.productUid}`}>
+                <img src={product.imageUrls?.[0] || "/no-image.png"}alt={product.title} className="product-img-full"
+                  onError={(e) => (e.target.src = "/no-image.png")}/>
+              </Link>
+
+              <div className="card-content">
+                <h5>{product.title}</h5>
+                <span className="price">₹ {product.price}</span>
+              </div>
+
+              <div className="card-actions">
+                <button className="btn glass-btn w-100 mb-2" onClick={() => handleAddToCart(product)}>
+                  <FaCartPlus /> Add to Cart
                 </button>
 
-                {/* IMAGE */}
-                <Link
-                  to={`/productDetails`}
-                  className="position-relative d-block mb-2"
-                >
-                  <img src={mainImage} alt={product.title} className="product-img-full"onClick={() => imageClick(product)}/>
-                  <span className="badge new-badge position-absolute top-0 start-0 m-2">
-                    New
-                  </span>
-                </Link>
-
-                {/* CONTENT */}
-                <div className="card-content">
-                  <h5 className="card-title">{product.title}</h5>
-                  <div className="price-row">
-                    <span className="price">₹ {product.price}</span>
-                  </div>
-                </div>
-
-                {/* ACTIONS */}
-                <div className="card-actions">
-                  <button className="btn glass-btn w-100 mb-2" onClick={() => handleAddToCart(product)}>
-                    <FaCartPlus /> Move to Cart
-                  </button>
-
-                  <button className="btn glass-btn-secondary w-100" onClick={() => handleBuyNow(product)}>
-                    <FaShoppingBag /> Buy Now
-                  </button>
-                </div>
+                <button className="btn glass-btn-secondary w-100" onClick={() => handleBuyNow(product)}>
+                  <FaShoppingBag /> Buy Now
+                </button>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
+
+        {loading && <p className="text-center mt-3">Loading...</p>}
+        <div ref={loaderRef} style={{ height: 20 }} />
       </div>
     </div>
   );

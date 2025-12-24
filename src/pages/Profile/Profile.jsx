@@ -26,16 +26,13 @@ const Profile = () => {
   const [editingAddress, setEditingAddress] = useState(null);
   const [addressForm, setAddressForm] = useState(emptyAddress);
   const [userStats] = useState({cartItems: 0,totalOrders: 0,wishlistItems: 0});
+  const { isLoggedIn,token } = useSelector((state) => state.auth);
   
-
-  
- const { token, user,userUid} = useSelector((state) => state.auth);
-
 const fetchProfileData = async () => {
-  if (!token) return;
+  if (!isLoggedIn) return;
   try {
-    const data = await fetchUserProfile(token);
-    setProfile(data);
+    const res = await fetchUserProfile();
+    setProfile(res|| emptyProfile);
   } catch (err) {
     toast.error("Failed to fetch profile");
   }
@@ -43,10 +40,10 @@ const fetchProfileData = async () => {
 
 
 useEffect(() => {
-  if (userUid) {
+  if (isLoggedIn) {
     fetchProfileData();
   }
-}, [userUid, token]);
+}, [isLoggedIn]);
 
   const fetchAddresses = async () => {
     try {
@@ -63,34 +60,28 @@ useEffect(() => {
 
 const handleImageUpload = async (e) => {
   const file = e.target.files?.[0];
+  console.log("Selected file:", file);
+
   if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    toast.error("Please select an image file");
-    return;
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    toast.error("Image size should be less than 5MB");
-    return;
-  }
 
   try {
     setImageLoading(true);
 
-    // Single file upload
     const imageUrl = await uploadToCloudinary(file);
+    console.log("Cloudinary URL:", imageUrl);
 
     const res = await profileImageUpload(imageUrl);
-    setProfile((prev) => ({ ...prev, image: res.data.data.image }));
+    setProfile(prev => ({ ...prev, image: imageUrl }));
+
     toast.success("Profile image updated successfully");
   } catch (error) {
-    console.error(error);
+    console.error("Upload failed:", error);
     toast.error("Failed to upload image");
   } finally {
     setImageLoading(false);
   }
 };
+
 
   const handleProfileSubmit = async () => {
     console.log(profile.name);
@@ -103,7 +94,7 @@ const handleImageUpload = async (e) => {
   try {
     setLoading(true);
     const res = await updateProfile(profile);
-    setProfile(res.data.data);
+    setProfile(res);
     toast.success("Profile updated successfully");
   } catch (error) {
     console.error(error);
@@ -136,9 +127,7 @@ const handleImageUpload = async (e) => {
     try {
       if (editingAddress) {
         const res = await updateAddress(editingAddress.addressUid,addressForm);
-
         const updated = res?.addressUid ? res : res?.data || res;
-
         setAddresses(prev =>
           prev.map(a =>
             a.addressUid === updated.addressUid ? updated : a
@@ -149,18 +138,15 @@ const handleImageUpload = async (e) => {
       } else {
         const res = await addAddress(addressForm);
         const created = res?.addressUid ? res : res?.data || res;
-
         setAddresses(prev => [...prev, created]);
         toast.success("Address added");
       }
-
       setShowAddressModal(false);
     } catch (err) {
       console.error(err.response?.data || err);
       toast.error("Address save failed");
     }
   };
-
   const removeAddress = async (uid) => {
     if (!window.confirm("Delete this address?")) return;
     try {
@@ -172,8 +158,6 @@ const handleImageUpload = async (e) => {
       toast.error("Delete failed");
     }
   };
-  
-
   const quickLinks = [
     { title: "Cart", icon: <FaShoppingCart />, count: userStats.cartItems, path: "/profile/cart" },
     { title: "Orders", icon: <FaBoxOpen />, count: userStats.totalOrders, path: "/profile/userOrders" },
@@ -212,10 +196,7 @@ const handleImageUpload = async (e) => {
               <button className={`nav-item ${activeTab === "profile" ? "active" : ""}`} onClick={() => setActiveTab("profile")}>
                 <FaUser /> Profile
               </button>
-              <button
-                className={`nav-item ${activeTab === "addresses" ? "active" : ""}`}
-                onClick={handleOpenAddresses}
-              >
+              <button className={`nav-item ${activeTab === "addresses" ? "active" : ""}`}onClick={handleOpenAddresses}>
                 <FaMapMarkerAlt /> Addresses
               </button>
 
@@ -236,11 +217,8 @@ const handleImageUpload = async (e) => {
               </button>
             </div>
           </div>
-
-          {/* MAIN CONTENT */}
           <div className="col-lg-9">
 
-            {/* PROFILE TAB */}
             {activeTab === "profile" && (
               <div className="content-card">
                 <div className="card-header-custom">

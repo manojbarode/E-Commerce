@@ -9,11 +9,15 @@ const axiosInstance = axios.create({
   },
 });
 
+// In axiosInstance.js interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = sessionStorage.getItem("token");
+    console.log("Sending request to:", config.url);
+    console.log("Token present:", !!token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Authorization header set");
     }
     return config;
   },

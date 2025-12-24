@@ -1,32 +1,17 @@
-import axiosInstance from "./axiosConfig";
+
+import { publicAxios } from "./publicApi";
+import sellerAxios from "./sellerAxios";
+import axios from "axios";
 
 export const ProductAdd = async (productData) => {
   try {
-    const sellerUid = localStorage.getItem("sellerUid");
-    if (!sellerUid) {
-      throw new Error("Seller UID not found. Please login again.");
-    }
-
-    const response = await axiosInstance.post(
-      "/product/add-product",
-      productData,
-      {
-        headers: {
-          sellerId: sellerUid,
-        },
-      }
-    );
+    const response = await sellerAxios.post("/seller/add-product", productData);
     return response.data;
   } catch (error) {
-    console.error(
-      "ADD PRODUCT ERROR:",
-      error.response?.data || error.message
-    );
+    console.error("ADD PRODUCT ERROR:", error.response?.data || error.message);
     throw error;
   }
 };
-
-
 
 export const uploadToCloudinary = async (file) => {
   try {
@@ -37,7 +22,7 @@ export const uploadToCloudinary = async (file) => {
     const cloudName = "djbgoanwn";
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
-    const res = await axiosInstance.post(url, formData, {
+    const res = await axios.post(url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -52,6 +37,7 @@ export const uploadToCloudinary = async (file) => {
 };
 
 
+
 export const uploadMultipleToCloudinary = async (files) => {
   try {
     const uploads = files.map((file) => uploadToCloudinary(file));
@@ -63,22 +49,26 @@ export const uploadMultipleToCloudinary = async (files) => {
   }
 };
 
-export const ShowProduct = async () => {
+
+// Fetch paginated products (public, no token)
+export const ShowProductPaginated = async (page = 0, size = 10) => {
   try {
-    const response = await axiosInstance.get("/product/all");
-    return response.data.data;
+    const response = await publicAxios.get(`/product/all/paginated?page=${page}&size=${size}`
+    );
+    return response.data;
   } catch (error) {
-    console.error("API ERROR:", error);
-    return [];
+    console.error('API ERROR:', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
+    throw error;
   }
 };
 
 export const getProductById = async (productUid) => {
-  try {
-    const response = await axiosInstance.get(`/product/${productUid}`);
-    return response.data.data;
-  } catch (error) {
-    console.error("GET PRODUCT ERROR:", error.response?.data || error.message);
-    throw error;
-  }
+  const response = await publicAxios.get(`/product/${productUid}`);
+  return response.data.data; 
 };
+
+

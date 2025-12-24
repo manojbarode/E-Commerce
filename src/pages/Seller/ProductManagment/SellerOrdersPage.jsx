@@ -7,43 +7,41 @@ import SellerOrdersService from "../../../api/orderApi";
 const PAGE_SIZE = 10;
 
 const SellerOrdersPage = () => {
-  const sellerUid = useSelector(state => state.seller.sellerUid);
+  const token = useSelector((state) => state.seller.token);
 
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
-
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Fetch paged orders whenever token or page changes
   useEffect(() => {
-    if (!sellerUid) return;
+    if (!token) return;
     fetchPagedOrders();
-  }, [sellerUid, page]);
+  }, [token, page]);
 
+  // Filter orders locally when search changes
   useEffect(() => {
     if (!search) {
       setFilteredOrders(orders);
       return;
     }
 
-    const v = search.toLowerCase();
-    const filtered = orders.filter(o =>
-      o.productTitle?.toLowerCase().includes(v)
+    const filtered = orders.filter((o) =>
+      o.productTitle?.toLowerCase().includes(search.toLowerCase())
     );
-
     setFilteredOrders(filtered);
   }, [search, orders]);
 
   const fetchPagedOrders = async () => {
     try {
       setLoading(true);
-      const res = await SellerOrdersService.getSellerOrders(
-        sellerUid,
-        page,
-        PAGE_SIZE
-      );
+      const res = await SellerOrdersService.getSellerOrders(page, PAGE_SIZE);
+      
+    console.log("Response from API:", res); // log the entire API response
+    console.log("Orders content:", res.content);
 
       setOrders(res.content || []);
       setFilteredOrders(res.content || []);
@@ -57,10 +55,7 @@ const SellerOrdersPage = () => {
     return (
       <div className="vh-100 d-flex justify-content-center align-items-center bg-light">
         <div className="text-center">
-          <div
-            className="spinner-border text-primary mb-3"
-            style={{ width: "3rem", height: "3rem" }}
-          />
+          <div className="spinner-border text-primary mb-3" style={{ width: "3rem", height: "3rem" }} />
           <p className="text-muted fw-medium">Loading your orders...</p>
         </div>
       </div>
@@ -74,12 +69,9 @@ const SellerOrdersPage = () => {
           <div className="row align-items-center mb-4">
             <div className="col-md-6">
               <h2 className="text-white fw-bold mb-2">
-                <i className="bi bi-cart-check-fill me-2"></i>
-                Seller Orders
+                <i className="bi bi-cart-check-fill me-2"></i> Seller Orders
               </h2>
-              <p className="text-white-50 mb-0">
-                Manage and track your orders efficiently
-              </p>
+              <p className="text-white-50 mb-0">Manage and track your orders efficiently</p>
             </div>
             <div className="col-md-6 text-md-end mt-3 mt-md-0">
               <span className="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
@@ -94,13 +86,10 @@ const SellerOrdersPage = () => {
               className="form-control premium-search shadow"
               placeholder="Search by Product Title..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
             />
             {search && (
-              <button
-                className="btn btn-link position-absolute clear-btn"
-                onClick={() => setSearch("")}
-              >
+              <button className="btn btn-link position-absolute clear-btn" onClick={() => setSearch("")}>
                 <i className="bi bi-x-circle-fill text-muted"></i>
               </button>
             )}
@@ -115,9 +104,7 @@ const SellerOrdersPage = () => {
               <i className="bi bi-inbox display-1 mb-3"></i>
               <h5 className="fw-bold">No orders found</h5>
               <p className="text-muted">
-                {search
-                  ? "No matching product found on this page"
-                  : "No orders available"}
+                {search ? "No matching product found on this page" : "No orders available"}
               </p>
             </div>
           </div>
@@ -137,20 +124,14 @@ const SellerOrdersPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredOrders.map(o => (
+                    {filteredOrders.map((o) => (
                       <tr key={o.orderUid}>
                         <td>
-                          <div className="fw-bold text-primary">{o.orderUid}</div>
                           <div className="small text-muted">{o.maskIdentifier}</div>
                         </td>
                         <td className="d-flex align-items-center gap-3">
-                          <img
-                            src={o.imageUrls?.[0]}
-                            width="60"
-                            height="60"
-                            className="rounded-3"
-                            alt="product"
-                          />
+                          <img src={o.items?.[0]?.imageUrls?.[0] || "https://via.placeholder.com/60"} width="60"
+                            height="60" className="rounded-3"alt={o.items?.[0]?.productName || "product"}/> 
                           {o.productTitle}
                         </td>
                         <td className="text-center">{o.quantity}</td>
@@ -158,11 +139,7 @@ const SellerOrdersPage = () => {
                           {SellerOrdersService.formatCurrency(o.totalAmount)}
                         </td>
                         <td>
-                          <span
-                            className={`badge bg-${SellerOrdersService.getStatusBadgeClass(
-                              o.orderStatus
-                            )}`}
-                          >
+                          <span className={`badge bg-${SellerOrdersService.getStatusBadgeClass(o.orderStatus)}`}>
                             {o.orderStatus}
                           </span>
                         </td>
@@ -174,28 +151,20 @@ const SellerOrdersPage = () => {
               </div>
             </div>
 
+            {/* Mobile view */}
             <div className="d-lg-none">
               <div className="row g-3">
-                {filteredOrders.map(o => (
+                {filteredOrders.map((o) => (
                   <div key={o.orderUid} className="col-12">
                     <div className="card mobile-order-card shadow-sm border-0">
                       <div className="card-body">
                         <div className="d-flex gap-3 mb-3">
-                          <img
-                            src={o.imageUrls?.[0]}
-                            width="80"
-                            height="80"
-                            className="rounded-3"
-                            alt="product"
-                          />
+                          <img src={o.items?.[0]?.imageUrls?.[0] || "https://via.placeholder.com/80"}
+                            width="80" height="80" className="rounded-3" alt={o.items?.[0]?.productName || "product"}/>
+
                           <div>
                             <h6 className="fw-bold mb-1">{o.productTitle}</h6>
-                            <div className="small text-muted">{o.orderUid}</div>
-                            <span
-                              className={`badge bg-${SellerOrdersService.getStatusBadgeClass(
-                                o.orderStatus
-                              )}`}
-                            >
+                            <span className={`badge bg-${SellerOrdersService.getStatusBadgeClass(o.orderStatus)}`}>
                               {o.orderStatus}
                             </span>
                           </div>
@@ -203,14 +172,10 @@ const SellerOrdersPage = () => {
 
                         <div className="d-flex justify-content-between">
                           <span>{o.quantity} pcs</span>
-                          <span className="fw-bold text-success">
-                            {SellerOrdersService.formatCurrency(o.totalAmount)}
-                          </span>
+                          <span className="fw-bold text-success">{SellerOrdersService.formatCurrency(o.totalAmount)}</span>
                         </div>
 
-                        <div className="text-muted mt-2">
-                          {SellerOrdersService.formatDate(o.orderDate)}
-                        </div>
+                        <div className="text-muted mt-2">{SellerOrdersService.formatDate(o.orderDate)}</div>
                       </div>
                     </div>
                   </div>
@@ -220,33 +185,18 @@ const SellerOrdersPage = () => {
           </>
         )}
 
+        {/* Pagination */}
         {totalPages > 1 && (
           <div className="d-flex justify-content-end mt-4">
             <ul className="pagination pagination-modern">
               <li className={`page-item ${page === 0 ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setPage(p => p - 1)}
-                >
-                  Prev
-                </button>
+                <button className="page-link" onClick={() => setPage((p) => p - 1)}>Prev</button>
               </li>
               <li className="page-item active">
-                <span className="page-link">
-                  {page + 1} / {totalPages}
-                </span>
+                <span className="page-link">{page + 1} / {totalPages}</span>
               </li>
-              <li
-                className={`page-item ${
-                  page === totalPages - 1 ? "disabled" : ""
-                }`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => setPage(p => p + 1)}
-                >
-                  Next
-                </button>
+              <li className={`page-item ${page === totalPages - 1 ? "disabled" : ""}`}>
+                <button className="page-link" onClick={() => setPage((p) => p + 1)}>Next</button>
               </li>
             </ul>
           </div>

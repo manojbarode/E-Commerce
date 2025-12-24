@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { loginUser as loginApi, fetchUserProfile } from "../../api/authApi";
-import { loginUser as loginUserAction } from "../../Redux/authSlice";
+import { loginUser as loginUserAction, logoutUser } from "../../Redux/authSlice";
+
+// ================= CONFIG =================
+// 1 minute for testing (production me 60 * 60 * 1000)
+// const ONE_MINUTE = 1 * 60 * 1000;
+const ONE_MINUTE = 60*60*1000;
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,12 +20,39 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // ================= LOGOUT FUNCTION =================
+  const handleLogout = () => {
+    sessionStorage.clear();
+    dispatch(logoutUser());
+    toast.error("Session expired. Please login again.");
+    navigate("/login");
+  };
+
+  // ================= SESSION CHECK (REFRESH SAFE) =================
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const expiry = sessionStorage.getItem("tokenExpiry");
+
+    if (token && expiry) {
+      const remainingTime = Number(expiry) - Date.now();
+
+      if (remainingTime <= 0) {
+        handleLogout();
+      } else {
+        const logoutTimer = setTimeout(() => {
+          handleLogout();
+        }, remainingTime);
+
+        return () => clearTimeout(logoutTimer);
+      }
+    }
+  }, []);
+
+  // ================= LOGIN SUBMIT =================
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
 
-
-    // Basic validation
     if (!email || !password) {
       toast.error("Please enter email and password");
       return;
@@ -28,40 +60,43 @@ const Login = () => {
 
     setLoading(true);
 
-   try {
-  console.log("🔐 Logging in with:", email);
-  const res = await loginApi({ email, password });
+    try {
+      const res = await loginApi({ email, password });
+      const token = res.token;
+      if (!token) throw new Error("Token missing");
 
-  const token = res.token;
-  if (!token) {
-    throw new Error("Token not received from server");
-  }
-  sessionStorage.setItem("token", token);
-  console.log("✅ Token stored:", token);
-  console.log("👤 Fetching user profile...");
-  const profile = await fetchUserProfile();
-  console.log("✅ Profile fetched:", profile);
+      // token expiry time
+      const expiryTime = Date.now() + ONE_MINUTE;
 
-  dispatch(
-    loginUserAction({
-      token,
-      user: profile,
-    })
-  );
-  sessionStorage.setItem("user", JSON.stringify(profile));
+      sessionStorage.setItem("token", token);
+      sessionStorage.setItem("tokenExpiry", expiryTime);
 
-  toast.success("Login successful!");
-  navigate("/");
+      const profile = await fetchUserProfile();
 
-} catch (err) {
-  console.error("❌ Login failed:", err);
-  toast.error(err.response?.data?.message || err.message || "Login failed");
-} finally {
-  setLoading(false);
-}
+      dispatch(
+        loginUserAction({
+          token,
+          user: profile,
+        })
+      );
 
+      // 🔑 IMPORTANT: expiry-based logout (NO RESET ON REFRESH)
+      const remainingTime = expiryTime - Date.now();
+      setTimeout(() => {
+        handleLogout();
+      }, remainingTime);
+
+      toast.success("Login successful!");
+      toast.info("Session will expire automatically in 1 hour for security reasons.");
+      navigate("/");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // ================= UI =================
   return (
     <div style={{ background: "#f8f9fa", padding: "60px 0" }}>
       <div className="container d-flex justify-content-center">
@@ -79,7 +114,6 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                required
               />
 
               <input
@@ -89,7 +123,6 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                required
               />
 
               <button
@@ -111,7 +144,6 @@ const Login = () => {
                 Sign Up
               </button>
             </p>
-
           </div>
         </div>
       </div>
