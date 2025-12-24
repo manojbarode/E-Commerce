@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Payment.css";
-import {getPaymentMethods,getPaymentFields,submitPayment,} from "../api/paymentApi";
+import {getPaymentMethods,getPaymentFields,submitPayment, getPaymentMethodsUser, getPaymentFieldsUser,} from "../api/paymentApi";
 import { FaCreditCard, FaPaypal, FaMobileAlt } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -35,7 +35,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchMethods = async () => {
       try {
-        const methods = await getPaymentMethods();
+        const methods = await getPaymentMethodsUser();
         setPaymentMethods(
           methods.map((m) => ({
             ...m,
@@ -63,7 +63,7 @@ useEffect(() => {
     dispatch(setPaymentMethod(method.label));
 
     try {
-      const methodFields = await getPaymentFields(method.id);
+      const methodFields = await getPaymentFieldsUser(method.id);
       setFields(methodFields);
     } catch {
       toast.error("Failed to load payment fields");

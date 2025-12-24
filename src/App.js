@@ -27,16 +27,16 @@ import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
 import SellerProducts from "./pages/Seller/ProductManagment/Sellerproduct";
 import SellerOrdersPage from "./pages/Seller/ProductManagment/SellerOrdersPage";
 import UpdateProduct from "./pages/Seller/ProductManagment/SellerProductUpdate";
-import AddressBook from "./pages/Profile/buynow";
 import ProductDetails from "./pages/Product/ProductDetails";
 import UserOrderedProducts from "./pages/Profile/UserOrderedProducts";
 import Checkout from "./pages/Profile/Checkout";
 import PaymentForm from "./Payment/payment";
 import Order from "./pages/Seller/SellerAuth/Order/order"; 
 import PaymentSuccess from "./Payment/PaymentSuccess";
+import AdminLogin from "./pages/Admin/pages/AdminLogin";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminRoutes from "./pages/Admin/routes/AdminRoutes";
-import AdminLayout from "./pages/Admin/layout/AdminLayout";
-import Dashboard from "./pages/Admin/pages/Dashboard";
+import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
 
 const App = () => {
   return (
@@ -62,29 +62,18 @@ const App = () => {
 
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/cart" element={<PrivateRoute><Cart /></PrivateRoute>}/>
-          <Route path="/profile/wishcart" element={<PrivateRoute> <WishCart /></PrivateRoute>}/>
-          <Route path="/buynow" element={<PrivateRoute> <AddressBook /></PrivateRoute>}/>
+          <Route path="/profile/wishcart" element={<PrivateRoute><WishCart /></PrivateRoute>}/>
           <Route path="/productDetails" element={<ProductDetails />}/>
           <Route path="/profile/userOrders" element={<UserOrderedProducts />}/>
-          <Route path="/checkout" element={<Checkout />}/>
+          <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>}/>
           <Route path="/payment" element={<PaymentForm />}/>
           <Route path="/payment-success" element={<PaymentSuccess />}/>
-<<<<<<< HEAD
-
-        </Route>
-        {/* Admin */}
-
-        <Route  >
-            <Route path="/admin" element={<AdminRoutes><AdminLayout/></AdminRoutes>}/>
-            <Route path="dashboard" element={<Dashboard />} />
-            {/* <Route path="users" element={<Users />} />
-            <Route path="sellers" element={<Sellers />} />
-            <Route path="products" element={<Products />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="payments" element={<Payments />} /> */}
-=======
           <Route path="/order" element={<Order/>}/>
->>>>>>> Master
+
+          {/* Admin */}
+          <Route path="/admin/login" element={<AdminLogin/>}/>
+          <Route path="/admin/dashboard" element={<AdminRoutes><AdminDashboard/></AdminRoutes>}/>
+          <Route path="/admin/payment/form" element={<AdminRoutes><PaymentMethodAddForm/></AdminRoutes>}/>
         </Route>
       </Routes>
     </>

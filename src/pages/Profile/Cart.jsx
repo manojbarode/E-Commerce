@@ -80,13 +80,25 @@ const Cart = () => {
   };
 
   const handleContinueShopping = () => navigate("/");
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      toast.error("Your cart is empty");
-      return;
+ const handleCheckout = () => {
+  if (cartItems.length === 0) {
+    toast.error("Your cart is empty");
+    return;
+  }
+
+  navigate("/checkout", {
+    state: {
+      items: cartItems.map((item) => ({
+        productUid: item.productUid,
+        quantity: item.quantity,
+        price: item.priceAtTime || item.price,
+        name: item.productName,
+        image: item.imageUrls?.[0] || item.imageUrl
+      }))
     }
-    navigate("/checkout");
-  };
+  });
+};
+
 
   const subtotal = cartItems.reduce(
     (acc, item) => acc + (item.priceAtTime || item.price || 0) * item.quantity,

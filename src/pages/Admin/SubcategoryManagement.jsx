@@ -1,74 +1,36 @@
 // src/components/SubcategoryManagement.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { toast } from "react-toastify";
-import {
-  addSubcategory,
-  deleteSubcategory,
-  getCategories,
-  getSubcategories,
-  updateSubcategory,
-} from "../../api/categoriesApi";
-import { useDispatch } from "react-redux";
+import { addSubcategory, deleteSubcategory, updateSubcategory } from "../../api/categoriesApi";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories1 } from "../../Redux/categoriesSlice";
 
 export default function SubcategoryManagement() {
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [subcategories, setSubcategories] = useState([]);
-  const [loadingCats, setLoadingCats] = useState(false);
-  const [loadingSubs, setLoadingSubs] = useState(false);
-
-  const [newSubcategory, setNewSubcategory] = useState({ name: "", customFields: [""] });
-  const [editingSubcategory, setEditingSubcategory] = useState({
-    id: null,
-    name: "",
-    customFields: [""],
-  });
-
   const dispatch = useDispatch();
+  const { data: categoriesRedux, status } = useSelector(state => state.categories);
 
-  // ---------------- Fetch Categories ----------------
-  const fetchCategories = async () => {
-    try {
-      setLoadingCats(true);
-      const cats = await getCategories();
-      setCategories(cats || []);
-    } catch (err) {
-      console.error("Fetch categories error:", err);
-      toast.error(err.response?.data?.message || "Failed to load categories");
-    } finally {
-      setLoadingCats(false);
-    }
-  };
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [loadingSubs, setLoadingSubs] = useState(false);
+  const [newSubcategory, setNewSubcategory] = useState({ name: "", customFields: [""] });
+  const [editingSubcategory, setEditingSubcategory] = useState({ id: null, name: "", customFields: [""] });
 
+  // Fetch categories once on mount
   useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  // ---------------- Fetch Subcategories ----------------
-  const fetchSubcategories = async (categoryId) => {
-    if (!categoryId) return setSubcategories([]);
-    try {
-      setLoadingSubs(true);
-      const subs = await getSubcategories(categoryId);
-      setSubcategories(subs || []);
-    } catch (err) {
-      console.error("Fetch subcategories error:", err);
-      toast.error(err.response?.data?.message || "Failed to load subcategories");
-    } finally {
-      setLoadingSubs(false);
+    if (status === "idle") {
+      dispatch(fetchCategories1());
     }
-  };
+  }, [dispatch, status]);
 
-  useEffect(() => {
-    if (selectedCategory) fetchSubcategories(selectedCategory);
-    else setSubcategories([]);
-  }, [selectedCategory]);
+  // Compute subcategories for the selected category
+  const subcategories = useMemo(() => {
+    if (status !== "succeeded" || !selectedCategory) return [];
+    const cat = categoriesRedux.find(c => c.id === Number(selectedCategory));
+    return cat?.subcategories || [];
+  }, [categoriesRedux, selectedCategory, status]);
 
   // ---------------- Add Subcategory ----------------
   const handleAddSubcategory = async () => {
     const cleanedFields = newSubcategory.customFields.map(f => f.trim()).filter(f => f);
-
     if (!newSubcategory.name.trim()) return toast.error("Subcategory name required!");
     if (!selectedCategory) return toast.error("Select a category first!");
 
@@ -78,13 +40,9 @@ export default function SubcategoryManagement() {
         name: newSubcategory.name.trim(),
         customFields: cleanedFields,
       });
-
       toast.success("Subcategory added!");
       setNewSubcategory({ name: "", customFields: [""] });
-
-      // Update Redux store & local list
-      dispatch(fetchCategories1());
-      fetchSubcategories(selectedCategory);
+      dispatch(fetchCategories1()); // refresh categories in Redux
     } catch (err) {
       console.error("Add subcategory error:", err);
       toast.error(err.response?.data?.message || "Failed to add subcategory");
@@ -116,9 +74,7 @@ export default function SubcategoryManagement() {
       await updateSubcategory(editingSubcategory.id, { name: trimmedName, customFields: cleanedFields });
       toast.success("Subcategory updated!");
       cancelEditing();
-
       dispatch(fetchCategories1());
-      fetchSubcategories(selectedCategory);
     } catch (err) {
       console.error("Update subcategory error:", err);
       toast.error(err.response?.data?.message || "Failed to update subcategory");
@@ -134,9 +90,7 @@ export default function SubcategoryManagement() {
       setLoadingSubs(true);
       await deleteSubcategory(id);
       toast.info("Deleted!");
-
       dispatch(fetchCategories1());
-      fetchSubcategories(selectedCategory);
     } catch (err) {
       console.error("Delete subcategory error:", err);
       toast.error(err.response?.data?.message || "Failed to delete subcategory");
@@ -188,11 +142,10 @@ export default function SubcategoryManagement() {
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           <option value="">-- Choose category --</option>
-          {categories.map(cat => (
+          {categoriesRedux.map(cat => (
             <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
-        {loadingCats && <span className="text-muted small">Loading categories...</span>}
       </div>
 
       {/* Add Subcategory */}
@@ -231,8 +184,7 @@ export default function SubcategoryManagement() {
       )}
 
       {/* Subcategory List */}
-      {loadingSubs && <p className="text-muted small mb-2">Loading subcategories...</p>}
-
+      {loadingSubs && <p className="text-muted small mb-2">Processing...</p>}
       {subcategories.length === 0 && selectedCategory && !loadingSubs && (
         <p className="text-muted small">No subcategories for this category.</p>
       )}
@@ -248,7 +200,6 @@ export default function SubcategoryManagement() {
                   value={editingSubcategory.name}
                   onChange={(e) => setEditingSubcategory({ ...editingSubcategory, name: e.target.value })}
                 />
-
                 {editingSubcategory.customFields.map((field, idx) => (
                   <div className="input-group mb-2" key={idx}>
                     <input
@@ -257,23 +208,13 @@ export default function SubcategoryManagement() {
                       value={field}
                       onChange={(e) => handleFieldChange(idx, e.target.value, true)}
                     />
-                    <button className="btn btn-danger" onClick={() => removeField(idx, true)}>
-                      ✕
-                    </button>
+                    <button className="btn btn-danger" onClick={() => removeField(idx, true)}>✕</button>
                   </div>
                 ))}
-
-                <button className="btn btn-secondary btn-sm mb-2" onClick={() => addField(true)}>
-                  + Add Field
-                </button>
-
+                <button className="btn btn-secondary btn-sm mb-2" onClick={() => addField(true)}>+ Add Field</button>
                 <div className="d-flex gap-2">
-                  <button className="btn btn-sm btn-success" onClick={saveEdit}>
-                    Save
-                  </button>
-                  <button className="btn btn-sm btn-secondary" onClick={cancelEditing}>
-                    Cancel
-                  </button>
+                  <button className="btn btn-sm btn-success" onClick={saveEdit}>Save</button>
+                  <button className="btn btn-sm btn-secondary" onClick={cancelEditing}>Cancel</button>
                 </div>
               </div>
             ) : (
@@ -286,14 +227,9 @@ export default function SubcategoryManagement() {
                     </div>
                   )}
                 </div>
-
                 <div className="d-flex gap-2">
-                  <button className="btn btn-sm btn-info" onClick={() => startEditing(sub)}>
-                    Edit
-                  </button>
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(sub.id)}>
-                    Delete
-                  </button>
+                  <button className="btn btn-sm btn-info" onClick={() => startEditing(sub)}>Edit</button>
+                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(sub.id)}>Delete</button>
                 </div>
               </div>
             )}

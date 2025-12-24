@@ -81,3 +81,25 @@
 .checkout-btn:hover {
   background: linear-gradient(135deg, #1e40af, #1e3a8a);
 }
+.checkout-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.checkout-item-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.checkout-item-info {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.checkout-item-price {
+  font-weight: 600;
+}

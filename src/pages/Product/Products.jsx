@@ -84,22 +84,27 @@ export default function Product() {
   };
 
 
-  const handleBuyNow = (product) => {
-    if (!isLoggedIn) return toast.warning("Please login first");
-    navigate("/checkout", {
-      state: {
-        items: [
-          {
-            productUid: product.productUid,
-            quantity: 1,
-          },
-        ],
-        source: "BUY_NOW",
-      },
-    });
-  };
+ const handleBuyNow = (product) => {
+  if (!isLoggedIn) {
+    toast.warning("Please login first");
+    return;
+  }
 
-  /* ---------------- WISHLIST ---------------- */
+  navigate("/checkout", {
+    state: {
+      items: [
+        {
+          productUid: product.productUid,
+          name: product.title,
+          image: product.imageUrls?.[0] || "/no-image.png",
+          quantity: 1,
+          price: product.price,
+        },
+      ],
+      source: "BUY_NOW",
+    },
+  });
+};
 
   const handleWishlist = async (productUid) => {
     if (!isLoggedIn) return toast.warning("Please login first");
