@@ -73,7 +73,6 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/cart" element={<PrivateRoute><Cart /></PrivateRoute>}/>
           <Route path="/profile/wishcart" element={<PrivateRoute><WishCart /></PrivateRoute>}/>
-          <Route path="/productDetails" element={<ProductDetails />}/>
           <Route path="/profile/userOrders" element={<UserOrderedProducts />}/>
           <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>}/>
           <Route path="/payment" element={<PaymentForm />}/>
