@@ -42,6 +42,10 @@ import ChangePassword from "./pages/Seller/SellerAuth/Order/change_password";
 import LoginIssue from "./pages/Seller/SellerAuth/Order/login_issue";
 import DeactivateAccount from "./pages/Seller/SellerAuth/Order/deactivate";
 import Chat from "./pages/Seller/SellerAuth/Order/chat";
+import AdminLogin from "./pages/Admin/pages/AdminLogin";
+import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
+import AdminRoutes from "./pages/Admin/routes/AdminRoutes";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 
 const App = () => {
