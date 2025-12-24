@@ -32,10 +32,17 @@ import Checkout from "./pages/Profile/Checkout";
 import PaymentForm from "./Payment/payment";
 import Order from "./pages/Seller/SellerAuth/Order/order"; 
 import PaymentSuccess from "./Payment/PaymentSuccess";
-import AdminLogin from "./pages/Admin/pages/AdminLogin";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
-import AdminRoutes from "./pages/Admin/routes/AdminRoutes";
-import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
+import RefundPayment from "./pages/Seller/SellerAuth/Order/refund_payment";
+import Delivery from "./pages/Seller/SellerAuth/Order/delivery";
+import Return from "./pages/Seller/SellerAuth/Order/return";
+import Offer from "./pages/Seller/SellerAuth/Order/offer_rewards";
+import Offer_Rewards from "./pages/Seller/SellerAuth/Order/offer_rewards";
+import Account from "./pages/Seller/SellerAuth/Order/account";
+import ChangePassword from "./pages/Seller/SellerAuth/Order/change_password";
+import LoginIssue from "./pages/Seller/SellerAuth/Order/login_issue";
+import DeactivateAccount from "./pages/Seller/SellerAuth/Order/deactivate";
+import Chat from "./pages/Seller/SellerAuth/Order/chat";
+
 
 const App = () => {
   return (
@@ -68,14 +75,15 @@ const App = () => {
           <Route path="/payment" element={<PaymentForm />}/>
           <Route path="/payment-success" element={<PaymentSuccess />}/>
           <Route path="/order" element={<Order/>}/>
-
-          {/* Product */}
-          <Route path="/products/:productUid" element={<ProductDetails />} />
-
-          {/* Admin */}
-          <Route path="/admin/login" element={<AdminLogin/>}/>
-          <Route path="/admin/dashboard" element={<AdminRoutes><AdminDashboard/></AdminRoutes>}/>
-          <Route path="/admin/payment/form" element={<AdminRoutes><PaymentMethodAddForm/></AdminRoutes>}/>
+          <Route path="/refund-payment" element={<RefundPayment/>}/>
+          <Route path="/delivery" element={<Delivery/>} />
+          <Route path="/return" element={<Return/>} />
+          <Route path="/offer-rewards" element={<Offer_Rewards/>} />
+          <Route path="/account" element={<Account/>}/>
+          <Route path="/change-password" element={<ChangePassword/>}/>
+          <Route path="/login-issue" element={<LoginIssue/>}/>
+          <Route path="/deactivate" element={<DeactivateAccount/>} />
+          <Route path="/chat" element={<Chat/>}/>
         </Route>
       </Routes>
     </>
