@@ -43,9 +43,10 @@ import LoginIssue from "./pages/Seller/SellerAuth/Order/login_issue";
 import DeactivateAccount from "./pages/Seller/SellerAuth/Order/deactivate";
 import Chat from "./pages/Seller/SellerAuth/Order/chat";
 import AdminLogin from "./pages/Admin/pages/AdminLogin";
-import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
 import AdminRoutes from "./pages/Admin/routes/AdminRoutes";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
+import OrderIssues from "./pages/Seller/SellerAuth/Order/order";
 
 
 const App = () => {
@@ -73,12 +74,12 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/cart" element={<PrivateRoute><Cart /></PrivateRoute>}/>
           <Route path="/profile/wishcart" element={<PrivateRoute><WishCart /></PrivateRoute>}/>
-          <Route path="/productDetails" element={<ProductDetails />}/>
           <Route path="/profile/userOrders" element={<UserOrderedProducts />}/>
           <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>}/>
           <Route path="/payment" element={<PaymentForm />}/>
           <Route path="/payment-success" element={<PaymentSuccess />}/>
           <Route path="/order" element={<Order/>}/>
+          <Route path="/order-issue" element={<OrderIssues/>}/>
           <Route path="/refund-payment" element={<RefundPayment/>}/>
           <Route path="/delivery" element={<Delivery/>} />
           <Route path="/return" element={<Return/>} />
