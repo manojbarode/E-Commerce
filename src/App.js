@@ -46,6 +46,7 @@ import AdminLogin from "./pages/Admin/pages/AdminLogin";
 import AdminRoutes from "./pages/Admin/routes/AdminRoutes";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
+import OrderIssues from "./pages/Seller/SellerAuth/Order/order";
 
 
 const App = () => {
@@ -78,6 +79,7 @@ const App = () => {
           <Route path="/payment" element={<PaymentForm />}/>
           <Route path="/payment-success" element={<PaymentSuccess />}/>
           <Route path="/order" element={<Order/>}/>
+          <Route path="/order-issue" element={<OrderIssues/>}/>
           <Route path="/refund-payment" element={<RefundPayment/>}/>
           <Route path="/delivery" element={<Delivery/>} />
           <Route path="/return" element={<Return/>} />
