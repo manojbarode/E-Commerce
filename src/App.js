@@ -84,6 +84,13 @@ const App = () => {
           <Route path="/login-issue" element={<LoginIssue/>}/>
           <Route path="/deactivate" element={<DeactivateAccount/>} />
           <Route path="/chat" element={<Chat/>}/>
+           {/* Product */}
+          <Route path="/products/:productUid" element={<ProductDetails />} />
+
+          {/* Admin */}
+          <Route path="/admin/login" element={<AdminLogin/>}/>
+          <Route path="/admin/dashboard" element={<AdminRoutes><AdminDashboard/></AdminRoutes>}/>
+          <Route path="/admin/payment/form" element={<AdminRoutes><PaymentMethodAddForm/></AdminRoutes>}/>
         </Route>
       </Routes>
     </>
