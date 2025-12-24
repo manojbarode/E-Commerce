@@ -66,14 +66,9 @@ export const ShowProductPaginated = async (page = 0, size = 10) => {
   }
 };
 
-// Fetch single product by UID (public, no token)
 export const getProductById = async (productUid) => {
-  try {
-    const response = await publicAxios.get(`/product/${productUid}`);
-    return response.data.data;
-  } catch (error) {
-    console.error("API ERROR:", error);
-    return null;
-  }
+  const response = await publicAxios.get(`/product/${productUid}`);
+  return response.data.data; 
 };
+
 

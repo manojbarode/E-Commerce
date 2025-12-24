@@ -127,21 +127,15 @@ export default function Product() {
             <div key={product.productUid} className="product-card">
 
               <button
-                className={`wishlist-icon ${
-                  wishlist.includes(product.productUid) ? "active" : ""
-                }`}
+                className={`wishlist-icon ${wishlist.includes(product.productUid) ? "active" : ""}`}
                 onClick={() => handleWishlist(product.productUid)}
               >
                 <FaHeart />
               </button>
 
               <Link to={`/products/${product.productUid}`}>
-                <img
-                  src={product.imageUrls?.[0] || "/no-image.png"}
-                  alt={product.title}
-                  className="product-img-full"
-                  onError={(e) => (e.target.src = "/no-image.png")}
-                />
+                <img src={product.imageUrls?.[0] || "/no-image.png"}alt={product.title} className="product-img-full"
+                  onError={(e) => (e.target.src = "/no-image.png")}/>
               </Link>
 
               <div className="card-content">
@@ -150,17 +144,11 @@ export default function Product() {
               </div>
 
               <div className="card-actions">
-                <button
-                  className="btn glass-btn w-100 mb-2"
-                  onClick={() => handleAddToCart(product)}
-                >
+                <button className="btn glass-btn w-100 mb-2" onClick={() => handleAddToCart(product)}>
                   <FaCartPlus /> Add to Cart
                 </button>
 
-                <button
-                  className="btn glass-btn-secondary w-100"
-                  onClick={() => handleBuyNow(product)}
-                >
+                <button className="btn glass-btn-secondary w-100" onClick={() => handleBuyNow(product)}>
                   <FaShoppingBag /> Buy Now
                 </button>
               </div>

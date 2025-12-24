@@ -21,7 +21,6 @@ import Profile from "./pages/Profile/Profile";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SellerAuth from "./pages/Seller/SellerAuth/Seller";
-import { ProductAdd } from "./api/productApi";
 import ProductUpload from "./components/ProductUpload/ProductUpload";
 import SellerForm from "./pages/Seller/SellerDetails/SellerDetailsForm";
 import SellerProducts from "./pages/Seller/ProductManagment/Sellerproduct";
@@ -69,6 +68,9 @@ const App = () => {
           <Route path="/payment" element={<PaymentForm />}/>
           <Route path="/payment-success" element={<PaymentSuccess />}/>
           <Route path="/order" element={<Order/>}/>
+
+          {/* Product */}
+          <Route path="/products/:productUid" element={<ProductDetails />} />
 
           {/* Admin */}
           <Route path="/admin/login" element={<AdminLogin/>}/>
