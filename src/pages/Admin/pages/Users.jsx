@@ -85,7 +85,7 @@ const Users = () => {
 
   const viewUserDetails = async (userId) => {
     try {
-      const userData = await usersAPI.getById(userId);
+      const userData = await usersAPI.getByUid(userId);
       setSelectedUser(userData);
       setShowModal(true);
     } catch (error) {
