@@ -148,23 +148,26 @@ const Users = () => {
     <div className="premium-dashboard">
       {/* Page Header */}
 
-      <div className="page-header-card">
-        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
-          <h4 className="page-title mb-0">
-            <span className="title-icon">👥</span>
-            <span className="title-icon-name" color="white">Users Management</span>
-          </h4>
-          <div className="header-actions">
-              <Button className="action-btn" onClick={fetchUsers}>
-                <span className="btn-icon">🔄</span>
-              </Button>
-              <Button className="action-btn" onClick={exportUsers}>
-                <span className="btn-icon">📥</span>
-              </Button>
-            </div>
+    <div className="page-header-card">
+  <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    
+    <h4 className="page-title mb-0">
+      <span className="title-icon">👥</span>
+      <span className="title-text">Users Management</span>
+    </h4>
 
-        </div>
-      </div>
+    <div className="header-actions">
+      <Button className="action-btn" onClick={fetchUsers}>
+        <span className="btn-icon">🔄</span>
+      </Button>
+      <Button className="action-btn" onClick={exportUsers}>
+        <span className="btn-icon">📥</span>
+      </Button>
+    </div>
+
+  </div>
+</div>
+
 
       {/* Filters Section */}
       <Card className="filter-card mb-4">
