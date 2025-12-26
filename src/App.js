@@ -46,8 +46,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PaymentMethodAddForm from "./pages/Admin/PaymentForm";
 import OrderIssues from "./pages/Seller/SellerAuth/Order/order";
 import Dashboard from "./pages/Admin/pages/Dashboard";
-import Users from "./pages/Admin/pages/Users";
 import OffersPage from "./pages/Extra/offers";
+import Users from "./pages/Admin/pages/AdminUsers";
 
 
 const App = () => {

@@ -85,7 +85,7 @@ const Users = () => {
 
   const viewUserDetails = async (userId) => {
     try {
-      const userData = await usersAPI.getById(userId);
+      const userData = await usersAPI.getByUid(userId);
       setSelectedUser(userData);
       setShowModal(true);
     } catch (error) {
@@ -310,65 +310,94 @@ const Users = () => {
       </Card>
 
       {/* User Details Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
-        <Modal.Header closeButton className="modal-header-custom">
-          <Modal.Title>👤 User Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="modal-body-custom">
-          {selectedUser && (
-            <>
-              <Row className="mb-4">
-                <Col md={3} className="text-center">
-                  <img src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${selectedUser.name}&background=667eea&color=fff&size=150`}
-                    alt={selectedUser.name} className="modal-avatar"/>
-                </Col>
-                <Col md={9}>
-                  <h5 className="modal-user-name">{selectedUser.name}</h5>
-                  <p className="mb-2"><strong>Email:</strong> {selectedUser.email}</p>
-                  <p className="mb-2"><strong>Phone:</strong> {selectedUser.phone || 'N/A'}</p>
-                  <p className="mb-2">
-                    <strong>Role:</strong> <Badge bg={getRoleBadge(selectedUser.role)}>{selectedUser.role}</Badge>
-                  </p>
-                  <p className="mb-2">
-                    <strong>Status:</strong> <Badge bg={getStatusBadge(selectedUser.status)}>{selectedUser.status}</Badge>
-                  </p>
-                  <p className="mb-2">
-                    <strong>Joined:</strong> {new Date(selectedUser.createdAt).toLocaleDateString('en-IN')}
-                  </p>
-                </Col>
-              </Row>
+     /* User Details Modal - Updated Version */
+<Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+  <Modal.Header closeButton className="modal-header-custom">
+    <Modal.Title>👤 User Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body className="modal-body-custom">
+    {selectedUser && (
+      <>
+        <Row className="mb-4">
+          <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
+            <img 
+              src={selectedUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=667eea&color=fff&size=150`}
+              alt={selectedUser.name} 
+              className="modal-avatar"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=667eea&color=fff&size=150`;
+              }}
+            />
+          </Col>
+          <Col xs={12} md={9}>
+            <h5 className="modal-user-name">{selectedUser.name}</h5>
+            <p className="mb-2"><strong>Email:</strong> {selectedUser.email}</p>
+            <p className="mb-2"><strong>Phone:</strong> {selectedUser.phone || 'N/A'}</p>
+            <p className="mb-2">
+              <strong>Role:</strong>{' '}
+              <Badge bg={getRoleBadge(selectedUser.role)}>{selectedUser.role}</Badge>
+            </p>
+            <p className="mb-2">
+              <strong>Status:</strong>{' '}
+              <Badge bg={getStatusBadge(selectedUser.status)}>{selectedUser.status}</Badge>
+            </p>
+            <p className="mb-2">
+              <strong>Joined:</strong> {new Date(selectedUser.createdAt).toLocaleDateString('en-IN')}
+            </p>
+          </Col>
+        </Row>
 
-              <Card className="stats-card mb-3">
-                <Card.Body>
-                  <h6 className="stats-title">📊 User Statistics</h6>
-                  <Row>
-                    <Col md={4}><p><strong>Total Orders:</strong> {selectedUser.totalOrders || 0}</p></Col>
-                    <Col md={4}><p><strong>Total Spent:</strong> ₹{selectedUser.totalSpent?.toLocaleString('en-IN') || 0}</p></Col>
-                    <Col md={4}><p><strong>Last Order:</strong> {selectedUser.lastOrderDate ? new Date(selectedUser.lastOrderDate).toLocaleDateString('en-IN') : 'N/A'}</p></Col>
-                  </Row>
-                </Card.Body>
-              </Card>
+        <Card className="stats-card mb-3">
+          <Card.Body>
+            <h6 className="stats-title">📊 User Statistics</h6>
+            <Row>
+              <Col xs={12} sm={4} className="mb-2 mb-sm-0">
+                <p className="mb-0">
+                  <strong>Total Orders:</strong> {selectedUser.totalOrders || 0}
+                </p>
+              </Col>
+              <Col xs={12} sm={4} className="mb-2 mb-sm-0">
+                <p className="mb-0">
+                  <strong>Total Spent:</strong> ₹{selectedUser.totalSpent?.toLocaleString('en-IN') || 0}
+                </p>
+              </Col>
+              <Col xs={12} sm={4}>
+                <p className="mb-0">
+                  <strong>Last Order:</strong>{' '}
+                  {selectedUser.lastOrderDate 
+                    ? new Date(selectedUser.lastOrderDate).toLocaleDateString('en-IN') 
+                    : 'N/A'}
+                </p>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
 
-              {selectedUser.addresses?.length > 0 && (
-                <Card className="address-card">
-                  <Card.Body>
-                    <h6 className="address-title">📍 Saved Addresses</h6>
-                    {selectedUser.addresses.map((address, idx) => (
-                      <div key={idx} className="address-item">
-                        <strong>{address.label || `Address ${idx + 1}`}:</strong>
-                        <p className="address-text">{address.street}, {address.city}, {address.state} - {address.zipCode}</p>
-                      </div>
-                    ))}
-                  </Card.Body>
-                </Card>
-              )}
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
-        </Modal.Footer>
-      </Modal>
+        {selectedUser.addresses?.length > 0 && (
+          <Card className="address-card">
+            <Card.Body>
+              <h6 className="address-title">📍 Saved Addresses</h6>
+              {selectedUser.addresses.map((address, idx) => (
+                <div key={idx} className="address-item">
+                  <strong>{address.label || `Address ${idx + 1}`}:</strong>
+                  <p className="address-text">
+                    {address.street}, {address.city}, {address.state} - {address.zipCode}
+                  </p>
+                </div>
+              ))}
+            </Card.Body>
+          </Card>
+        )}
+      </>
+    )}
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowModal(false)}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };
