@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
 import "../Css/AdminLogin.css";
 import { loginAdmin } from '../../../api/services/adminApi';
@@ -118,7 +118,8 @@ const AdminLogin = () => {
                   </Button>
 
                   <div className="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2">
-                    <a href="#" className="link-muted small">Forgot password?</a>
+                    <Link to="/admin-forget" className="link-muted small">
+                    Forgot password?</Link>
                     <span className="small text-muted">v2025</span>
                   </div>
                 </form>

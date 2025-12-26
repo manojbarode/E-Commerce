@@ -50,7 +50,7 @@
   box-shadow: 0 15px 40px rgba(0,0,0,0.3);
 }
 .page-title {
-  color: white;
+  color: white !important;
   font-weight: 700;
   font-size: 2rem;
   display: flex;
@@ -60,7 +60,7 @@
 }
 
 .title-icon-name{
-  color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255) !important;
 }
 
 .header-actions,
