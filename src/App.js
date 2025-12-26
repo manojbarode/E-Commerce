@@ -49,6 +49,7 @@ import Dashboard from "./pages/Admin/pages/Dashboard";
 import OffersPage from "./pages/Extra/offers";
 import Users from "./pages/Admin/pages/AdminUsers";
 import Sellers from "./pages/Admin/pages/AdminSellers";
+import AdminForget from "./pages/Admin/pages/adminforget";
 
 
 const App = () => {
@@ -91,6 +92,9 @@ const App = () => {
           <Route path="/login-issue" element={<LoginIssue/>}/>
           <Route path="/deactivate" element={<DeactivateAccount/>} />
           <Route path="/chat" element={<Chat/>}/>
+
+          <Route path="/admin-forget" element={< AdminForget/>}/>
+
            {/* Product */}
           <Route path="/products/:productUid" element={<ProductDetails />} />
           <Route path="/dashboard" element={<Dashboard />} />
