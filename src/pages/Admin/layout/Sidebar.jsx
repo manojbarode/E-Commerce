@@ -1,43 +1,45 @@
+import React from "react";
 import { NavLink } from "react-router-dom";
-import {
-  FaTachometerAlt,
-  FaUsers,
-  FaStore,
-  FaBox,
-  FaShoppingCart,
-  FaMoneyBill,
-} from "react-icons/fa";
 
-const Sidebar = () => {
+const AdminSidebar = () => {
   return (
-    <div className="admin-sidebar">
-      <h4 className="text-white text-center py-3">Admin Panel</h4>
+    <aside className="admin-sidebar">
+      <div className="sidebar-logo">
+        <h4>Shopsy</h4>
+        <span>Admin Panel</span>
+      </div>
 
-      <NavLink to="/admin/dashboard" className="nav-link">
-        <FaTachometerAlt /> Dashboard
-      </NavLink>
+      <nav className="sidebar-menu">
+        <NavLink to="/admin/dashboard">
+          📊 Dashboard
+        </NavLink>
 
-      <NavLink to="/admin/users" className="nav-link">
-        <FaUsers /> Users
-      </NavLink>
+        <NavLink to="/admin/users">
+          👥 Users
+        </NavLink>
 
-      <NavLink to="/admin/sellers" className="nav-link">
-        <FaStore /> Sellers
-      </NavLink>
+        <NavLink to="/admin/orders">
+          📦 Orders
+        </NavLink>
 
-      <NavLink to="/admin/products" className="nav-link">
-        <FaBox /> Products
-      </NavLink>
+        <NavLink to="/admin/products">
+          🛍️ Products
+        </NavLink>
 
-      <NavLink to="/admin/orders" className="nav-link">
-        <FaShoppingCart /> Orders
-      </NavLink>
+        <NavLink to="/admin/payments">
+          💳 Payments
+        </NavLink>
 
-      <NavLink to="/admin/payments" className="nav-link">
-        <FaMoneyBill /> Payments
-      </NavLink>
-    </div>
+        <NavLink to="/admin/reports">
+          📈 Reports
+        </NavLink>
+
+        <NavLink to="/admin/settings">
+          ⚙️ Settings
+        </NavLink>
+      </nav>
+    </aside>
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

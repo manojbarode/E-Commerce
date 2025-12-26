@@ -1,0 +1,230 @@
+/* ===== ROOT THEME ===== */
+:root {
+  --primary: #667eea;
+  --secondary: #764ba2;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #0ea5e9;
+
+  --bg: #f4f6fb;
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --border: rgba(0, 0, 0, 0.06);
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.dashboard-content {
+  background: var(--bg);
+  padding: 24px;
+  min-height: 100vh;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.page-header h4 {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+/* ===== LOADING ===== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 80px;
+  color: var(--text-muted);
+}
+
+/* ===== STAT CARDS ===== */
+.stat-card {
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+}
+
+.stat-card-2 {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.stat-card-3 {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.stat-card-4 {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+}
+
+.stat-card .card-body {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.stat-icon {
+  font-size: 34px;
+  opacity: 0.9;
+}
+
+.stat-title {
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  opacity: 0.85;
+}
+
+.stat-value {
+  font-weight: 800;
+  margin: 4px 0;
+}
+
+.stat-change {
+  font-size: 12px;
+}
+
+.stat-change.positive {
+  color: #d1fae5;
+}
+
+.stat-change.negative {
+  color: #fee2e2;
+}
+
+/* ===== CHART CARDS ===== */
+.chart-card {
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.chart-card h5 {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* ===== TABLE CARD ===== */
+.table-card {
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.view-all-btn {
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.view-all-btn:hover {
+  text-decoration: underline;
+}
+
+/* ===== MODERN TABLE ===== */
+.modern-table th {
+  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.modern-table td {
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.modern-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+/* ===== CUSTOMER INFO ===== */
+.customer-info {
+  font-weight: 600;
+}
+
+.customer-info small {
+  display: block;
+}
+
+/* ===== QUICK STATS ===== */
+.quick-stat-card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease;
+}
+
+.quick-stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.quick-stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+}
+
+/* ===== BADGES ===== */
+.badge {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .dashboard-content {
+    padding: 16px;
+  }
+
+  .stat-card .card-body {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+}

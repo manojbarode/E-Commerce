@@ -1,18 +1,29 @@
-const Header = () => {
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
+const AdminTopbar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminRole");
+    navigate("/admin/login");
+  };
+
   return (
-    <div className="admin-header d-flex justify-content-between align-items-center px-4">
-      <h5 className="mb-0">Admin Dashboard</h5>
-      <button
-        className="btn btn-outline-danger btn-sm"
-        onClick={() => {
-          localStorage.clear();
-          window.location.href = "/login";
-        }}
-      >
-        Logout
-      </button>
-    </div>
+    <header className="admin-topbar">
+      <div className="topbar-left">
+        <h6>Admin Dashboard</h6>
+      </div>
+
+      <div className="topbar-right">
+        <span className="admin-name">👤 Admin</span>
+        <button onClick={handleLogout} className="logout-btn">
+          Logout
+        </button>
+      </div>
+    </header>
   );
 };
 
-export default Header;
+export default AdminTopbar;

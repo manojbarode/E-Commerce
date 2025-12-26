@@ -46,6 +46,12 @@ export default function AdminDashboard() {
         >
           ➕ Add Payment Method
         </button>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin/user")}
+        >
+          UserController
+        </button>
       </div>
     </div>
   );

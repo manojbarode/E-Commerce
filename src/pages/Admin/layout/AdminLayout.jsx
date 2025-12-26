@@ -1,13 +1,19 @@
-import Sidebar from "./Sidebar";
-import Header from "./Header";
+import React from "react";
+import { Outlet } from "react-router-dom";
+import AdminSidebar from "../components/admin/AdminSidebar";
+import AdminTopbar from "../components/admin/AdminTopbar";
+import "../styles/adminLayout.css";
 
-const AdminLayout = ({ children }) => {
+const AdminLayout = () => {
   return (
-    <div className="admin-wrapper">
-      <Sidebar />
-      <div className="admin-content">
-        <Header />
-        <div className="container-fluid p-4">{children}</div>
+    <div className="admin-layout">
+      <AdminSidebar />
+
+      <div className="admin-main">
+        <AdminTopbar />
+        <div className="admin-content">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

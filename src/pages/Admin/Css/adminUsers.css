@@ -1,0 +1,205 @@
+:root {
+  --primary-start: #1a3fe3;
+  --primary-end: #2b0057;
+  --success-start: #10b981;
+  --success-end: #059669;
+  --danger-start: #ef4444;
+  --danger-end: #dc2626;
+  --dark-start: #1f2937;
+  --dark-end: #111827;
+  --warning-start: #f59e0b;
+  --warning-end: #fbbf24;
+  --secondary: #6b7280;
+  --bg-light: #f9fafb;
+  --border-radius: 12px;
+
+}
+
+.premium-dashboard {
+  /* background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); */
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  gap: 1rem;
+  color: white;
+  font-weight: 600;
+}
+
+.page-header-card,
+.stat-card,
+.filter-card,
+.table-card {
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  background: white;
+  color: black;
+  transition: all 0.3s ease;
+}
+
+.page-header-card {
+  background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+.page-title {
+  color: white;
+  font-weight: 700;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.title-icon-name{
+  color: rgb(255, 255, 255);
+}
+
+.header-actions,
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-btn,
+.action-btn-view,
+.action-btn-delete,
+.pagination-btn,
+.status-select {
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid white;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  border-radius: var(--border-radius);
+  border: 2px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-start);
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+}
+
+.input-group .search-icon {
+  background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+  color: white;
+  border: none;
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
+  font-size: 1.2rem;
+}
+
+.input-group .form-control {
+  border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  border-radius: 10px;
+}
+
+/* Stats Card Variants */
+.stat-total { border-left: 5px solid var(--primary-start); }
+.stat-active { border-left: 5px solid var(--success-start); }
+.stat-inactive { border-left: 5px solid var(--danger-start); }
+.stat-banned { border-left: 5px solid var(--dark-start); }
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.stat-value { margin: 0.25rem 0 0; font-weight: 700; }
+
+.stat-total .stat-icon { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; color: var(--primary-start); }
+.stat-active .stat-icon { background: linear-gradient(135deg, var(--success-start), var(--success-end)); color: white; color: var(--success-start); }
+.stat-inactive .stat-icon { background: linear-gradient(135deg, var(--danger-start), var(--danger-end)); color: white; color: var(--danger-start); }
+.stat-banned .stat-icon { background: linear-gradient(135deg, var(--dark-start), var(--dark-end)); color: white; color: var(--dark-start); }
+
+/* Table */
+.table-card { overflow: hidden; }
+.table-responsive { border-radius: 20px; }
+
+.users-table thead {
+  background: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+}
+
+.users-table th { color: white; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; border: none; padding: 1.25rem 1rem; }
+
+.users-table td { padding: 1rem; vertical-align: middle; color: #374151; }
+
+.admin-row { background: linear-gradient(90deg, #fef3c7, #fef9e7) !important; font-weight: 600; }
+.admin-row:hover { background: linear-gradient(90deg, #fde68a, #fef3c7) !important; }
+
+/* Avatar */
+.user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 3px solid #e5e7eb; transition: 0.3s; }
+.user-avatar:hover { transform: scale(1.1); border-color: var(--primary-start); }
+
+/* Status select */
+.status-select { padding: 0.5rem 0.75rem; cursor: pointer; }
+.status-active { border-color: var(--success-start); color: var(--success-start); background: #ecfdf5; }
+.status-inactive { border-color: var(--danger-start); color: var(--danger-start); background: #fef2f2; }
+.status-banned { border-color: var(--dark-start); color: var(--dark-start); background: #f9fafb; }
+.status-suspended { border-color: var(--warning-start); color: var(--warning-start); background: #fffbeb; }
+.status-blocked { border-color: var(--secondary); color: var(--secondary); background: #f9fafb; }
+
+/* Modal */
+.modal-header-custom { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); color: white; border-radius: 20px 20px 0 0; padding: 1.5rem; }
+.modal-avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-start); box-shadow: 0 8px 20px rgba(102,126,234,0.3); }
+
+/* Scrollbar */
+.table-responsive::-webkit-scrollbar { height: 8px; }
+.table-responsive::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 10px; }
+.table-responsive::-webkit-scrollbar-thumb { background: linear-gradient(135deg, var(--primary-start), var(--primary-end)); border-radius: 10px; }
+.table-responsive::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, var(--primary-end), var(--primary-start)); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .premium-dashboard { padding: 1rem; }
+  .page-title { font-size: 1.4rem; }
+  .stat-content { flex-direction: column; text-align: center; }
+  .stat-icon { margin: 0 auto; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card,
+.filter-card,
+.table-card { animation: fadeIn 0.5s ease; }

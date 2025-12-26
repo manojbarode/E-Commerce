@@ -12,9 +12,12 @@ export const ProductAdd = async (productData) => {
     throw error;
   }
 };
-
 export const uploadToCloudinary = async (file) => {
   try {
+    if (!file || !(file instanceof File)) {
+      throw new Error("Invalid file object");
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "Ecommerce");
@@ -22,32 +25,35 @@ export const uploadToCloudinary = async (file) => {
     const cloudName = "djbgoanwn";
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
 
-    const res = await axios.post(url, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const res = await axios.post(url, formData);
 
     return res.data.secure_url;
-
   } catch (error) {
-    console.error("Cloudinary Upload ERROR:", error.response?.data || error.message);
+    console.error("Cloudinary Upload ERROR FULL:", error.response?.data);
+    console.error("Cloudinary Upload ERROR MESSAGE:", error.response?.data?.error?.message);
     throw error;
   }
 };
+
+
 
 
 
 export const uploadMultipleToCloudinary = async (files) => {
   try {
-    const uploads = files.map((file) => uploadToCloudinary(file));
-    const results = await Promise.all(uploads);
-    return results;
+    if (!files || files.length === 0) return [];
+
+    const uploads = Array.from(files).map(file =>
+      uploadToCloudinary(file)
+    );
+
+    return await Promise.all(uploads);
   } catch (error) {
     console.error("Multiple Cloudinary upload error:", error);
     throw error;
   }
 };
+
 
 
 // Fetch paginated products (public, no token)
