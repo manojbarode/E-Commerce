@@ -1,4 +1,3 @@
-// Users.jsx
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Row, Col, Card, Table, Badge, Button, Spinner, Modal, InputGroup } from 'react-bootstrap';
 import { usersAPI } from "../../../api/services/adminuserapi";
@@ -152,7 +151,7 @@ const Users = () => {
         <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
           <h4 className="page-title mb-0">
             <span className="title-icon">👥</span>
-            <span className="title-icon-name" color="white">Users Management</span>
+            <h4 className="title-icon-name" color="white">Users Management</h4>
           </h4>
           <div className="header-actions">
               <Button className="action-btn" onClick={fetchUsers}>
