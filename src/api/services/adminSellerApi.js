@@ -6,12 +6,12 @@ export const sellersAPI = {
     const params = { page, limit,...filters,};
 
     const res = await adminInstance.get("/admin/sellers", { params });
+    console.log(res.data);
     return res.data;
   },
 
   getById: async (sellerId) => {
     if (!sellerId) throw new Error("Seller ID is required");
-
     const res = await adminInstance.get(`/admin/sellers/${sellerId}`);
     return res.data;
   },

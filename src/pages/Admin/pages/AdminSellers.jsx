@@ -1,4 +1,4 @@
-// Enhanced Sellers.jsx
+// Enhanced Sellers.jsx - Real-Time Updates
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {Row,Col,Card,Table,Badge,Button,Form,Spinner,Modal,InputGroup,} from "react-bootstrap";
 import sellersAPI from "../../../api/services/adminSellerApi";
@@ -9,11 +9,9 @@ const PAGE_SIZE = 20;
 
 const Sellers = () => {
   const [loading, setLoading] = useState(false);
-  const [sellers, setSellers] = useState([]);
+  const [allSellers, setAllSellers] = useState([]); // Store all sellers
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalSellers, setTotalSellers] = useState(0);
-
+  
   const [filters, setFilters] = useState({
     search: "",
     status: "",
@@ -23,25 +21,13 @@ const Sellers = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSeller, setSelectedSeller] = useState(null);
 
-  // Calculate stats
-  const stats = useMemo(() => {
-    return {
-      total: sellers.length,
-      approved: sellers.filter(s => s.verificationStatus?.toLowerCase() === 'approved').length,
-      pending: sellers.filter(s => s.verificationStatus?.toLowerCase() === 'pending').length,
-      rejected: sellers.filter(s => s.verificationStatus?.toLowerCase() === 'rejected').length,
-    };
-  }, [sellers]);
-
+  // Fetch all sellers once
   const fetchSellers = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await sellersAPI.getAll(currentPage, PAGE_SIZE, filters);
-      const payload = res.data || res;
-
-      setSellers(payload.sellers || payload.content || []);
-      setTotalPages(payload.totalPages || 1);
-      setTotalSellers(payload.totalSellers || payload.totalElements || 0);
+      const res = await sellersAPI.getAll(0, 1000, {});
+      const pageData = res.data;
+      setAllSellers(pageData.content || []);
       toast.success("Sellers loaded successfully!");
     } catch (err) {
       console.error("Fetch sellers failed:", err);
@@ -49,35 +35,93 @@ const Sellers = () => {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, filters]);
+  }, []);
 
   useEffect(() => {
     fetchSellers();
   }, [fetchSellers]);
 
+  // Client-side filtering
+  const filteredSellers = useMemo(() => {
+    return allSellers.filter(seller => {
+      // Search filter
+      const searchMatch = !filters.search || 
+        [seller.shopName, seller.ownerName, seller.email, seller.phone]
+          .some(field => field?.toLowerCase().includes(filters.search.toLowerCase()));
+      
+      // Verification status filter
+      const verificationMatch = !filters.verificationStatus || 
+        seller.verificationStatus?.toLowerCase() === filters.verificationStatus.toLowerCase();
+      
+      // Status filter (active/inactive)
+      const statusMatch = !filters.status || 
+        (filters.status === 'active' ? seller.active : !seller.active);
+      
+      return searchMatch && verificationMatch && statusMatch;
+    });
+  }, [allSellers, filters]);
+
+  // Calculate stats from ALL sellers (not filtered)
+  const stats = useMemo(() => {
+    return {
+      total: allSellers.length,
+      approved: allSellers.filter(s => s.verificationStatus?.toLowerCase() === "approved").length,
+      pending: allSellers.filter(s => s.verificationStatus?.toLowerCase() === "pending").length,
+      rejected: allSellers.filter(s => s.verificationStatus?.toLowerCase() === "rejected").length,
+    };
+  }, [allSellers]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredSellers.length / PAGE_SIZE);
+  const paginatedSellers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return filteredSellers.slice(start, start + PAGE_SIZE);
+  }, [filteredSellers, currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
-  const applyFilters = () => {
-    setCurrentPage(1);
-    fetchSellers();
-  };
-
   const clearFilters = () => {
     setFilters({ search: "", status: "", verificationStatus: "" });
-    setCurrentPage(1);
+  };
+
+  // Real-time update helper function
+  const updateSellerInState = (sellerUid, updates) => {
+    setAllSellers(prevSellers => 
+      prevSellers.map(seller => 
+        seller.sellerUid === sellerUid 
+          ? { ...seller, ...updates }
+          : seller
+      )
+    );
+    
+    // Update modal if it's the selected seller
+    if (selectedSeller?.sellerUid === sellerUid) {
+      setSelectedSeller(prev => ({ ...prev, ...updates }));
+    }
   };
 
   const approveSeller = async (seller) => {
     if (!window.confirm(`Approve seller "${seller.shopName}"?`)) return;
     try {
-      await sellersAPI.approve(seller.id);
+      await sellersAPI.approve(seller.sellerUid);
+      
+      // Real-time update: Change verification status to approved
+      updateSellerInState(seller.sellerUid, { 
+        verificationStatus: "APPROVED",
+        active: true 
+      });
+      
       toast.success(`Seller "${seller.shopName}" approved successfully!`);
-      fetchSellers();
     } catch (err) {
       console.error("Approve failed:", err);
-      toast.error("Failed to approve seller");
+      toast.error(err.response?.data?.message || "Failed to approve seller");
     }
   };
 
@@ -85,30 +129,45 @@ const Sellers = () => {
     const reason = prompt("Enter rejection reason:");
     if (!reason) return;
     try {
-      await sellersAPI.reject(seller.id, reason);
+      await sellersAPI.reject(seller.sellerUid, reason);
+      
+      // Real-time update: Change verification status to rejected
+      updateSellerInState(seller.sellerUid, { 
+        verificationStatus: "REJECTED",
+        rejectionReason: reason,
+        active: false
+      });
+      
       toast.success(`Seller "${seller.shopName}" rejected`);
-      fetchSellers();
     } catch (err) {
       console.error("Reject failed:", err);
-      toast.error("Failed to reject seller");
+      toast.error(err.response?.data?.message || "Failed to reject seller");
     }
   };
 
-  const updateStatus = async (sellerId, status) => {
+  const updateStatus = async (sellerUid, status) => {
     try {
-      await sellersAPI.updateStatus(sellerId, status);
+      await sellersAPI.updateStatus(sellerUid, status);
+      
+      // Real-time update: Change active status
+      updateSellerInState(sellerUid, { 
+        active: status === 'active' 
+      });
+      
       toast.success("Status updated successfully!");
-      fetchSellers();
     } catch (err) {
       console.error("Status update failed:", err);
-      toast.error("Failed to update status");
+      toast.error(err.response?.data?.message || "Failed to update status");
+      
+      // Revert on error - refetch to get correct state
+      fetchSellers();
     }
   };
 
-  const viewDetails = async (sellerId) => {
+  const viewDetails = async (sellerUid) => {
     try {
-      const res = await sellersAPI.getById(sellerId);
-      setSelectedSeller(res.data || res);
+      const res = await sellersAPI.getById(sellerUid);
+      setSelectedSeller(res.data?.data || res.data || res);
       setShowModal(true);
     } catch (err) {
       console.error("Fetch details failed:", err);
@@ -126,15 +185,10 @@ const Sellers = () => {
   };
 
   const getStatusBadge = (status) => {
-    const variants = {
-      active: "success",
-      inactive: "secondary",
-      suspended: "danger",
-    };
-    return variants[status?.toLowerCase()] || "secondary";
+    return status ? "success" : "secondary";
   };
 
-  if (loading && sellers.length === 0) {
+  if (loading && allSellers.length === 0) {
     return (
       <div className="dashboard-content">
         <div className="loading-container">
@@ -197,7 +251,7 @@ const Sellers = () => {
               <Form.Label>Search</Form.Label>
               <InputGroup>
                 <Form.Control
-                  placeholder="Shop / Owner / Email"
+                  placeholder="Shop / Owner / Email / Phone"
                   value={filters.search}
                   onChange={(e) => handleFilterChange("search", e.target.value)}
                 />
@@ -226,17 +280,22 @@ const Sellers = () => {
                 <option value="">All Status</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
               </Form.Select>
             </Col>
 
             <Col xs={12} md={2} className="d-flex gap-2 align-items-end">
-              <Button onClick={applyFilters} className="flex-fill">Apply</Button>
-              <Button variant="outline-secondary" onClick={clearFilters} className="flex-fill">
-                Clear
+              <Button variant="outline-secondary" onClick={clearFilters} className="w-100">
+                Clear All
               </Button>
             </Col>
           </Row>
+          
+          {/* Results count */}
+          <div className="mt-3">
+            <small className="text-muted">
+              Showing <strong>{paginatedSellers.length}</strong> of <strong>{filteredSellers.length}</strong> sellers
+            </small>
+          </div>
         </Card.Body>
       </Card>
 
@@ -263,9 +322,9 @@ const Sellers = () => {
                       <Spinner size="sm" /> Loading...
                     </td>
                   </tr>
-                ) : sellers.length ? (
-                  sellers.map((s) => (
-                    <tr key={s.id}>
+                ) : paginatedSellers.length ? (
+                  paginatedSellers.map((s) => (
+                    <tr key={s.sellerUid}>
                       <td>
                         <div className="seller-info">
                           <img
@@ -279,7 +338,7 @@ const Sellers = () => {
                           />
                           <div className="seller-details">
                             <strong className="seller-name">{s.shopName}</strong>
-                            <small className="seller-id">{s.id?.substring(0, 8)}</small>
+                            <small className="seller-id">{s.sellerUid?.substring(0, 8)}</small>
                           </div>
                         </div>
                       </td>
@@ -294,40 +353,29 @@ const Sellers = () => {
                         </Badge>
                       </td>
                       <td>
-                        <Form.Select
-                          size="sm"
+                        <Form.Select 
+                          size="sm" 
                           className="status-select-inline"
-                          value={s.status}
-                          onChange={(e) => updateStatus(s.id, e.target.value)}
+                          value={s.active ? "active" : "inactive"}
+                          onChange={(e) => updateStatus(s.sellerUid, e.target.value)}
                         >
                           <option value="active">Active</option>
                           <option value="inactive">Inactive</option>
-                          <option value="suspended">Suspended</option>
                         </Form.Select>
                       </td>
                       <td>
                         <div className="action-buttons">
-                          <button
-                            className="action-btn-view"
-                            onClick={() => viewDetails(s.id)}
+                          <button className="action-btn-view" onClick={() => viewDetails(s.sellerUid)}
                             title="View Details"
                           >
                             👁️
                           </button>
                           {s.verificationStatus?.toUpperCase() === "PENDING" && (
                             <>
-                              <Button
-                                size="sm"
-                                variant="success"
-                                onClick={() => approveSeller(s)}
-                              >
+                              <Button size="sm" variant="success" onClick={() => approveSeller(s)}>
                                 ✓ Approve
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="danger"
-                                onClick={() => rejectSeller(s)}
-                              >
+                              <Button size="sm" variant="danger" onClick={() => rejectSeller(s)}>
                                 ✕ Reject
                               </Button>
                             </>
@@ -341,7 +389,11 @@ const Sellers = () => {
                     <td colSpan="6" className="text-center">
                       <div className="empty-state">
                         <div className="empty-state-icon">🏪</div>
-                        <p className="empty-state-text">No sellers found</p>
+                        <p className="empty-state-text">
+                          {filters.search || filters.status || filters.verificationStatus
+                            ? "No sellers match your filters"
+                            : "No sellers found"}
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -353,11 +405,7 @@ const Sellers = () => {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="pagination-container">
-              <Button
-                className="pagination-btn"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => p - 1)}
-              >
+              <Button className="pagination-btn" disabled={currentPage === 1} onClick={() => setCurrentPage((p) => p - 1)}>
                 ← Previous
               </Button>
               <span className="pagination-info">
@@ -385,10 +433,8 @@ const Sellers = () => {
             <>
               <Row className="mb-4">
                 <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                  <img
-                    src={selectedSeller.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSeller.shopName)}&background=667eea&color=fff&size=150`}
-                    alt={selectedSeller.shopName}
-                    className="modal-avatar"
+                  <img src={selectedSeller.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSeller.shopName)}&background=667eea&color=fff&size=150`}
+                    alt={selectedSeller.shopName} className="modal-avatar"
                     style={{ width: "120px", height: "120px", objectFit: "cover", borderRadius: "50%" }}
                     onError={(e) => {
                       e.target.onerror = null;
@@ -403,14 +449,14 @@ const Sellers = () => {
                   <p className="mb-2"><strong>Phone:</strong> {selectedSeller.phone || "N/A"}</p>
                   <p className="mb-2">
                     <strong>Status:</strong>{" "}
-                    <Badge bg={getStatusBadge(selectedSeller.status)}>
-                      {selectedSeller.status}
+                    <Badge bg={getStatusBadge(selectedSeller.active)}>
+                      {selectedSeller.active ? "ACTIVE" : "INACTIVE"}
                     </Badge>
                   </p>
                   <p className="mb-2">
                     <strong>Verification:</strong>{" "}
                     <Badge bg={getVerificationBadge(selectedSeller.verificationStatus)}>
-                      {selectedSeller.verificationStatus}
+                      {selectedSeller.verificationStatus || "N/A"}
                     </Badge>
                   </p>
                   {selectedSeller.createdAt && (
@@ -421,6 +467,15 @@ const Sellers = () => {
                   )}
                 </Col>
               </Row>
+
+              {selectedSeller.rejectionReason && (
+                <div className="seller-detail-card" style={{ borderLeft: "4px solid #ef4444" }}>
+                  <div className="seller-detail-section">
+                    <h6 style={{ color: "#ef4444" }}>❌ Rejection Reason</h6>
+                    <p>{selectedSeller.rejectionReason}</p>
+                  </div>
+                </div>
+              )}
 
               {selectedSeller.description && (
                 <div className="seller-detail-card">
@@ -434,7 +489,7 @@ const Sellers = () => {
               {selectedSeller.address && (
                 <div className="seller-detail-card">
                   <div className="seller-detail-section">
-                    <h6>📍 Shop Address</h6>
+                    <h6>📍Shop Address</h6>
                     <p>{selectedSeller.address}</p>
                   </div>
                 </div>
@@ -466,9 +521,7 @@ const Sellers = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
         </Modal.Footer>
       </Modal>
     </div>
