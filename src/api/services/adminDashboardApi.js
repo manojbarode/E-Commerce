@@ -216,51 +216,6 @@ export const subCategoriesAPI = {
   }
 };
 
-// ============ USERS APIs ============
-
-
-// ============ SELLERS APIs ============
-export const sellersAPI = {
-  // Get all sellers with pagination and filters
-  getAll: async (page = 1, limit = 20, filters = {}) => {
-    const queryParams = new URLSearchParams({ page, limit, ...filters });
-    return await apiCall(`/admin/sellers?${queryParams}`);
-  },
-
-  // Get single seller by ID
-  getById: async (sellerId) => {
-    return await apiCall(`/admin/sellers/${sellerId}`);
-  },
-
-  // Approve seller
-  approve: async (sellerId) => {
-    return await apiCall(`/admin/sellers/${sellerId}/approve`, {
-      method: 'PUT'
-    });
-  },
-
-  // Reject seller
-  reject: async (sellerId, reason) => {
-    return await apiCall(`/admin/sellers/${sellerId}/reject`, {
-      method: 'PUT',
-      body: JSON.stringify({ reason })
-    });
-  },
-
-  // Update seller status
-  updateStatus: async (sellerId, status) => {
-    return await apiCall(`/admin/sellers/${sellerId}/status`, {
-      method: 'PUT',
-      body: JSON.stringify({ status })
-    });
-  },
-
-  // Get seller analytics
-  getAnalytics: async () => {
-    return await apiCall('/admin/sellers/analytics');
-  }
-};
-
 // ============ PAYMENTS APIs ============
 export const paymentsAPI = {
   // Get all payments with pagination and filters
@@ -488,7 +443,6 @@ export default {
   products: productsAPI,
   categories: categoriesAPI,
   subCategories: subCategoriesAPI,
-  sellers: sellersAPI,
   payments: paymentsAPI,
   shipping: shippingAPI,
   coupons: couponsAPI,

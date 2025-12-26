@@ -48,6 +48,7 @@ import OrderIssues from "./pages/Seller/SellerAuth/Order/order";
 import Dashboard from "./pages/Admin/pages/Dashboard";
 import OffersPage from "./pages/Extra/offers";
 import Users from "./pages/Admin/pages/AdminUsers";
+import Sellers from "./pages/Admin/pages/AdminSellers";
 
 
 const App = () => {
@@ -99,6 +100,7 @@ const App = () => {
           <Route path="/admin/dashboard" element={<AdminRoutes><AdminDashboard/></AdminRoutes>}/>
           <Route path="/admin/payment/form" element={<AdminRoutes><PaymentMethodAddForm/></AdminRoutes>}/>
           <Route path="/admin/user" element={<AdminRoutes><Users /></AdminRoutes>} />
+          <Route path="/admin/seller" element={<AdminRoutes><Sellers /></AdminRoutes>} />
         </Route>
       </Routes>
     </>
