@@ -313,7 +313,6 @@ const Users = () => {
       </Card>
 
       {/* User Details Modal */}
-     /* User Details Modal - Updated Version */
 <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
   <Modal.Header closeButton className="modal-header-custom">
     <Modal.Title>👤 User Details</Modal.Title>

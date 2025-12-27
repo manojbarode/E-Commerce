@@ -57,6 +57,18 @@ export default function AdminDashboard() {
           onClick={() => navigate("/admin/seller")}
         >
           SellerController
+        </button><br />
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin/product")}
+        >
+          ProductController
+        </button>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/admin/categoris")}
+        >
+          CategoryController
         </button>
       </div>
     </div>

@@ -11,7 +11,8 @@ const Sellers = () => {
   const [loading, setLoading] = useState(false);
   const [allSellers, setAllSellers] = useState([]); // Store all sellers
   const [currentPage, setCurrentPage] = useState(1);
-  
+  const [selectedBusinesses, setSelectedBusinesses] = useState([]);
+
   const [filters, setFilters] = useState({
     search: "",
     status: "",
@@ -165,15 +166,31 @@ const Sellers = () => {
   };
 
   const viewDetails = async (sellerUid) => {
-    try {
-      const res = await sellersAPI.getById(sellerUid);
-      setSelectedSeller(res.data?.data || res.data || res);
-      setShowModal(true);
-    } catch (err) {
-      console.error("Fetch details failed:", err);
-      toast.error("Failed to load seller details");
-    }
-  };
+  try {
+    setSelectedSeller(null); // Clear previous data
+    setSelectedBusinesses([]); // Clear previous businesses
+    
+    const res = await sellersAPI.getById(sellerUid);
+    console.log("API Response:", res); // Debug log
+    
+    // Handle different response structures
+    const businesses = res.data?.data || res.data || res || [];
+    
+    console.log("Parsed Businesses:", businesses); // Debug log
+    
+    setSelectedBusinesses(Array.isArray(businesses) ? businesses : [businesses]);
+    
+    // Find the seller from allSellers state
+    const seller = allSellers.find(s => s.sellerUid === sellerUid);
+    setSelectedSeller(seller);
+    
+    setShowModal(true);
+  } catch (err) {
+    console.error("Fetch details failed:", err);
+    toast.error("Failed to load seller details");
+  }
+};
+
 
   const getVerificationBadge = (status) => {
     const variants = {
@@ -370,16 +387,6 @@ const Sellers = () => {
                           >
                             👁️
                           </button>
-                          {s.verificationStatus?.toUpperCase() === "PENDING" && (
-                            <>
-                              <Button size="sm" variant="success" onClick={() => approveSeller(s)}>
-                                ✓ Approve
-                              </Button>
-                              <Button size="sm" variant="danger" onClick={() => rejectSeller(s)}>
-                                ✕ Reject
-                              </Button>
-                            </>
-                          )}
                         </div>
                       </td>
                     </tr>
@@ -423,107 +430,337 @@ const Sellers = () => {
         </Card.Body>
       </Card>
 
-      {/* Details Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Seller Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedSeller && (
-            <>
-              <Row className="mb-4">
-                <Col xs={12} md={3} className="text-center mb-3 mb-md-0">
-                  <img src={selectedSeller.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSeller.shopName)}&background=667eea&color=fff&size=150`}
-                    alt={selectedSeller.shopName} className="modal-avatar"
-                    style={{ width: "120px", height: "120px", objectFit: "cover", borderRadius: "50%" }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSeller.shopName)}&background=667eea&color=fff&size=150`;
-                    }}
-                  />
-                </Col>
-                <Col xs={12} md={9}>
-                  <h5 className="modal-user-name">{selectedSeller.shopName}</h5>
-                  <p className="mb-2"><strong>Owner:</strong> {selectedSeller.ownerName}</p>
-                  <p className="mb-2"><strong>Email:</strong> {selectedSeller.email}</p>
-                  <p className="mb-2"><strong>Phone:</strong> {selectedSeller.phone || "N/A"}</p>
-                  <p className="mb-2">
-                    <strong>Status:</strong>{" "}
-                    <Badge bg={getStatusBadge(selectedSeller.active)}>
-                      {selectedSeller.active ? "ACTIVE" : "INACTIVE"}
-                    </Badge>
-                  </p>
-                  <p className="mb-2">
-                    <strong>Verification:</strong>{" "}
-                    <Badge bg={getVerificationBadge(selectedSeller.verificationStatus)}>
-                      {selectedSeller.verificationStatus || "N/A"}
-                    </Badge>
-                  </p>
-                  {selectedSeller.createdAt && (
-                    <p className="mb-2">
-                      <strong>Joined:</strong>{" "}
-                      {new Date(selectedSeller.createdAt).toLocaleDateString("en-IN")}
-                    </p>
-                  )}
-                </Col>
-              </Row>
+{/* Premium Details Modal */}
+<Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
+  <Modal.Header closeButton>
+    <Modal.Title>
+      <span>🏪</span> Seller Details
+    </Modal.Title>
+  </Modal.Header>
+  
+      <Modal.Body>
+  {selectedSeller ? (
+    <>
+      {/* Premium Profile Section */}
+      <div className="seller-profile-section">
+        <div className="seller-profile-content">
+          <div className="seller-avatar-wrapper">
+            <img
+              src={selectedSeller.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSeller.shopName)}&background=667eea&color=fff&size=200`}
+              alt={selectedSeller.shopName}
+              className="seller-avatar"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSeller.shopName)}&background=667eea&color=fff&size=200`;
+              }}
+            />
+          </div>
+          <div className="seller-profile-info">
+            <h3>{selectedSeller.shopName}</h3>
+            <div className="seller-profile-badges">
+              <span className="badge-premium">
+                <span>{selectedSeller.active ? '✓' : '✕'}</span>
+                {selectedSeller.active ? 'Active' : 'Inactive'}
+              </span>
+              <span className="badge-premium">
+                <span>
+                  {selectedSeller.verificationStatus === 'APPROVED' ? '✓' : 
+                   selectedSeller.verificationStatus === 'PENDING' ? '⏳' : '✕'}
+                </span>
+                {selectedSeller.verificationStatus || 'N/A'}
+              </span>
+              {selectedSeller.createdAt && (
+                <span className="badge-premium">
+                  <span>📅</span>
+                  Joined {new Date(selectedSeller.createdAt).toLocaleDateString('en-IN', { 
+                    year: 'numeric', 
+                    month: 'short' 
+                  })}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
-              {selectedSeller.rejectionReason && (
-                <div className="seller-detail-card" style={{ borderLeft: "4px solid #ef4444" }}>
-                  <div className="seller-detail-section">
-                    <h6 style={{ color: "#ef4444" }}>❌ Rejection Reason</h6>
-                    <p>{selectedSeller.rejectionReason}</p>
+      {/* Rejection Alert */}
+      {selectedSeller.rejectionReason && (
+        <div className="rejection-alert">
+          <h6>❌ Rejection Reason</h6>
+          <p>{selectedSeller.rejectionReason}</p>
+        </div>
+      )}
+
+      {/* Primary Contact Card */}
+      <div className="seller-info-grid">
+        <div className="info-card contact-card">
+          <div className="info-card-header">
+            <div className="info-card-icon">👤</div>
+            <h6 className="info-card-title">Primary Contact</h6>
+          </div>
+          <div className="info-card-content">
+            <div className="info-row">
+              <span className="info-label">Owner</span>
+              <span className="info-value">{selectedSeller.ownerName}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Email</span>
+              <span className="info-value">{selectedSeller.email}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Phone</span>
+              <span className="info-value">{selectedSeller.phone || 'N/A'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Business Details Section */}
+      {selectedBusinesses && selectedBusinesses.length > 0 ? (
+        <>
+          <div style={{ 
+            marginTop: '1.5rem', 
+            marginBottom: '1rem',
+            paddingBottom: '0.5rem',
+            borderBottom: '2px solid #e5e7eb'
+          }}>
+            <h5 style={{ 
+              color: '#1f2937', 
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              💼 Business Details ({selectedBusinesses.length})
+            </h5>
+          </div>
+
+          {selectedBusinesses.map((business, idx) => (
+            <div key={business.businessUid || idx} style={{ marginBottom: '1.5rem' }}>
+              {/* Business Header */}
+              <div style={{
+                background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                padding: '1rem 1.5rem',
+                borderRadius: '12px 12px 0 0',
+                color: 'white',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <h6 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+                  {business.businessName || `Business ${idx + 1}`}
+                </h6>
+                <span style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  padding: '0.25rem 0.75rem',
+                  borderRadius: '999px',
+                  fontSize: '0.85rem'
+                }}>
+                  {business.businessType || 'N/A'}
+                </span>
+              </div>
+
+              {/* Business Info Cards */}
+              <div className="seller-info-grid" style={{ marginTop: 0 }}>
+                {/* Business Details Card */}
+                <div className="info-card business-card">
+                  <div className="info-card-header">
+                    <div className="info-card-icon">🏢</div>
+                    <h6 className="info-card-title">Business Info</h6>
+                  </div>
+                  <div className="info-card-content">
+                    <div className="info-row">
+                      <span className="info-label">Full Name</span>
+                      <span className="info-value">{business.fullName || 'N/A'}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Category</span>
+                      <span className="info-value">{business.category || 'N/A'}</span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">GST Number</span>
+                      <span className="info-value" style={{ 
+                        fontFamily: 'monospace', 
+                        fontSize: '0.85rem' 
+                      }}>
+                        {business.gstNumber || 'N/A'}
+                      </span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">PAN Number</span>
+                      <span className="info-value" style={{ 
+                        fontFamily: 'monospace', 
+                        fontSize: '0.85rem' 
+                      }}>
+                        {business.panNumber || 'N/A'}
+                      </span>
+                    </div>
+                    <div className="info-row">
+                      <span className="info-label">Products</span>
+                      <span className="info-value">{business.productCount || 0}</span>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {selectedSeller.description && (
-                <div className="seller-detail-card">
-                  <div className="seller-detail-section">
-                    <h6>📝 Shop Description</h6>
-                    <p>{selectedSeller.description}</p>
+                {/* Address Card */}
+                {business.warehouseAddress && (
+                  <div className="info-card location-card">
+                    <div className="info-card-header">
+                      <div className="info-card-icon">📍</div>
+                      <h6 className="info-card-title">Warehouse Address</h6>
+                    </div>
+                    <div className="info-card-content">
+                      <div className="info-row">
+                        <span className="info-label">Address</span>
+                        <span className="info-value">{business.warehouseAddress}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">City</span>
+                        <span className="info-value">{business.city || 'N/A'}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">State</span>
+                        <span className="info-value">{business.state || 'N/A'}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Pincode</span>
+                        <span className="info-value">{business.pincode || 'N/A'}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {selectedSeller.address && (
-                <div className="seller-detail-card">
-                  <div className="seller-detail-section">
-                    <h6>📍Shop Address</h6>
-                    <p>{selectedSeller.address}</p>
+                {/* Bank Details Card */}
+                {business.accountNumber && (
+                  <div className="info-card" style={{ borderLeftColor: '#8b5cf6' }}>
+                    <div className="info-card-header">
+                      <div className="info-card-icon">🏦</div>
+                      <h6 className="info-card-title">Bank Details</h6>
+                    </div>
+                    <div className="info-card-content">
+                      <div className="info-row">
+                        <span className="info-label">Account Name</span>
+                        <span className="info-value">{business.accountName || 'N/A'}</span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Account No.</span>
+                        <span className="info-value" style={{ 
+                          fontFamily: 'monospace', 
+                          fontSize: '0.85rem' 
+                        }}>
+                          {business.accountNumber || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">IFSC Code</span>
+                        <span className="info-value" style={{ 
+                          fontFamily: 'monospace', 
+                          fontSize: '0.85rem' 
+                        }}>
+                          {business.ifscCode || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="info-row">
+                        <span className="info-label">Bank Name</span>
+                        <span className="info-value">{business.bankName || 'N/A'}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+          ))}
+        </>
+      ) : (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '2rem',
+          background: '#f9fafb',
+          borderRadius: '12px',
+          marginTop: '1rem'
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>💼</div>
+          <p style={{ color: '#6b7280', margin: 0 }}>No business details available</p>
+        </div>
+      )}
 
-              <Card className="stats-card">
-                <Card.Body>
-                  <h6 className="stats-title">📊 Seller Statistics</h6>
-                  <Row>
-                    <Col xs={12} sm={4} className="mb-2 mb-sm-0">
-                      <p className="mb-0">
-                        <strong>Total Products:</strong> {selectedSeller.totalProducts || 0}
-                      </p>
-                    </Col>
-                    <Col xs={12} sm={4} className="mb-2 mb-sm-0">
-                      <p className="mb-0">
-                        <strong>Total Orders:</strong> {selectedSeller.totalOrders || 0}
-                      </p>
-                    </Col>
-                    <Col xs={12} sm={4}>
-                      <p className="mb-0">
-                        <strong>Rating:</strong> {selectedSeller.rating || "N/A"} ⭐
-                      </p>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Description */}
+      {selectedSeller.description && (
+        <div className="description-card">
+          <h6>📝 Shop Description</h6>
+          <p>{selectedSeller.description}</p>
+        </div>
+      )}
+
+      {/* Statistics Grid */}
+      <div className="stats-grid">
+        <div className="stat-box">
+          <div className="stat-box-icon">📦</div>
+          <div className="stat-box-value">{selectedSeller.totalProducts || 0}</div>
+          <div className="stat-box-label">Products</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-box-icon">🛒</div>
+          <div className="stat-box-value">{selectedSeller.totalOrders || 0}</div>
+          <div className="stat-box-label">Orders</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-box-icon">⭐</div>
+          <div className="stat-box-value">{selectedSeller.rating || 'N/A'}</div>
+          <div className="stat-box-label">Rating</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-box-icon">💰</div>
+          <div className="stat-box-value">
+            {selectedSeller.totalRevenue ? `₹${selectedSeller.totalRevenue}` : 'N/A'}
+          </div>
+          <div className="stat-box-label">Revenue</div>
+        </div>
+      </div>
+    </>
+  ) : (
+    <div className="modal-loading">
+      <Spinner animation="border" />
+      <p>Loading seller details...</p>
+    </div>
+  )}
+</Modal.Body>
+  <Modal.Footer>
+    <div className="footer-status">
+      <span style={{ fontSize: '0.9rem', fontWeight: 600, color: '#6b7280' }}>
+        Current Status:
+      </span>
+      <Badge bg={getVerificationBadge(selectedSeller?.verificationStatus)}>
+        {selectedSeller?.verificationStatus || 'N/A'}
+      </Badge>
+    </div>
+
+    <div className="footer-actions">
+      <Button
+        variant="success"
+        disabled={selectedSeller?.verificationStatus === "APPROVED"}
+        onClick={() => approveSeller(selectedSeller)}
+      >
+        <span>✓</span> Approve
+      </Button>
+
+      <Button
+        variant="danger"
+        disabled={selectedSeller?.verificationStatus === "REJECTED"}
+        onClick={() => rejectSeller(selectedSeller)}
+      >
+        <span>✕</span> Reject
+      </Button>
+
+      <Button 
+        variant="secondary" 
+        onClick={() => setShowModal(false)}
+      >
+        Close
+      </Button>
+    </div>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };

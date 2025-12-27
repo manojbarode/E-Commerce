@@ -12,7 +12,10 @@ export const sellersAPI = {
 
   getById: async (sellerId) => {
     if (!sellerId) throw new Error("Seller ID is required");
+    
+    // ✅ FIXED: Proper string concatenation
     const res = await adminInstance.get(`/admin/sellers/${sellerId}`);
+    console.log("Seller Details Response:", res.data);
     return res.data;
   },
 

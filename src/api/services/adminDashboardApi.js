@@ -82,65 +82,6 @@ export const ordersAPI = {
   }
 };
 
-// ============ PRODUCTS APIs ============
-export const productsAPI = {
-  // Get all products with pagination and filters
-  getAll: async (page = 1, limit = 20, filters = {}) => {
-    const queryParams = new URLSearchParams({ page, limit, ...filters });
-    return await apiCall(`/admin/products?${queryParams}`);
-  },
-
-  // Get single product by ID
-  getById: async (productId) => {
-    return await apiCall(`/admin/products/${productId}`);
-  },
-
-  // Create new product
-  create: async (productData) => {
-    return await apiCall('/admin/products', {
-      method: 'POST',
-      body: JSON.stringify(productData)
-    });
-  },
-
-  // Update product
-  update: async (productId, productData) => {
-    return await apiCall(`/admin/products/${productId}`, {
-      method: 'PUT',
-      body: JSON.stringify(productData)
-    });
-  },
-
-  // Delete product
-  delete: async (productId) => {
-    return await apiCall(`/admin/products/${productId}`, {
-      method: 'DELETE'
-    });
-  },
-
-  // Bulk update products
-  bulkUpdate: async (productIds, updateData) => {
-    return await apiCall('/admin/products/bulk-update', {
-      method: 'PUT',
-      body: JSON.stringify({ productIds, updateData })
-    });
-  },
-
-  // Upload product image
-  uploadImage: async (productId, imageFile) => {
-    const formData = new FormData();
-    formData.append('image', imageFile);
-    
-    return await fetch(`${API_BASE_URL}/admin/products/${productId}/upload-image`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-      },
-      body: formData
-    }).then(res => res.json());
-  }
-};
-
 // ============ CATEGORIES APIs ============
 export const categoriesAPI = {
   // Get all categories
@@ -440,7 +381,6 @@ export const settingsAPI = {
 export default {
   dashboard: dashboardAPI,
   orders: ordersAPI,
-  products: productsAPI,
   categories: categoriesAPI,
   subCategories: subCategoriesAPI,
   payments: paymentsAPI,

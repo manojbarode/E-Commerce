@@ -50,6 +50,8 @@ import OffersPage from "./pages/Extra/offers";
 import Users from "./pages/Admin/pages/AdminUsers";
 import Sellers from "./pages/Admin/pages/AdminSellers";
 import AdminForget from "./pages/Admin/pages/adminforget";
+import AdminProducts from "./pages/Admin/pages/AdminProducts";
+import Categories from "./pages/Admin/pages/AdminCategoris";
 
 
 const App = () => {
@@ -105,6 +107,8 @@ const App = () => {
           <Route path="/admin/payment/form" element={<AdminRoutes><PaymentMethodAddForm/></AdminRoutes>}/>
           <Route path="/admin/user" element={<AdminRoutes><Users /></AdminRoutes>} />
           <Route path="/admin/seller" element={<AdminRoutes><Sellers /></AdminRoutes>} />
+          <Route path="/admin/product" element={<AdminRoutes><AdminProducts /></AdminRoutes>} />
+          <Route path="/admin/categoris" element={<AdminRoutes><Categories /></AdminRoutes>} />
         </Route>
       </Routes>
     </>
